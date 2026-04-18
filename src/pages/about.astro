@@ -1,8 +1,11 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+
+const aboutDescription =
+  'Dai Pan (潘岱) is a visual artist, photographer, printmaker and writer based in Brisbane, with ties to Shanghai and New York.';
 ---
 
-<BaseLayout title="About — Dai Pan">
+<BaseLayout title="About" description={aboutDescription}>
   <main class="reading-page">
     <header class="reading-header">
       <h1>About</h1>
@@ -27,6 +30,13 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           target="_blank"
           rel="noopener noreferrer">@jumpingchick666</a>
       </p>
+      <div class="reading-copyright-block">
+        <p>
+          All written and visual works by Dai Pan (潘岱) are protected under copyright. Unauthorized
+          reproduction, redistribution, or use of any content from this site or daipan.art is strictly
+          prohibited. © 2024–2025 Dai Pan. All rights reserved.
+        </p>
+      </div>
     </section>
   </main>
 </BaseLayout>

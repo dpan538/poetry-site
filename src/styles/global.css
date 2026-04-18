@@ -9,7 +9,6 @@ body {
   width: 100%;
   min-height: 100vh;
   background-color: var(--color-bg, #f5f2ed);
-  color: #1a1a1a;
   font-size: var(--type-body);
   line-height: var(--leading-body);
   /* Hide vertical scrollbar; content remains scrollable */
@@ -26,6 +25,7 @@ body::-webkit-scrollbar {
 
 body {
   font-family: Georgia, 'Times New Roman', serif;
+  color: var(--color-primary, #1a1a1a);
   /*
    * Fixed `.site-nav` does not consume layout height; without this inset, `<main>` would
    * begin at y=0 and sit under the nav. Padding on `body` pushes in-flow content down reliably.
@@ -41,6 +41,33 @@ body > main {
   padding-top: 0;
   padding-bottom: 0;
   box-sizing: border-box;
+  /* Opaque fill so poem grids / frames never composite against a different layer */
+  background-color: var(--color-bg, #f5f2ed);
+}
+
+/*
+ * World tokens on <html data-world> so poem pages match PoemCanvas palette
+ * before client JS runs (avoids wrong default bg / banding next to nav).
+ */
+html[data-world='their-world'] {
+  --color-bg: #f5f2ed;
+  --color-primary: #1a1a1a;
+  --color-accent: #c0392b;
+  --color-meta: #888888;
+}
+
+html[data-world='bless-you'] {
+  --color-bg: #f2ede4;
+  --color-primary: #2c1810;
+  --color-accent: #9b7b8b;
+  --color-meta: #a09080;
+}
+
+html[data-world='still-life'] {
+  --color-bg: #f8f7f4;
+  --color-primary: #2a2a2a;
+  --color-accent: #8a9e8a;
+  --color-meta: #aaaaaa;
 }
 
 /**
@@ -99,6 +126,23 @@ body > main {
 }
 
 .reading-prose p:last-child {
+  margin-bottom: 0;
+}
+
+.reading-prose .reading-copyright-block {
+  margin-top: var(--space-xl);
+}
+
+.reading-prose .reading-copyright-block p {
+  margin: 0 0 var(--space-lg);
+  font-size: calc(var(--type-body) + 2px);
+  line-height: 1.65;
+  font-weight: 400;
+  color: #3d4249;
+  max-width: none;
+}
+
+.reading-prose .reading-copyright-block p:last-child {
   margin-bottom: 0;
 }
 

@@ -5,6 +5,7 @@ import IndexMenu from '../components/IndexMenu.astro';
 import { getCollection } from 'astro:content';
 import { loadPoemsByWorldForIndexMenu } from '../lib/index-menu-data';
 import { analyzePoemText, computeEmotionScore } from '../lib/poem-analyzer';
+import { excerptWords } from '../lib/seo';
 
 const poemsByWorld = await loadPoemsByWorldForIndexMenu();
 
@@ -30,9 +31,17 @@ const entryWorld = 'their-world' as const;
 const rawText = entryPoem.body ?? '';
 const analysis = analyzePoemText(rawText, entryPoem.data.title);
 const currentEmotionScore = Math.round(computeEmotionScore(analysis.metrics) * 1000) / 1000;
+const homeDescription =
+  excerptWords(rawText, 20) ||
+  'Three Worlds — poetry by Dai Pan across Still Life, Bless You, and Their World.';
 ---
 
-<BaseLayout title="Dai Pan — Three Worlds" world="their-world" homeRandomPoems={homeRandomPoems}>
+<BaseLayout
+  title="Three Worlds"
+  description={homeDescription}
+  world="their-world"
+  homeRandomPoems={homeRandomPoems}
+>
   <main class="home-main">
     <nav class="poem-nav" id="poem-nav">
       <a class="nav-prev" id="nav-prev" href="#" aria-label="Previous poem">←</a>
@@ -263,7 +272,7 @@ const currentEmotionScore = Math.round(computeEmotionScore(analysis.metrics) * 1
     line-height: 1;
     font-family: Georgia, serif;
     text-decoration: none;
-    color: #1a1a1a;
+    color: var(--color-primary, #1a1a1a);
     opacity: 0;
     transition: opacity 0.2s ease;
     pointer-events: all;
@@ -281,7 +290,7 @@ const currentEmotionScore = Math.round(computeEmotionScore(analysis.metrics) * 1
 
   .poem-nav.visible .nav-prev,
   .poem-nav.visible .nav-next {
-    opacity: 0.3;
+    opacity: 0.5;
   }
 
   .nav-prev:hover,

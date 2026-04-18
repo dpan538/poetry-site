@@ -1,8 +1,11 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+
+const collectionDescription =
+  'A poetry collection by Dai Pan spanning Still Life, Bless You, and Their World — written between 2024 and 2025.';
 ---
 
-<BaseLayout title="Three Worlds — Dai Pan">
+<BaseLayout title="Three Worlds" description={collectionDescription}>
   <main class="reading-page">
     <header class="reading-header">
       <h1>Three Worlds</h1>
@@ -25,6 +28,14 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         <em>Their World</em> — porous and overlapping, the way memory actually moves. You are invited
         not to arrive at anything, but simply to pass through.
       </p>
+      <div class="reading-copyright-block">
+        <p>
+          All poems collected in Three Worlds are the original work of Dai Pan (潘岱) and are protected
+          under copyright. No part of this collection may be reproduced, distributed, or transmitted in
+          any form without the prior written permission of the author. For permissions and inquiries,
+          visit daipan.art.
+        </p>
+      </div>
     </section>
   </main>
 </BaseLayout>

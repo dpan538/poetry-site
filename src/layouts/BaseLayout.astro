@@ -1,16 +1,22 @@
 ---
 import '../styles/global.css';
 import Nav from '../components/Nav.astro';
+import SEO from '../components/SEO.astro';
 
 interface Props {
   world?: 'their-world' | 'bless-you' | 'still-life';
+  /** Short page title (shown as `{title} — Dai Pan` in &lt;title&gt; and Open Graph). */
   title: string;
+  description: string;
+  ogImage?: string;
   /** When set, `/` immediately redirects to a random poem (JS). */
   homeRandomPoems?: { id: string; world: string }[];
 }
 
-const { world, title, homeRandomPoems } = Astro.props;
+const { world, title, description, ogImage, homeRandomPoems } = Astro.props;
 const pathname = Astro.url.pathname;
+const site = Astro.site ?? new URL('https://daipan.ink');
+const canonicalURL = new URL(pathname, site).href;
 ---
 
 <!doctype html>
@@ -19,7 +25,9 @@ const pathname = Astro.url.pathname;
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <title>{title}</title>
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#1a1a1a" />
+    <SEO title={title} description={description} canonicalURL={canonicalURL} ogImage={ogImage} />
     {
       homeRandomPoems && homeRandomPoems.length > 0 ? (
         <script is:inline define:vars={{ entries: homeRandomPoems }}>
@@ -38,6 +46,51 @@ const pathname = Astro.url.pathname;
   </head>
   <body>
     <Nav pathname={pathname} />
-    <slot />
+    <div class="site-body-stack">
+      <div class="site-main-slot">
+        <slot />
+      </div>
+      <footer class="site-copyright" aria-label="Copyright">
+        <p>
+          © 2024–2025 Dai Pan (潘岱). All rights reserved. Poems may not be reproduced without written permission.
+        </p>
+      </footer>
+    </div>
   </body>
 </html>
+
+<style>
+  .site-body-stack {
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100vh - var(--site-content-offset));
+    box-sizing: border-box;
+  }
+
+  .site-main-slot {
+    flex: 1 0 auto;
+  }
+
+  .site-copyright {
+    flex-shrink: 0;
+    margin-top: calc(var(--space-xl) - 10px);
+    padding-top: var(--space-lg);
+    padding-bottom: var(--space-xl);
+    padding-inline: var(--margin-x);
+    max-width: var(--content-w);
+    width: 100%;
+    margin-inline: auto;
+    box-sizing: border-box;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 11px;
+    line-height: 1.55;
+    letter-spacing: 0.06em;
+    color: var(--color-meta, #888888);
+    text-align: center;
+  }
+
+  .site-copyright p {
+    margin: 0 auto;
+    max-width: 52rem;
+  }
+</style>

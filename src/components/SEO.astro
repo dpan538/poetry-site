@@ -1,0 +1,61 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  canonicalURL: string;
+  ogImage?: string;
+}
+
+const { title, description, canonicalURL, ogImage } = Astro.props;
+
+const fullTitle = `${title} — Dai Pan`;
+const ogSiteName = 'Dai Pan — daipan.ink';
+
+const keywords =
+  'Dai Pan, 潘岱, poetry, contemporary poetry, Chinese poet, visual artist, daipan.art, Brisbane, Three Worlds, Still Life, Bless You, Their World';
+
+const personLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: 'Dai Pan',
+  alternateName: '潘岱',
+  url: 'https://daipan.ink',
+  sameAs: ['https://daipan.art', 'https://instagram.com/jumpingchick666'],
+  jobTitle: 'Visual Artist and Writer',
+  description:
+    'Dai Pan is a visual artist, photographer, printmaker and writer based in Brisbane.',
+  copyrightHolder: {
+    '@type': 'Person',
+    name: 'Dai Pan',
+  },
+  copyrightYear: '2024',
+  license: 'All rights reserved',
+};
+
+const jsonLd = JSON.stringify(personLd);
+---
+
+<title>{fullTitle}</title>
+<meta name="description" content={description} />
+<meta name="author" content="Dai Pan" />
+<meta name="copyright" content="© Dai Pan (潘岱). All rights reserved." />
+<meta
+  name="rights"
+  content="All poems and texts © Dai Pan (潘岱). Unauthorized reproduction prohibited."
+/>
+<meta name="keywords" content={keywords} />
+<link rel="canonical" href={canonicalURL} />
+
+<meta property="og:title" content={fullTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonicalURL} />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content={ogSiteName} />
+{ogImage ? <meta property="og:image" content={ogImage} /> : null}
+
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content={fullTitle} />
+<meta name="twitter:description" content={description} />
+{ogImage ? <meta name="twitter:image" content={ogImage} /> : null}
+
+<script type="application/ld+json" set:html={jsonLd} />

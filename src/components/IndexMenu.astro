@@ -233,15 +233,31 @@ function truncateLetters(text: string, max = 120): string {
     z-index: 200;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.25s linear;
+    visibility: hidden;
+    overflow: hidden;
+    transition:
+      opacity 0.25s linear,
+      visibility 0s linear 0.25s;
     padding: var(--site-content-offset) var(--margin-x) var(--space-xl);
     box-sizing: border-box;
-    overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .index-overlay::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
   }
 
   .index-overlay.is-open {
     opacity: 1;
     pointer-events: auto;
+    visibility: visible;
+    overflow-y: auto;
+    transition:
+      opacity 0.25s linear,
+      visibility 0s linear 0s;
   }
 
   .index-inner {
@@ -269,7 +285,7 @@ function truncateLetters(text: string, max = 120): string {
     background: none;
     border: none;
     cursor: pointer;
-    color: #1a1a1a;
+    color: var(--color-primary, #1a1a1a);
     padding: 0;
     opacity: 0.8;
     z-index: 210;
@@ -297,7 +313,7 @@ function truncateLetters(text: string, max = 120): string {
     font-size: var(--type-display);
     line-height: var(--leading-display);
     font-weight: normal;
-    color: #1a1a1a;
+    color: var(--color-primary, #1a1a1a);
     opacity: 0.2;
     transition: opacity 0.24s linear;
   }

@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
+import { truncateChars } from '../lib/seo';
 
 interface Props {
   world: 'their-world' | 'bless-you' | 'still-life';
@@ -9,12 +10,13 @@ interface Props {
 }
 
 const { world, title, description } = Astro.props;
+const metaDescription = truncateChars(description, 160);
 
 const list = await getCollection(world);
 const poems = [...list].sort((a, b) => a.data.order - b.data.order);
 ---
 
-<BaseLayout title={title} world={world}>
+<BaseLayout title={title} world={world} description={metaDescription}>
   <main class="world-index">
     <header class="world-header">
       <h1>{title}</h1>
