@@ -1,0 +1,126 @@
+@import "tailwindcss";
+@import "./tokens.css";
+@import "./grid.css";
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
+  background-color: var(--color-bg, #f5f2ed);
+  color: #1a1a1a;
+  font-size: var(--type-body);
+  line-height: var(--leading-body);
+  /* Hide vertical scrollbar; content remains scrollable */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+body {
+  font-family: Georgia, 'Times New Roman', serif;
+  /*
+   * Fixed `.site-nav` does not consume layout height; without this inset, `<main>` would
+   * begin at y=0 and sit under the nav. Padding on `body` pushes in-flow content down reliably.
+   */
+  padding-top: var(--site-content-offset);
+}
+
+body > main {
+  width: var(--content-w);
+  max-width: 100%;
+  margin: 0 auto;
+  padding-inline: var(--margin-x);
+  padding-top: 0;
+  padding-bottom: 0;
+  box-sizing: border-box;
+}
+
+/**
+ * Shared “Collection” reading layout: centered column, display title, meta line, prose.
+ * Lives in global CSS so it is not weakened by Astro scoped-selector + Tailwind cascade order.
+ */
+@keyframes reading-page-in {
+  from {
+    opacity: 0.9;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.reading-page {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: min(68ch, 100%);
+  margin-inline: auto;
+  margin-block: 0;
+  padding-bottom: var(--space-xl);
+  animation: reading-page-in 0.35s linear both;
+}
+
+.reading-header {
+  padding-top: 0;
+  margin-bottom: calc(var(--space-xl) + var(--space-sm));
+}
+
+.reading-header h1 {
+  margin: 0 0 var(--space-sm);
+  margin-top: 0;
+  font-size: calc(var(--type-display) - 18px);
+  line-height: 1.06;
+  font-weight: bold;
+  color: #1a1a1a;
+}
+
+.reading-meta {
+  margin: 0;
+  font-size: var(--type-body);
+  font-weight: 400;
+  color: #5a5f66;
+}
+
+.reading-prose p {
+  margin: 0 0 var(--space-lg);
+  font-size: calc(var(--type-body) + 2px);
+  line-height: 1.65;
+  font-weight: 400;
+  color: #3d4249;
+  max-width: none;
+}
+
+.reading-prose p:last-child {
+  margin-bottom: 0;
+}
+
+.reading-prose em {
+  font-style: italic;
+  font-weight: 400;
+  color: #454a52;
+}
+
+.preface-header h1,
+.world-header h1 {
+  margin-top: 0;
+}
+
+html[data-world='their-world'] {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+html[data-world='bless-you'] {
+  font-family: Futura, 'Century Gothic', 'Trebuchet MS', sans-serif;
+}
+
+html[data-world='still-life'] {
+  font-family: Georgia, 'Times New Roman', serif;
+}

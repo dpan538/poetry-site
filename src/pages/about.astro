@@ -1,0 +1,63 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="About — Dai Pan">
+  <main class="reading-page">
+    <header class="reading-header">
+      <h1>About</h1>
+      <p class="reading-meta">Dai Pan</p>
+    </header>
+
+    <section class="reading-prose">
+      <p>
+        Dai Pan is a visual artist and writer based in Brisbane, moving between photography, printmaking,
+        painting, and language. Born in China, formed in Shanghai and New York, his work traces the
+        distance between places and the things that remain.
+      </p>
+      <p>
+        He holds a BFA from the School of Visual Arts, New York, and is currently pursuing a Master of
+        Information Technology at the University of Queensland.
+      </p>
+      <p class="about-link">
+        <a href="https://daipan.art" target="_blank" rel="noopener noreferrer">daipan.art</a>
+        <a
+          href="https://www.instagram.com/jumpingchick666/"
+          class="about-instagram"
+          target="_blank"
+          rel="noopener noreferrer">@jumpingchick666</a>
+      </p>
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+  /* About-only: link row (same prose scale as body; layout only). */
+  .about-link {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-lg);
+    align-items: baseline;
+    margin-top: var(--space-md);
+  }
+
+  .about-link a {
+    font-size: calc(var(--type-body) + 2px);
+    color: #3d4249;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: opacity 0.2s linear;
+  }
+
+  .about-link a:hover {
+    opacity: 0.82;
+  }
+
+  .about-link a.about-instagram {
+    font-size: var(--type-body);
+    font-weight: 400;
+    color: #5a5f66;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+</style>

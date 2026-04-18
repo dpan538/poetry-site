@@ -1,0 +1,380 @@
+---
+import type { IndexMenuPoemRow, IndexWorld } from '../lib/index-menu-data';
+
+interface Props {
+  currentWorld: IndexWorld;
+  currentPoemId: string;
+  poemsByWorld: Record<IndexWorld, IndexMenuPoemRow[]>;
+}
+
+const { currentWorld, currentPoemId, poemsByWorld } = Astro.props;
+
+const BASE = ['their-world', 'bless-you', 'still-life'] as const;
+type WorldId = (typeof BASE)[number];
+
+function nextW(w: WorldId): WorldId {
+  const i = BASE.indexOf(w);
+  return BASE[(i + 1) % 3];
+}
+
+function orderFrom(first: WorldId): WorldId[] {
+  return [first, nextW(first), nextW(nextW(first))];
+}
+
+const initialOrder = orderFrom(currentWorld);
+
+const worldLabels: Record<WorldId, string> = {
+  'their-world': 'Their World',
+  'bless-you': 'Bless You',
+  'still-life': 'Still Life',
+};
+
+const worldPaths: Record<WorldId, string> = {
+  'their-world': '/their-world',
+  'bless-you': '/bless-you',
+  'still-life': '/still-life',
+};
+
+function truncateLetters(text: string, max = 120): string {
+  const compact = text.replace(/\s+/g, ' ').trim();
+  if (compact.length <= max) return compact;
+  return `${compact.slice(0, max - 1).trimEnd()}…`;
+}
+---
+
+<div class="index-overlay" id="index-overlay" aria-hidden="true">
+  <div class="index-inner">
+    <button type="button" class="index-close" id="index-close" aria-label="Close index">×</button>
+    <div class="world-switcher" role="tablist" aria-label="Worlds">
+      <button
+        type="button"
+        class="world-tab"
+        role="tab"
+        id="world-tab-0"
+        data-tab-index="0"
+        data-world={initialOrder[0]}
+        aria-selected="true"
+      >
+        {worldLabels[initialOrder[0]]}
+      </button>
+      <button
+        type="button"
+        class="world-tab"
+        role="tab"
+        id="world-tab-1"
+        data-tab-index="1"
+        data-world={initialOrder[1]}
+        aria-selected="false"
+      >
+        {worldLabels[initialOrder[1]]}
+      </button>
+      <button
+        type="button"
+        class="world-tab"
+        role="tab"
+        id="world-tab-2"
+        data-tab-index="2"
+        data-world={initialOrder[2]}
+        aria-selected="false"
+      >
+        {worldLabels[initialOrder[2]]}
+      </button>
+    </div>
+
+    {BASE.map((world) => {
+      const poems = poemsByWorld[world];
+      const isActive = world === currentWorld;
+      return (
+        <div
+          class:list={['world-panel', { 'is-shown': isActive }]}
+          id={`world-panel-${world}`}
+          data-panel={world}
+          role="tabpanel"
+          aria-hidden={!isActive}
+        >
+          <ul class="poem-list">
+            {poems.map((poem) => {
+              const isCurrent = poem.id === currentPoemId && world === currentWorld;
+              return (
+                <li class:list={['poem-item', { 'is-current': isCurrent }]}>
+                  <a href={`${worldPaths[world]}/${poem.id}`} class="poem-link">
+                    <span class="poem-order">{String(poem.order).padStart(2, '0')}</span>
+                    <span class="poem-title">{poem.title}</span>
+                    <span class="poem-first-line">{truncateLetters(poem.firstLine ?? '', 120)}</span>
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      );
+    })}
+  </div>
+</div>
+
+<script define:vars={{ initWorld: currentWorld }}>
+  const BASE = ['their-world', 'bless-you', 'still-life'];
+  const LABELS = {
+    'their-world': 'Their World',
+    'bless-you': 'Bless You',
+    'still-life': 'Still Life',
+  };
+
+  function nextW(w) {
+    const i = BASE.indexOf(w);
+    return BASE[(i + 1) % 3];
+  }
+
+  function orderFrom(first) {
+    return [first, nextW(first), nextW(nextW(first))];
+  }
+
+  function initIndexMenu() {
+    const overlay = document.getElementById('index-overlay');
+    const closeBtn = document.getElementById('index-close');
+    const tabEls = [
+      document.getElementById('world-tab-0'),
+      document.getElementById('world-tab-1'),
+      document.getElementById('world-tab-2'),
+    ].filter(Boolean);
+    const panels = {
+      'their-world': document.getElementById('world-panel-their-world'),
+      'bless-you': document.getElementById('world-panel-bless-you'),
+      'still-life': document.getElementById('world-panel-still-life'),
+    };
+
+    let selectedWorld = initWorld;
+
+    function syncTabs() {
+      const order = orderFrom(selectedWorld);
+      tabEls.forEach((btn, i) => {
+        const w = order[i];
+        if (!btn || !w) return;
+        btn.dataset.world = w;
+        btn.textContent = LABELS[w];
+        const isFirst = i === 0;
+        btn.setAttribute('aria-selected', isFirst ? 'true' : 'false');
+        btn.classList.toggle('is-lead', isFirst);
+      });
+    }
+
+    function syncPanels() {
+      for (const w of BASE) {
+        const panel = panels[w];
+        if (!panel) continue;
+        const on = w === selectedWorld;
+        panel.classList.toggle('is-shown', on);
+        panel.setAttribute('aria-hidden', on ? 'false' : 'true');
+      }
+    }
+
+    function setWorld(w) {
+      if (!BASE.includes(w)) return;
+      selectedWorld = w;
+      syncTabs();
+      syncPanels();
+    }
+
+    tabEls.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const w = btn.dataset.world;
+        if (w) setWorld(w);
+      });
+    });
+
+    syncTabs();
+    syncPanels();
+
+    function openIndex() {
+      if (!overlay) return;
+      overlay.classList.add('is-open');
+      overlay.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('index-open');
+    }
+
+    window.openIndex = openIndex;
+
+    function closeIndex() {
+      if (!overlay) return;
+      overlay.classList.remove('is-open');
+      overlay.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('index-open');
+    }
+
+    closeBtn?.addEventListener('click', closeIndex);
+
+    overlay?.addEventListener('click', (e) => {
+      if (e.target === overlay) closeIndex();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && overlay?.classList.contains('is-open')) {
+        closeIndex();
+      }
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initIndexMenu);
+  } else {
+    initIndexMenu();
+  }
+</script>
+
+<style is:global>
+  body.index-open {
+    overflow: hidden;
+  }
+
+  .index-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--color-bg, #f8f7f4);
+    z-index: 200;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s linear;
+    padding: var(--site-content-offset) var(--margin-x) var(--space-xl);
+    box-sizing: border-box;
+    overflow-y: auto;
+  }
+
+  .index-overlay.is-open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .index-inner {
+    max-width: var(--content-w);
+    margin: 0 auto;
+    position: relative;
+    transform: translateY(10px);
+    opacity: 0.92;
+    transition: transform 0.45s linear, opacity 0.45s linear;
+  }
+
+  .index-overlay.is-open .index-inner {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  .index-close {
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: var(--type-display);
+    line-height: var(--leading-display);
+    font-weight: normal;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #1a1a1a;
+    padding: 0;
+    opacity: 0.8;
+    z-index: 210;
+  }
+
+  .index-close:hover {
+    opacity: 1;
+  }
+
+  .world-switcher {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--space-xl);
+    align-items: baseline;
+    margin-bottom: 0;
+  }
+
+  .world-tab {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: var(--type-display);
+    line-height: var(--leading-display);
+    font-weight: normal;
+    color: #1a1a1a;
+    opacity: 0.2;
+    transition: opacity 0.24s linear;
+  }
+
+  .world-tab.is-lead {
+    opacity: 1;
+  }
+
+  .world-panel {
+    opacity: 0;
+    visibility: hidden;
+    max-height: 0;
+    overflow: hidden;
+    padding-top: 0;
+    transform: translateY(6px);
+    transition:
+      opacity 0.24s linear,
+      transform 0.24s linear,
+      max-height 0.28s linear,
+      visibility 0s linear 0.28s,
+      padding-top 0.22s linear;
+  }
+
+  .world-panel.is-shown {
+    opacity: 1;
+    visibility: visible;
+    max-height: 12000px;
+    padding-top: var(--space-xl);
+    transform: translateY(0);
+    transition:
+      opacity 0.24s linear,
+      transform 0.24s linear,
+      max-height 0.28s linear,
+      visibility 0s linear 0s,
+      padding-top 0.22s linear;
+  }
+
+  .poem-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .poem-item {
+    margin-bottom: var(--space-lg);
+  }
+
+  .poem-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .poem-order {
+    display: block;
+    font-size: 14px;
+    color: #888888;
+    margin-bottom: 0.15rem;
+  }
+
+  .poem-title {
+    display: block;
+    font-size: calc(var(--type-title) - 4px);
+    line-height: var(--leading-title);
+    font-weight: normal;
+    margin-bottom: 0.25rem;
+  }
+
+  .poem-first-line {
+    display: block;
+    font-size: 18px;
+    color: #666666;
+    line-height: 1.45;
+  }
+
+  .poem-item.is-current .poem-title {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+</style>

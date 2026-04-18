@@ -1,0 +1,297 @@
+---
+import { getCollection } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PoemCanvas from '../../components/PoemCanvas.astro';
+import IndexMenu from '../../components/IndexMenu.astro';
+import { loadPoemsByWorldForIndexMenu } from '../../lib/index-menu-data';
+import { analyzePoemText, computeEmotionScore } from '../../lib/poem-analyzer';
+
+type World = 'their-world' | 'bless-you' | 'still-life';
+
+export async function getStaticPaths() {
+  const worlds: readonly World[] = ['their-world', 'bless-you', 'still-life'];
+  const poemsByWorld = await loadPoemsByWorldForIndexMenu();
+
+  const byWorld: Record<World, CollectionEntry<World>[]> = {
+    'their-world': [],
+    'bless-you': [],
+    'still-life': [],
+  };
+
+  for (const world of worlds) {
+    const list = await getCollection(world);
+    byWorld[world] = [...list].sort((a, b) => a.data.order - b.data.order);
+  }
+
+  const paths = [];
+
+  for (const world of worlds) {
+    for (const poem of byWorld[world]) {
+      paths.push({
+        params: { world, poem: poem.id },
+        props: {
+          poem,
+          world,
+          poemsByWorld,
+        },
+      });
+    }
+  }
+
+  return paths;
+}
+
+const { poem, world, poemsByWorld } = Astro.props;
+const rawText = poem.body ?? '';
+const analysis = analyzePoemText(rawText, poem.data.title);
+const currentEmotionScore = Math.round(computeEmotionScore(analysis.metrics) * 1000) / 1000;
+---
+
+<BaseLayout world={world} title={poem.data.title}>
+  <main class="poem-shell">
+    <nav class="poem-nav" id="poem-nav">
+      <a class="nav-prev" id="nav-prev" href="#" aria-label="Previous poem">←</a>
+      <a class="nav-next" id="nav-next" href="#" aria-label="Next poem">→</a>
+    </nav>
+
+    <PoemCanvas
+      poemId={poem.id}
+      world={world}
+      title={poem.data.title}
+      rawText={rawText}
+      order={poem.data.order}
+    />
+    <IndexMenu currentWorld={world} currentPoemId={poem.id} poemsByWorld={poemsByWorld} />
+  </main>
+</BaseLayout>
+
+<script
+  define:vars={{
+    currentPoemId: poem.id,
+    currentWorld: world,
+    currentEmotionScore,
+  }}
+>
+  const HISTORY_KEY = 'three-worlds-history';
+  const MAX_HISTORY = 20;
+  let hideTimer;
+
+  function getHistory() {
+    try {
+      const raw = localStorage.getItem(HISTORY_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function pushToHistory(entry) {
+    try {
+      const h = getHistory().filter((x) => x.id !== entry.id);
+      h.unshift(entry);
+      localStorage.setItem(HISTORY_KEY, JSON.stringify(h.slice(0, MAX_HISTORY)));
+    } catch {
+      // ignore
+    }
+  }
+
+  function contentSimilarity(typesA, typesB) {
+    if (!typesA.length || !typesB.length) return 0;
+    const intersection = typesA.filter((t) => typesB.includes(t)).length;
+    const union = new Set([...typesA, ...typesB]).size;
+    return intersection / union;
+  }
+
+  function getNextPoemId(ctx, allPoems) {
+    const current = allPoems.find((p) => p.id === ctx.currentId);
+    if (!current) return allPoems[0]?.id ?? ctx.currentId;
+
+    let targetDirection = 'neutral';
+    if (ctx.prev2 && ctx.prev1) {
+      const risingTwice =
+        ctx.prev2.emotionScore < ctx.prev1.emotionScore &&
+        ctx.prev1.emotionScore < ctx.currentEmotionScore;
+      const fallingTwice =
+        ctx.prev2.emotionScore > ctx.prev1.emotionScore &&
+        ctx.prev1.emotionScore > ctx.currentEmotionScore;
+      if (risingTwice) targetDirection = 'down';
+      else if (fallingTwice) targetDirection = 'up';
+      else targetDirection = ctx.prev1.emotionScore < ctx.currentEmotionScore ? 'up' : 'down';
+    }
+
+    const excludeIds = new Set([ctx.currentId, ctx.prev1?.id, ctx.prev2?.id].filter(Boolean));
+
+    const candidates = allPoems
+      .filter((p) => !excludeIds.has(p.id))
+      .map((p) => {
+        let arcScore = 0.5;
+        if (targetDirection === 'up') {
+          arcScore = p.emotionScore > ctx.currentEmotionScore ? 1 : 0.2;
+        } else if (targetDirection === 'down') {
+          arcScore = p.emotionScore < ctx.currentEmotionScore ? 1 : 0.2;
+        } else {
+          arcScore = 1 - Math.abs(p.emotionScore - ctx.currentEmotionScore);
+        }
+
+        const contentScore = contentSimilarity(current.contentTypes || [], p.contentTypes || []);
+        const worldScore = p.world !== ctx.currentWorld ? 1 : 0.3;
+        const worldPenalty = ctx.prev1 && p.world === ctx.prev1.world ? 0.6 : 1;
+
+        const total = (arcScore * 0.4 + contentScore * 0.35 + worldScore * 0.15 + 0.1) * worldPenalty;
+
+        return { poem: p, score: total };
+      });
+
+    candidates.sort((a, b) => b.score - a.score);
+
+    const top5 = candidates.slice(0, 5);
+    const idx = Math.floor(Math.random() * top5.length);
+    return top5[idx]?.poem.id ?? candidates[0]?.poem.id ?? ctx.currentId;
+  }
+
+  function getPrevPoemId(ctx) {
+    return ctx.prev1?.id ?? null;
+  }
+
+  function bindKeyboard() {
+    document.addEventListener('keydown', (e) => {
+      if (document.body.classList.contains('index-open')) return;
+      const t = e.target;
+      if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+      if (e.key === 'ArrowLeft') {
+        document.getElementById('nav-prev')?.click();
+      } else if (e.key === 'ArrowRight') {
+        document.getElementById('nav-next')?.click();
+      }
+    });
+  }
+
+  function bindNavVisibility() {
+    document.addEventListener('mousemove', () => {
+      const nav = document.getElementById('poem-nav');
+      nav?.classList.add('visible');
+      clearTimeout(hideTimer);
+      hideTimer = setTimeout(() => {
+        nav?.classList.remove('visible');
+      }, 2000);
+    });
+  }
+
+  async function initNav() {
+    bindKeyboard();
+    bindNavVisibility();
+
+    try {
+      const res = await fetch('/poem-data.json');
+      const allPoems = await res.json();
+
+      const currentPoem = allPoems.find((p) => p.id === currentPoemId && p.world === currentWorld);
+      const emotionScore = currentPoem?.emotionScore ?? currentEmotionScore ?? 0.5;
+
+      pushToHistory({
+        id: currentPoemId,
+        world: currentWorld,
+        emotionScore,
+        timestamp: Date.now(),
+      });
+
+      const history = getHistory();
+      const prev1 = history[1] ?? null;
+      const prev2 = history[2] ?? null;
+
+      const ctx = {
+        currentId: currentPoemId,
+        currentWorld,
+        currentEmotionScore: emotionScore,
+        prev1,
+        prev2,
+      };
+
+      const nextId = getNextPoemId(ctx, allPoems);
+      const nextPoem = allPoems.find((p) => p.id === nextId);
+
+      const prevId = getPrevPoemId(ctx);
+      const prevPoem = prevId ? allPoems.find((p) => p.id === prevId) : null;
+
+      if (nextPoem) {
+        const nextEl = document.getElementById('nav-next');
+        if (nextEl) nextEl.setAttribute('href', `/${nextPoem.world}/${nextPoem.id}`);
+      }
+
+      if (prevPoem) {
+        const prevEl = document.getElementById('nav-prev');
+        if (prevEl) prevEl.setAttribute('href', `/${prevPoem.world}/${prevPoem.id}`);
+      } else {
+        const prevEl = document.getElementById('nav-prev');
+        if (prevEl) prevEl.style.display = 'none';
+      }
+    } catch (err) {
+      console.error('[dynamic-nav] failed to initialize:', err);
+      const prevEl = document.getElementById('nav-prev');
+      const nextEl = document.getElementById('nav-next');
+      if (prevEl) prevEl.style.display = 'none';
+      if (nextEl) nextEl.style.display = 'none';
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', initNav);
+</script>
+
+<style>
+  .poem-shell {
+    position: relative;
+    min-height: calc(100vh - var(--site-content-offset));
+    padding-left: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+    max-width: none;
+    width: 100%;
+    margin: 0;
+  }
+
+  .poem-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: 40;
+  }
+
+  .nav-prev,
+  .nav-next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 32px;
+    line-height: 1;
+    font-family: Georgia, serif;
+    text-decoration: none;
+    color: #1a1a1a;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: all;
+    padding: var(--space-md);
+    user-select: none;
+  }
+
+  .nav-prev {
+    left: var(--space-md);
+  }
+
+  .nav-next {
+    right: var(--space-md);
+  }
+
+  .poem-nav.visible .nav-prev,
+  .poem-nav.visible .nav-next {
+    opacity: 0.3;
+  }
+
+  .nav-prev:hover,
+  .nav-next:hover {
+    opacity: 1 !important;
+  }
+</style>

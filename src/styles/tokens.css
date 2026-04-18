@@ -1,0 +1,48 @@
+/**
+ * Golden ratio design tokens (φ ≈ 1.618).
+ * Grid cell height: 56 × φ ≈ 90.608 → 90px.
+ */
+:root {
+  --phi: 1.618;
+
+  --grid-cols: 24;
+  --grid-rows: 10;
+  --cell-w: 56px;
+  --cell-h: 90px;
+  --margin-x: 48px;
+  --content-w: 1344px;
+  --viewport-target: 1440px;
+
+  /* Type scale: each step × φ from previous */
+  --type-body: 20px;
+  --type-subtitle: 26px;
+  --type-title: 42px;
+  --type-display: 68px;
+  --type-hero: 110px;
+
+  /* Title size range — used by layout engine */
+  --type-title-min: var(--type-display);
+  --type-title-max: var(--type-hero);
+
+  /* Body size is always fixed */
+  --type-body-poem: var(--type-body);
+
+  /* Spacing scale: each step × φ from previous */
+  --space-xs: 8px;
+  --space-sm: 13px;
+  --space-md: 21px;
+  --space-lg: 34px;
+  --space-xl: 55px;
+
+  /* Fixed header (see Nav.astro height) — in-flow content starts below this inset */
+  --site-nav-height: 56px;
+  --site-content-offset: calc(
+    var(--site-nav-height) + var(--space-xl) + var(--space-lg) + 12px
+  );
+
+  --leading-tight: 1;
+  --leading-body: 1.618;
+  --leading-loose: 2.618;
+  --leading-title: 1.12;
+  --leading-display: 1.05;
+}

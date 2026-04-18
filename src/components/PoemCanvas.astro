@@ -1,0 +1,846 @@
+---
+export interface Stanza {
+  lines: string[];
+}
+
+export interface Props {
+  poemId: string;
+  world: 'their-world' | 'bless-you' | 'still-life';
+  title: string;
+  rawText: string;
+  order: number;
+  showIndexTrigger?: boolean;
+}
+
+const { poemId, world, title, rawText, order, showIndexTrigger = true } = Astro.props;
+
+const stanzas: Stanza[] = (rawText ?? '')
+  .split(/\n\s*\n/)
+  .map((s) => ({
+    lines: s.split('\n').map((l) => l.trimEnd()).filter((l) => l.length > 0),
+  }))
+  .filter((s) => s.lines.length > 0);
+
+const allLines: string[] = [];
+stanzas.forEach((stanza, si) => {
+  stanza.lines.forEach((line) => allLines.push(line));
+  if (si < stanzas.length - 1) allLines.push('');
+});
+---
+
+<div
+  class="poem-page"
+  id="poem-page"
+  data-poem-id={poemId}
+  data-world={world}
+  data-title={JSON.stringify(title)}
+  data-lines={JSON.stringify(allLines)}
+  data-order={order}
+>
+  <div class="grid-canvas" id="grid-canvas">
+    <div class="title-frame" id="title-frame">
+      <h1 class="poem-title" id="poem-title">{title}</h1>
+    </div>
+
+    <div class="body-frames" id="body-frames"></div>
+
+    <div class="poem-meta" id="poem-meta">
+      {world.replace(/-/g, ' ')} — {order}
+    </div>
+  </div>
+
+  {
+    showIndexTrigger && (
+      <button type="button" class="index-trigger" id="index-trigger">
+        Index
+      </button>
+    )
+  }
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const page = document.getElementById('poem-page');
+    if (!page) return;
+
+    const poemId = page.dataset.poemId ?? '';
+    const world = page.dataset.world ?? 'their-world';
+    const title = JSON.parse(page.dataset.title ?? '""') as string;
+    const allLines = JSON.parse(page.dataset.lines ?? '[]') as string[];
+    const order = parseInt(page.dataset.order ?? '1', 10);
+
+    function computeMetrics(
+      lines: string[],
+      stanzas: string[][],
+    ): {
+      lineCount: number;
+      wordCount: number;
+      charCount: number;
+      stanzaCount: number;
+      avgLineLength: number;
+      avgStanzaSize: number;
+      stanzaVariance: number;
+      punctuationDensity: number;
+      uniqueWordRatio: number;
+      lineEndPunctuation: number;
+      repetitionScore: number;
+      titleLength: number;
+      hasDialogue: boolean;
+      hasStageDirection: boolean;
+      hasSectionNumbers: boolean;
+    } {
+      const nonEmpty = lines.filter((l) => l.length > 0);
+      const words = nonEmpty
+        .join(' ')
+        .replace(/[^a-zA-Z\s]/g, ' ')
+        .split(/\s+/)
+        .filter((w) => w.length > 0);
+      const punctuation = nonEmpty.join(' ').match(/[.,;:!?—–]/g) ?? [];
+      const uniqueWords = new Set(words.map((w) => w.toLowerCase()));
+      const wordFreq: Record<string, number> = {};
+      const stopWords = new Set([
+        'the',
+        'a',
+        'an',
+        'and',
+        'or',
+        'but',
+        'in',
+        'on',
+        'at',
+        'to',
+        'for',
+        'of',
+        'with',
+        'is',
+        'was',
+        'i',
+        'my',
+        'your',
+        'their',
+        'this',
+        'that',
+        'it',
+        'as',
+        'by',
+        'from',
+        'into',
+        'not',
+        'be',
+      ]);
+      words.forEach((w) => {
+        const l = w.toLowerCase();
+        if (!stopWords.has(l)) wordFreq[l] = (wordFreq[l] ?? 0) + 1;
+      });
+      const repeated = Object.values(wordFreq).filter((c) => c > 3).length;
+      const linesEndPunct = nonEmpty.filter((l) => /[.,;:!?—–]$/.test(l)).length;
+      const stanzaSizes = stanzas.map((s) => s.filter((l) => l.length > 0).length);
+      const avgStanza = stanzaSizes.length
+        ? stanzaSizes.reduce((a, b) => a + b, 0) / stanzaSizes.length
+        : 0;
+      const variance =
+        stanzaSizes.length > 1
+          ? stanzaSizes.reduce((a, s) => a + Math.pow(s - avgStanza, 2), 0) / stanzaSizes.length
+          : 0;
+
+      return {
+        lineCount: nonEmpty.length,
+        wordCount: words.length,
+        charCount: nonEmpty.join('').length,
+        stanzaCount: stanzas.length,
+        avgLineLength: nonEmpty.length ? words.length / nonEmpty.length : 0,
+        avgStanzaSize: avgStanza,
+        stanzaVariance: variance,
+        punctuationDensity: words.length ? punctuation.length / words.length : 0,
+        uniqueWordRatio: words.length ? uniqueWords.size / words.length : 1,
+        lineEndPunctuation: nonEmpty.length ? linesEndPunct / nonEmpty.length : 0,
+        repetitionScore: Math.min(repeated / 5, 1),
+        titleLength: title.length,
+        hasDialogue: nonEmpty.some((l) => /[\u201c\u201d"]/.test(l)),
+        hasStageDirection: nonEmpty.some((l) => /\([^)]{2,}\)/.test(l)),
+        hasSectionNumbers: nonEmpty.some((l) => /^\(\d+\)$/.test(l.trim())),
+      };
+    }
+
+    function classifyPoem(m: ReturnType<typeof computeMetrics>): string {
+      if (m.hasStageDirection && m.stanzaCount > 3) return 'collage';
+      if (m.hasSectionNumbers) return 'triptych';
+      if (m.hasDialogue && m.lineCount > 15 && m.avgLineLength > 5) return 'dramatic-narrative';
+      if (m.hasDialogue || m.hasStageDirection) return 'dramatic-monologue';
+      if (m.lineEndPunctuation > 0.6 && m.stanzaVariance < 2 && m.avgStanzaSize >= 3)
+        return 'hymn-structured';
+      if (m.repetitionScore > 0.5 && m.avgLineLength < 5) return 'incantatory';
+      if (m.repetitionScore > 0.4 && m.stanzaVariance < 2) return 'structured-repetitive';
+      if (m.lineCount <= 8 && m.avgLineLength < 5 && m.uniqueWordRatio > 0.8) return 'minimal-aphoristic';
+      if (m.lineCount <= 12 && m.avgLineLength < 5) return 'minimal-fragment';
+      if (m.lineCount <= 20 && m.punctuationDensity < 0.1 && m.uniqueWordRatio > 0.7)
+        return 'still-observation';
+      if (m.avgLineLength > 7 && m.lineCount > 15) return 'prose-lyric';
+      if (m.avgLineLength > 6 && m.stanzaCount <= 3) return 'dense-linear';
+      if (m.punctuationDensity > 0.15 && m.lineCount > 20) return 'lyric-dense';
+      if (m.uniqueWordRatio > 0.75 && m.stanzaVariance > 3) return 'lyric-fragmented';
+      if (m.lineCount > 8 && m.lineCount <= 25 && m.avgLineLength >= 4 && m.avgLineLength <= 7)
+        return 'meditative';
+      if (m.stanzaVariance > 5) return 'hybrid';
+      if (m.stanzaVariance < 3 && m.avgStanzaSize >= 3) return 'structured';
+      return 'prose-lyric';
+    }
+
+    function computeEmotionScore(m: ReturnType<typeof computeMetrics>): number {
+      return (
+        m.punctuationDensity * 0.25 +
+        m.repetitionScore * 0.2 +
+        (1 - m.uniqueWordRatio) * 0.15 +
+        Math.min(m.stanzaVariance / 10, 1) * 0.2 +
+        Math.min(m.avgLineLength / 15, 1) * 0.1 +
+        m.lineEndPunctuation * 0.1
+      );
+    }
+
+    function djb2(str: string): number {
+      let hash = 5381;
+      for (let i = 0; i < str.length; i++) {
+        hash = ((hash << 5) + hash) ^ str.charCodeAt(i);
+      }
+      return hash >>> 0;
+    }
+
+    function mulberry32(seed: number): () => number {
+      let s = seed >>> 0;
+      return function () {
+        s += 0x6d2b79f5;
+        let z = s;
+        z = Math.imul(z ^ (z >>> 15), z | 1);
+        z ^= z + Math.imul(z ^ (z >>> 7), z | 61);
+        return ((z ^ (z >>> 14)) >>> 0) / 0x100000000;
+      };
+    }
+
+    function getWorldTimeFraction(worldId: string): number {
+      const zones: Record<string, string> = {
+        'their-world': 'America/New_York',
+        'bless-you': 'Asia/Shanghai',
+        'still-life': 'Australia/Brisbane',
+      };
+      try {
+        const tz = zones[worldId] ?? 'UTC';
+        const now = new Date();
+        const str = now.toLocaleTimeString('en-US', {
+          timeZone: tz,
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false,
+        });
+        const [h, m] = str.split(':').map(Number);
+        return (h * 60 + m) / 1440;
+      } catch {
+        return 0;
+      }
+    }
+
+    function getLocalDateString(): string {
+      const d = new Date();
+      const y = d.getFullYear();
+      const mo = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${y}-${mo}-${day}`;
+    }
+
+    const LAYOUT_TIME_KEY_PREFIX = 'tw-layout-time:';
+
+    function getCachedWorldTimeInt(worldId: string, id: string): number {
+      const fresh = () => Math.floor(getWorldTimeFraction(worldId) * 10000);
+      if (typeof localStorage === 'undefined') {
+        return fresh();
+      }
+      const key = `${LAYOUT_TIME_KEY_PREFIX}${worldId}:${id}`;
+      const now = Date.now();
+      try {
+        const raw = localStorage.getItem(key);
+        if (raw) {
+          const parsed = JSON.parse(raw) as { v?: unknown; exp?: unknown };
+          const v = typeof parsed.v === 'number' ? parsed.v : null;
+          const exp = typeof parsed.exp === 'number' ? parsed.exp : null;
+          if (v !== null && exp !== null && now < exp) {
+            return v;
+          }
+        }
+      } catch {
+        /* ignore */
+      }
+      const v = fresh();
+      const ttlMs = (15 + Math.random() * 15) * 60 * 1000;
+      try {
+        localStorage.setItem(key, JSON.stringify({ v, exp: now + ttlMs }));
+      } catch {
+        /* ignore */
+      }
+      return v;
+    }
+
+    function buildSeed(worldId: string, id: string, metrics: ReturnType<typeof computeMetrics>): number {
+      const dateStr = getLocalDateString();
+      const wtInt = getCachedWorldTimeInt(worldId, id);
+      const combined = [
+        worldId,
+        id,
+        dateStr,
+        metrics.lineCount,
+        metrics.wordCount,
+        metrics.charCount,
+        metrics.stanzaCount,
+        wtInt,
+      ].join('|');
+      return djb2(combined);
+    }
+
+    const frameLayouts = [
+      {
+        id: 'FL-dense-A',
+        poemTypes: ['dense-linear', 'prose-lyric'],
+        titleFrame: { colStart: 1, colSpan: 8, rowStart: 1, rowSpan: 3 },
+        bodyFrames: [{ colStart: 10, colSpan: 13, rowStart: 1, rowSpan: 9 }],
+      },
+      {
+        id: 'FL-dense-B',
+        poemTypes: ['dense-linear', 'prose-lyric', 'lyric-dense'],
+        titleFrame: { colStart: 16, colSpan: 8, rowStart: 1, rowSpan: 3 },
+        bodyFrames: [{ colStart: 1, colSpan: 13, rowStart: 1, rowSpan: 9 }],
+      },
+      {
+        id: 'FL-dense-C',
+        poemTypes: ['dense-linear', 'prose-lyric', 'dramatic-narrative'],
+        titleFrame: { colStart: 1, colSpan: 21, rowStart: 1, rowSpan: 2 },
+        bodyFrames: [
+          { colStart: 1, colSpan: 10, rowStart: 3, rowSpan: 7 },
+          { colStart: 12, colSpan: 10, rowStart: 3, rowSpan: 7 },
+        ],
+      },
+      {
+        id: 'FL-structured-A',
+        poemTypes: ['structured', 'hymn-structured', 'structured-repetitive'],
+        titleFrame: { colStart: 1, colSpan: 5, rowStart: 1, rowSpan: 2 },
+        bodyFrames: [{ colStart: 7, colSpan: 13, rowStart: 1, rowSpan: 9 }],
+      },
+      {
+        id: 'FL-structured-B',
+        poemTypes: ['structured', 'hymn-structured', 'meditative'],
+        titleFrame: { colStart: 14, colSpan: 8, rowStart: 1, rowSpan: 2 },
+        bodyFrames: [{ colStart: 1, colSpan: 13, rowStart: 1, rowSpan: 9 }],
+      },
+      {
+        id: 'FL-triptych-A',
+        poemTypes: ['triptych', 'collage'],
+        titleFrame: { colStart: 1, colSpan: 13, rowStart: 1, rowSpan: 1 },
+        bodyFrames: [
+          { colStart: 1, colSpan: 7, rowStart: 2, rowSpan: 8 },
+          { colStart: 9, colSpan: 7, rowStart: 2, rowSpan: 8 },
+          { colStart: 17, colSpan: 7, rowStart: 2, rowSpan: 8 },
+        ],
+      },
+      {
+        id: 'FL-triptych-B',
+        poemTypes: ['triptych', 'collage', 'hybrid'],
+        titleFrame: { colStart: 17, colSpan: 7, rowStart: 1, rowSpan: 2 },
+        bodyFrames: [
+          { colStart: 1, colSpan: 7, rowStart: 1, rowSpan: 9 },
+          { colStart: 9, colSpan: 7, rowStart: 1, rowSpan: 9 },
+        ],
+      },
+      {
+        id: 'FL-incant-A',
+        poemTypes: ['incantatory', 'structured-repetitive'],
+        titleFrame: { colStart: 1, colSpan: 3, rowStart: 1, rowSpan: 5 },
+        bodyFrames: [{ colStart: 5, colSpan: 13, rowStart: 1, rowSpan: 9 }],
+      },
+      {
+        id: 'FL-incant-B',
+        poemTypes: ['incantatory', 'minimal-aphoristic'],
+        titleFrame: { colStart: 1, colSpan: 13, rowStart: 1, rowSpan: 3 },
+        bodyFrames: [{ colStart: 3, colSpan: 8, rowStart: 5, rowSpan: 5 }],
+      },
+      {
+        id: 'FL-minimal-A',
+        poemTypes: ['minimal-fragment', 'minimal-aphoristic'],
+        titleFrame: { colStart: 1, colSpan: 8, rowStart: 1, rowSpan: 2 },
+        bodyFrames: [{ colStart: 14, colSpan: 8, rowStart: 6, rowSpan: 4 }],
+      },
+      {
+        id: 'FL-minimal-B',
+        poemTypes: ['minimal-fragment', 'still-observation', 'minimal-aphoristic'],
+        titleFrame: { colStart: 6, colSpan: 13, rowStart: 3, rowSpan: 2 },
+        bodyFrames: [{ colStart: 9, colSpan: 8, rowStart: 6, rowSpan: 4 }],
+      },
+      {
+        id: 'FL-lyric-A',
+        poemTypes: ['lyric-fragmented', 'lyric-dense', 'hybrid'],
+        titleFrame: { colStart: 2, colSpan: 8, rowStart: 2, rowSpan: 2 },
+        bodyFrames: [
+          { colStart: 12, colSpan: 8, rowStart: 1, rowSpan: 4 },
+          { colStart: 2, colSpan: 8, rowStart: 5, rowSpan: 5 },
+        ],
+      },
+      {
+        id: 'FL-lyric-B',
+        poemTypes: ['lyric-fragmented', 'lyric-dense'],
+        titleFrame: { colStart: 1, colSpan: 5, rowStart: 4, rowSpan: 3 },
+        bodyFrames: [
+          { colStart: 8, colSpan: 13, rowStart: 1, rowSpan: 5 },
+          { colStart: 8, colSpan: 13, rowStart: 7, rowSpan: 3 },
+        ],
+      },
+      {
+        id: 'FL-meditative-A',
+        poemTypes: ['meditative', 'still-observation'],
+        titleFrame: { colStart: 3, colSpan: 8, rowStart: 2, rowSpan: 2 },
+        bodyFrames: [{ colStart: 5, colSpan: 8, rowStart: 5, rowSpan: 5 }],
+      },
+      {
+        id: 'FL-dramatic-A',
+        poemTypes: ['dramatic-monologue', 'dramatic-narrative', 'collage'],
+        titleFrame: { colStart: 1, colSpan: 13, rowStart: 1, rowSpan: 2 },
+        bodyFrames: [{ colStart: 1, colSpan: 21, rowStart: 4, rowSpan: 6 }],
+      },
+      {
+        id: 'FL-dramatic-B',
+        poemTypes: ['dramatic-monologue', 'dramatic-narrative'],
+        titleFrame: { colStart: 16, colSpan: 8, rowStart: 1, rowSpan: 2 },
+        bodyFrames: [{ colStart: 1, colSpan: 13, rowStart: 1, rowSpan: 9 }],
+      },
+      {
+        id: 'FL-still-A',
+        poemTypes: ['still-observation', 'meditative'],
+        titleFrame: { colStart: 14, colSpan: 8, rowStart: 3, rowSpan: 2 },
+        bodyFrames: [{ colStart: 16, colSpan: 8, rowStart: 6, rowSpan: 4 }],
+      },
+    ];
+
+    function selectFrameLayout(poemType: string, rand: () => number) {
+      const valid = frameLayouts.filter((fl) => fl.poemTypes.includes(poemType));
+      const pool = valid.length > 0 ? valid : [...frameLayouts];
+      return pool[Math.floor(rand() * pool.length)];
+    }
+
+    function applyPalette(worldId: string) {
+      const palettes: Record<string, { bg: string; primary: string; accent: string; meta: string }> = {
+        'their-world': {
+          bg: '#F5F2ED',
+          primary: '#1A1A1A',
+          accent: '#C0392B',
+          meta: '#888888',
+        },
+        'bless-you': {
+          bg: '#F2EDE4',
+          primary: '#2C1810',
+          accent: '#9B7B8B',
+          meta: '#A09080',
+        },
+        'still-life': {
+          bg: '#F8F7F4',
+          primary: '#2A2A2A',
+          accent: '#8A9E8A',
+          meta: '#AAAAAA',
+        },
+      };
+      const p = palettes[worldId] ?? palettes['their-world'];
+      document.body.style.setProperty('--color-bg', p.bg);
+      document.body.style.setProperty('--color-primary', p.primary);
+      document.body.style.setProperty('--color-accent', p.accent);
+      document.body.style.setProperty('--color-meta', p.meta);
+      document.body.style.background = p.bg;
+      document.body.style.color = p.primary;
+    }
+
+    function computeTitleSize(lineCount: number, rand: () => number): string {
+      if (lineCount > 20) return 'var(--type-display)';
+      if (lineCount > 10) {
+        return rand() < 0.5 ? 'var(--type-display)' : 'var(--type-hero)';
+      }
+      return 'var(--type-hero)';
+    }
+
+    const stanzas: string[][] = [];
+    let current: string[] = [];
+    for (const line of allLines) {
+      if (line === '') {
+        if (current.length > 0) {
+          stanzas.push(current);
+          current = [];
+        }
+      } else {
+        current.push(line);
+      }
+    }
+    if (current.length > 0) stanzas.push(current);
+
+    const metrics = computeMetrics(allLines, stanzas);
+    const poemType = classifyPoem(metrics);
+    const emotionScore = computeEmotionScore(metrics);
+    const seed = buildSeed(world, poemId, metrics);
+    const rand = mulberry32(seed);
+
+    applyPalette(world);
+
+    const frameLayout = selectFrameLayout(poemType, rand);
+    const titleSize = computeTitleSize(metrics.lineCount, rand);
+
+    const titleFrame = document.getElementById('title-frame');
+    const titleEl = document.getElementById('poem-title');
+    const canvas = document.getElementById('grid-canvas');
+
+    if (titleFrame && frameLayout.titleFrame) {
+      const tf = frameLayout.titleFrame;
+      titleFrame.style.gridColumn = `${tf.colStart} / span ${tf.colSpan}`;
+      titleFrame.style.gridRow = `${tf.rowStart} / span ${tf.rowSpan}`;
+      titleFrame.style.textAlign = rand() < 0.5 ? 'start' : 'end';
+    }
+
+    if (titleEl) {
+      titleEl.style.fontSize = titleSize;
+    }
+
+    const bodyFramesContainer = document.getElementById('body-frames');
+    if (!bodyFramesContainer || !canvas) return;
+
+    const frameEls: HTMLElement[] = frameLayout.bodyFrames.map((bf, i) => {
+      const el = document.createElement('div');
+      el.className = 'body-frame';
+      el.id = `body-frame-${i}`;
+      el.style.gridColumn = `${bf.colStart} / span ${bf.colSpan}`;
+      el.style.gridRow = `${bf.rowStart} / span ${bf.rowSpan}`;
+      el.style.height = `calc(${bf.rowSpan} * var(--cell-h))`;
+      el.style.minHeight = '';
+      el.style.overflow = 'hidden';
+      el.style.alignSelf = 'start';
+      bodyFramesContainer.appendChild(el);
+      return el;
+    });
+
+    const metaCorner = (['top-left', 'top-right', 'bottom-left', 'bottom-right'] as const)[
+      Math.floor(rand() * 4)
+    ];
+
+    function layoutBody() {
+      const bodyFontSize = parseFloat(getComputedStyle(document.body).fontSize || '20');
+      const lineHeightRatio = 1.618;
+      const stanzaGapLines = 1;
+      const lineHeightPx = bodyFontSize * lineHeightRatio;
+
+      const accentOnFirst = rand() < 0.5;
+
+      function applyFrameSizing(useGrowMode, extraPerFrame) {
+        frameEls.forEach((el, i) => {
+          const bf = frameLayout.bodyFrames[i];
+          if (useGrowMode) {
+            el.style.height = 'auto';
+            if (extraPerFrame > 0) {
+              el.style.minHeight = `calc(${bf.rowSpan} * var(--cell-h) + ${extraPerFrame}px)`;
+            } else {
+              el.style.minHeight = `calc(${bf.rowSpan} * var(--cell-h))`;
+            }
+          } else {
+            el.style.minHeight = '';
+            el.style.height = `calc(${bf.rowSpan} * var(--cell-h))`;
+          }
+        });
+      }
+
+      function runContentFlow() {
+        for (const el of frameEls) {
+          el.replaceChildren();
+        }
+
+        let stanzaIdx = 0;
+        let lineInStanza = 0;
+        let firstAccentDone = false;
+
+        for (const frameEl of frameEls) {
+          const frameHeight =
+            frameEl.getBoundingClientRect().height ||
+            parseFloat(String(frameEl.style.height)) ||
+            90;
+
+          let remainingPx = frameHeight;
+
+          while (stanzaIdx < stanzas.length && remainingPx > lineHeightPx) {
+            const stanza = stanzas[stanzaIdx];
+
+            const stanzaEl = document.createElement('div');
+            stanzaEl.className = 'poem-stanza';
+
+            while (lineInStanza < stanza.length && remainingPx > lineHeightPx) {
+              const lineEl = document.createElement('div');
+              lineEl.className = 'poem-line';
+              lineEl.textContent = stanza[lineInStanza];
+
+              if (!firstAccentDone && stanzaIdx === 0 && lineInStanza === 0 && accentOnFirst) {
+                lineEl.style.color = 'var(--color-accent)';
+                firstAccentDone = true;
+              }
+
+              stanzaEl.appendChild(lineEl);
+              lineInStanza++;
+              remainingPx -= lineHeightPx;
+            }
+
+            if (stanzaEl.children.length > 0) {
+              frameEl.appendChild(stanzaEl);
+            }
+
+            if (lineInStanza >= stanza.length) {
+              stanzaIdx++;
+              lineInStanza = 0;
+              remainingPx -= lineHeightPx * stanzaGapLines;
+            }
+          }
+        }
+
+        let overflowLines = 0;
+        if (stanzaIdx < stanzas.length) {
+          overflowLines += stanzas[stanzaIdx].length - lineInStanza;
+          for (let j = stanzaIdx + 1; j < stanzas.length; j++) {
+            overflowLines += stanzas[j].length;
+          }
+        }
+        return overflowLines;
+      }
+
+      // Default: fixed frame heights + single pass (matches pre–long-poem fix behavior).
+      applyFrameSizing(false, 0);
+      let overflowLines = runContentFlow();
+
+      // Only when content truly overflows: grow frames and re-flow (Room, Pockets, etc.).
+      if (overflowLines > 0) {
+        let extraPerFrame = 0;
+        const maxGrowIters = 14;
+        for (let grow = 0; grow < maxGrowIters; grow++) {
+          applyFrameSizing(true, extraPerFrame);
+          overflowLines = runContentFlow();
+          if (overflowLines === 0) break;
+          const n = frameEls.length || 1;
+          const bump = Math.ceil((overflowLines * lineHeightPx * 1.08) / n);
+          extraPerFrame += Math.max(1, bump);
+        }
+      }
+
+      const metaEl = document.getElementById('poem-meta');
+      if (metaEl) {
+        metaEl.style.position = 'absolute';
+        metaEl.style.bottom = '0';
+        metaEl.style.right = '0';
+        metaEl.style.color = 'var(--color-meta)';
+      }
+
+      if (window.location.search.includes('debug')) {
+        const old = document.getElementById('poem-debug-overlay');
+        old?.remove();
+        const overlay = document.createElement('div');
+        overlay.id = 'poem-debug-overlay';
+        overlay.style.cssText = `
+          position: fixed; bottom: 60px; right: 48px;
+          background: rgba(0,0,0,0.85); color: #fff;
+          font-family: monospace; font-size: 11px;
+          padding: 12px 16px; border-radius: 4px;
+          z-index: 1000; line-height: 1.7; max-width: 320px;
+        `;
+        overlay.innerHTML = `
+          <strong>${poemId}</strong><br>
+          type: <em>${poemType}</em><br>
+          layout: <em>${frameLayout.id}</em><br>
+          frames: ${frameLayout.bodyFrames.length}<br>
+          lines: ${metrics.lineCount} / stanzas: ${metrics.stanzaCount}<br>
+          emotion: ${emotionScore.toFixed(3)}<br>
+          seed: ${seed}<br>
+          meta: ${metaCorner}<br>
+          overflow lines: ${overflowLines}
+        `;
+        document.body.appendChild(overlay);
+      }
+    }
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(layoutBody);
+    });
+
+    const indexBtn = document.getElementById('index-trigger');
+    if (indexBtn) {
+      const KEY = 'tw-index-side';
+      const EXP = 'tw-index-side-exp';
+      const pickSide = (): 'left' | 'right' => {
+        if (typeof localStorage === 'undefined') {
+          return Math.random() < 0.5 ? 'left' : 'right';
+        }
+        const now = Date.now();
+        try {
+          const exp = parseInt(localStorage.getItem(EXP) || '0', 10);
+          const s = localStorage.getItem(KEY);
+          if ((s === 'left' || s === 'right') && now < exp) {
+            return s as 'left' | 'right';
+          }
+        } catch {
+          /* ignore */
+        }
+        const side = Math.random() < 0.5 ? 'left' : 'right';
+        const ttl = (15 + Math.random() * 15) * 60 * 1000;
+        try {
+          localStorage.setItem(KEY, side);
+          localStorage.setItem(EXP, String(Date.now() + ttl));
+        } catch {
+          /* ignore */
+        }
+        return side;
+      };
+      indexBtn.classList.toggle('index-trigger--right', pickSide() === 'right');
+      indexBtn.addEventListener('click', () => {
+        (window as Window & { openIndex?: () => void }).openIndex?.();
+      });
+    }
+
+    console.group(`[Poem] ${poemId}`);
+    console.log('type:', poemType);
+    console.log('layout:', frameLayout.id);
+    console.log('frames:', frameLayout.bodyFrames.length);
+    console.log('lines:', metrics.lineCount, '/ stanzas:', metrics.stanzaCount);
+    console.log('emotion:', emotionScore.toFixed(3));
+    console.log('seed:', seed);
+    console.groupEnd();
+
+    window.addEventListener('resize', () => {
+      requestAnimationFrame(layoutBody);
+    });
+  });
+</script>
+
+<style>
+  .poem-page {
+    width: min(var(--content-w), 100%);
+    margin: 0 auto;
+    min-height: calc(10 * var(--cell-h));
+    position: relative;
+    box-sizing: border-box;
+    /* Clear fixed INDEX when body frames extend below the nominal grid */
+    padding-bottom: calc(var(--space-xl) + 2.5rem);
+  }
+
+  .poem-page .grid-canvas {
+    display: grid;
+    grid-template-columns: repeat(var(--grid-cols), var(--cell-w));
+    grid-template-rows: repeat(var(--grid-rows), var(--cell-h));
+    width: min(var(--content-w), 100%);
+    margin-inline: auto;
+    position: relative;
+    box-sizing: border-box;
+    overflow: visible;
+  }
+
+  #body-frames {
+    display: contents;
+  }
+
+  .title-frame {
+    overflow: visible;
+    align-self: start;
+  }
+
+  .poem-title {
+    font-size: var(--computed-title-size, var(--type-display));
+    font-weight: normal;
+    line-height: var(--leading-tight);
+    margin: 0;
+    padding: 0;
+  }
+
+  /*
+   * Client script creates .body-frame / .poem-stanza / .poem-line — they do not get
+   * Astro scoped attributes, so rules must use :global() under a scoped ancestor.
+   */
+  .poem-page :global(.body-frame) {
+    overflow: hidden;
+    align-self: start;
+    position: relative;
+    box-sizing: border-box;
+    font-size: var(--type-body-poem, var(--type-body));
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .poem-page :global(.poem-stanza) {
+    margin-bottom: var(--space-lg);
+  }
+
+  .poem-page :global(.poem-stanza:last-child) {
+    margin-bottom: 0;
+  }
+
+  .poem-page :global(.poem-line) {
+    display: block;
+    line-height: var(--leading-body);
+    white-space: pre-wrap;
+    min-height: 1.618em;
+    font-size: var(--type-body);
+    margin: 0;
+    padding: 0;
+  }
+
+  .poem-meta {
+    position: absolute;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-meta, #888888);
+    font-family: Georgia, serif;
+    z-index: 2;
+    padding: var(--space-xs);
+  }
+
+  .index-trigger {
+    position: fixed;
+    bottom: var(--space-lg);
+    z-index: 50;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: Georgia, serif;
+    font-size: 19px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #1a1a1a;
+    opacity: 0.35;
+    padding: 0;
+    line-height: 1.2;
+    transition: opacity 0.2s;
+  }
+
+  .index-trigger:not(.index-trigger--right) {
+    left: max(var(--margin-x), 12px);
+    right: auto;
+  }
+
+  .index-trigger.index-trigger--right {
+    left: auto;
+    right: max(var(--margin-x), 12px);
+  }
+
+  .index-trigger::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='4'%3E%3Cpath d='M0 2 Q5 0 10 2 Q15 4 20 2' fill='none' stroke='%231A1A1A' stroke-width='0.8'/%3E%3C/svg%3E");
+    background-repeat: repeat-x;
+    background-size: 20px 3px;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .index-trigger:hover {
+    opacity: 1;
+  }
+
+  .index-trigger:hover::after {
+    opacity: 1;
+  }
+</style>

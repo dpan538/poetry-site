@@ -1,0 +1,105 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+interface Props {
+  world: 'their-world' | 'bless-you' | 'still-life';
+  title: string;
+  description: string;
+}
+
+const { world, title, description } = Astro.props;
+
+const list = await getCollection(world);
+const poems = [...list].sort((a, b) => a.data.order - b.data.order);
+---
+
+<BaseLayout title={title} world={world}>
+  <main class="world-index">
+    <header class="world-header">
+      <h1>{title}</h1>
+      <p class="world-desc">{description}</p>
+    </header>
+
+    <ol class="poem-nums" start="1">
+      {poems.map((poem) => (
+        <li>
+          <a href={`/${world}/${poem.id}`} class="poem-num-link">
+            <span class="poem-num">{String(poem.data.order).padStart(2, '0')}</span>
+            <span class="poem-num-title">{poem.data.title}</span>
+          </a>
+        </li>
+      ))}
+    </ol>
+  </main>
+</BaseLayout>
+
+<style>
+  .world-index {
+    padding-left: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+    max-width: none;
+    width: 100%;
+    margin: 0;
+  }
+
+  .world-header {
+    padding: var(--space-xl) 0 var(--space-lg);
+    border-bottom: 0.5px solid rgba(26, 26, 26, 0.15);
+    margin-bottom: var(--space-lg);
+  }
+
+  .world-header h1 {
+    margin: 0 0 var(--space-sm);
+    font-size: var(--type-display);
+    line-height: var(--leading-display);
+    font-weight: normal;
+  }
+
+  .world-desc {
+    margin: 0;
+    max-width: 42rem;
+    font-size: var(--type-body);
+    line-height: var(--leading-body);
+    color: #888888;
+  }
+
+  .poem-nums {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .poem-nums li {
+    margin: 0;
+  }
+
+  .poem-num-link {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-md);
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .poem-num {
+    font-size: 13px;
+    color: #888888;
+    min-width: 1.75rem;
+  }
+
+  .poem-num-title {
+    font-size: var(--type-title);
+    line-height: var(--leading-title);
+    font-weight: normal;
+  }
+
+  .poem-num-link:hover .poem-num-title {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+</style>

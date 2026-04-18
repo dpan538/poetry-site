@@ -1,0 +1,75 @@
+---
+interface Props {
+  pathname: string;
+}
+
+const { pathname } = Astro.props;
+const norm = pathname.replace(/\/$/, '') || '/';
+
+const collectionActive = norm === '/collection' || norm.startsWith('/collection/');
+const aboutActive = norm === '/about' || norm.startsWith('/about/');
+---
+
+<nav class="site-nav" aria-label="Site">
+  <a href="/" class="nav-logo">Dai Pan</a>
+  <div class="nav-right">
+    <a href="/collection" class:list={['nav-link', { 'is-active': collectionActive }]}>Collection</a>
+    <a href="/about" class:list={['nav-link', { 'is-active': aboutActive }]}>About</a>
+  </div>
+</nav>
+
+<style is:global>
+  .site-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--site-nav-height);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 var(--margin-x);
+    background: var(--color-bg, #f8f7f4);
+    border-bottom: 0.5px solid rgba(26, 26, 26, 0.1);
+    z-index: 100;
+    font-family: Georgia, 'Times New Roman', serif;
+    box-sizing: border-box;
+  }
+
+  .nav-logo {
+    font-size: 19px;
+    font-weight: normal;
+    text-decoration: none;
+    color: #1a1a1a;
+    letter-spacing: 0.01em;
+    opacity: 1;
+  }
+
+  .nav-right {
+    display: flex;
+    gap: var(--space-lg);
+    align-items: center;
+  }
+
+  .nav-link {
+    font-size: 14px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: #1a1a1a;
+    opacity: 1;
+    transition: opacity 0.2s linear, color 0.2s linear, text-decoration 0.2s linear;
+  }
+
+  .nav-link.is-active {
+    text-decoration: underline;
+    text-decoration-style: solid;
+    text-underline-offset: 3px;
+  }
+
+  .nav-link:hover {
+    text-decoration: underline;
+    text-decoration-style: wavy;
+    text-underline-offset: 4px;
+  }
+</style>

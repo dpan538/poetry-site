@@ -1,0 +1,43 @@
+---
+import '../styles/global.css';
+import Nav from '../components/Nav.astro';
+
+interface Props {
+  world?: 'their-world' | 'bless-you' | 'still-life';
+  title: string;
+  /** When set, `/` immediately redirects to a random poem (JS). */
+  homeRandomPoems?: { id: string; world: string }[];
+}
+
+const { world, title, homeRandomPoems } = Astro.props;
+const pathname = Astro.url.pathname;
+---
+
+<!doctype html>
+<html lang="en" {...world ? { 'data-world': world } : {}}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title}</title>
+    {
+      homeRandomPoems && homeRandomPoems.length > 0 ? (
+        <script is:inline define:vars={{ entries: homeRandomPoems }}>
+          (function () {
+            var path = typeof location !== 'undefined' ? location.pathname : '';
+            if (path !== '/' && path !== '') return;
+            var e = entries;
+            if (!e || !e.length) return;
+            var i = Math.floor(Math.random() * e.length);
+            var p = e[i];
+            location.replace('/' + p.world + '/' + p.id);
+          })();
+        </script>
+      ) : null
+    }
+  </head>
+  <body>
+    <Nav pathname={pathname} />
+    <slot />
+  </body>
+</html>

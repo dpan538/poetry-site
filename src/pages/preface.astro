@@ -1,0 +1,77 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Preface — Dai Pan">
+  <main class="preface-page">
+    <header class="preface-header">
+      <h1>Preface</h1>
+      <p class="preface-meta">Dai Pan — 2024–2025</p>
+    </header>
+
+    <section class="preface-body">
+      <p>
+        These poems were written between 2024 and spring 2025, during a stretch of life that felt
+        both crowded and empty — cities changing shape, relationships thinning and thickening, the
+        self trying to keep up with its own revisions.
+      </p>
+      <p>
+        I did not set out to build a collection. I wrote when language arrived, and I followed it.
+        Over time, three tones emerged: a voice that speaks toward power and spectacle (<em>Their
+        World</em>), a voice that prays and curses in the same breath (<em>Bless You</em>), and a
+        voice that tries to stay close to the ordinary surface of things (<em>Still Life</em>).
+      </p>
+      <p>
+        On this site, each poem is given a layout that responds to its own structure — line count,
+        rhythm, density, repetition — and to the time of day in a city tied to each world. The
+        reading experience is stable in meaning but unstable in form: the same poem can wear
+        different clothes depending on when and where you meet it.
+      </p>
+      <p>
+        If you are reading this before entering the poems, know that nothing here asks for a single
+        correct interpretation. These are attempts at honesty, not explanations. Take what holds,
+        leave what does not, and move between worlds as you need.
+      </p>
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+  .preface-page {
+    padding-left: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+    max-width: none;
+    width: 100%;
+    margin: 0;
+  }
+
+  .preface-header {
+    margin-bottom: var(--space-xl);
+  }
+
+  .preface-header h1 {
+    margin: 0 0 var(--space-sm);
+    font-size: var(--type-display);
+    line-height: var(--leading-display);
+    font-weight: normal;
+  }
+
+  .preface-meta {
+    margin: 0;
+    font-size: var(--type-body);
+    color: #1a1a1a;
+  }
+
+  .preface-body p {
+    margin: 0 0 var(--space-md);
+    font-size: var(--type-body);
+    line-height: var(--leading-body);
+    color: #1a1a1a;
+    max-width: 60ch;
+  }
+
+  .preface-body p:last-child {
+    margin-bottom: 0;
+  }
+</style>
