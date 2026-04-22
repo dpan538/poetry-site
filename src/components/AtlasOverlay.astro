@@ -64,26 +64,29 @@ const { poemId, world } = Astro.props;
 </div>
 
 <style>
-  /* ── Trigger button ──────────────────────────────────────────────────────── */
+  /* ── Trigger button — mirrors INDEX visual logic, top-right below nav ─────── */
   .atlas-trigger {
     position: fixed;
-    top: 14px;
-    right: var(--margin-x, 24px);
-    z-index: 200;
-    background: transparent;
+    top: calc(var(--site-nav-height, 56px) + var(--space-lg, 34px));
+    right: max(var(--margin-x, 24px), 12px);
+    z-index: 150;
+    background: none;
     border: none;
-    padding: 4px 0;
-    font-family: inherit;
-    font-size: 11px;
-    letter-spacing: 0.14em;
-    color: var(--color-meta, #595959);
+    padding: 0;
     cursor: pointer;
-    transition: color 0.15s ease, opacity 0.15s ease;
-    line-height: 1;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 19px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-primary, #1a1a1a);
+    opacity: 0.35;
+    line-height: 1.2;
+    transition: opacity 0.2s;
   }
 
   .atlas-trigger:hover {
-    color: var(--color-primary, #1a1a1a);
+    opacity: 1;
+    color: var(--color-accent, #1a1a1a);
   }
 
   .atlas-trigger:focus-visible {
