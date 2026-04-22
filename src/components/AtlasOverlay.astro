@@ -455,6 +455,7 @@ const { poemId, world } = Astro.props;
     pinchStart: number | null; pinchScale: number;
     pointerDownPos: { x: number; y: number } | null; pointerDownTime: number;
     rafId: number; isStub: boolean;
+    primaryColor: string; metaColor: string;
 
     constructor(canvas: HTMLCanvasElement, poemId: string, worldKey: string) {
       this.canvas = canvas;
@@ -469,8 +470,11 @@ const { poemId, world } = Astro.props;
       this.pinchStart = null; this.pinchScale = 1;
       this.pointerDownPos = null; this.pointerDownTime = 0;
       this.rafId = 0; this.isStub = !this.poem?.mode;
+      this.primaryColor = '#1a1a1a';
+      this.metaColor = '#4f4f4f';
 
       this.resize();
+      this.readThemeColors();
       this.buildGraph();
       this.primeLayout(320); // settle positions synchronously — no visible motion
       this.fitToCanvas();
@@ -483,6 +487,14 @@ const { poemId, world } = Astro.props;
       let h = 0;
       for (let i = 0; i < s.length; i++) h = (Math.imul(31, h) + s.charCodeAt(i)) | 0;
       return (h >>> 0) / 4294967296;
+    }
+
+    readThemeColors() {
+      const styles = getComputedStyle(document.documentElement);
+      const p = styles.getPropertyValue('--color-primary').trim();
+      const m = styles.getPropertyValue('--color-meta').trim();
+      if (p) this.primaryColor = p;
+      if (m) this.metaColor = m;
     }
 
     // ── Zone home position ────────────────────────────────────────────────────
@@ -677,7 +689,7 @@ const { poemId, world } = Astro.props;
       zones.forEach(({ key, rx, ry }) => {
         const z = ZONES[key];
         ctx.save();
-        ctx.globalAlpha = 0.07;
+        ctx.globalAlpha = 0.10;
         ctx.beginPath(); ctx.ellipse(z.cx, z.cy, rx, ry, 0, 0, Math.PI * 2);
         ctx.fillStyle = ATTR_COLORS[key]; ctx.fill();
         ctx.restore();
@@ -686,7 +698,7 @@ const { poemId, world } = Astro.props;
       zones.forEach(({ key, rx, ry }) => {
         const z = ZONES[key];
         ctx.save();
-        ctx.globalAlpha = 0.13;
+        ctx.globalAlpha = 0.20;
         ctx.beginPath(); ctx.ellipse(z.cx, z.cy, rx + 2, ry + 2, 0, 0, Math.PI * 2);
         ctx.strokeStyle = ATTR_COLORS[key]; ctx.lineWidth = 0.8;
         ctx.setLineDash([4, 5]); ctx.stroke(); ctx.setLineDash([]);
@@ -697,7 +709,7 @@ const { poemId, world } = Astro.props;
       ctx.font = 'italic 12px Georgia, serif';
       ctx.textBaseline = 'middle'; ctx.textAlign = 'center';
       zones.forEach(({ key, label, labelY }) => {
-        ctx.globalAlpha = 0.58;
+        ctx.globalAlpha = 0.74;
         ctx.fillStyle = ATTR_COLORS[key];
         ctx.fillText(label, ZONES[key].cx, labelY);
       });
@@ -712,7 +724,7 @@ const { poemId, world } = Astro.props;
         if (alpha < 0.02) return;
         const isSel = this.selectedNode === edge.to;
         ctx.save();
-        ctx.globalAlpha = alpha * (isSel ? 0.65 : 0.28);
+        ctx.globalAlpha = alpha * (isSel ? 0.72 : 0.40);
         ctx.strokeStyle = edge.color;
         ctx.lineWidth = isSel ? 1.5 : 1.0;
         ctx.beginPath();
@@ -755,7 +767,7 @@ const { poemId, world } = Astro.props;
       ctx.beginPath(); ctx.arc(0, 0, n.r, 0, Math.PI * 2);
       ctx.strokeStyle = wc.accent; ctx.lineWidth = 1.8; ctx.stroke();
       // Title below — larger, comfortable to read
-      ctx.font = '17px Georgia, serif'; ctx.fillStyle = '#1a1a1a';
+      ctx.font = '17px Georgia, serif'; ctx.fillStyle = this.primaryColor;
       ctx.textAlign = 'center'; ctx.textBaseline = 'top';
       this.wrapText(n.title || '', 0, n.r + 11, 140, 20);
     }
@@ -769,7 +781,7 @@ const { poemId, world } = Astro.props;
 
       // Active nodes: full presence.
       // Inactive: clearly subordinate but still legible — not faint, just smaller and muted.
-      const baseOpacity = active ? 1 : 0.58;
+      const baseOpacity = active ? 1 : 0.74;
       ctx.globalAlpha *= baseOpacity;
 
       const baseR = active ? 10 : 5;
@@ -778,7 +790,7 @@ const { poemId, world } = Astro.props;
       // Soft aura for active nodes
       if (active && !isSel) {
         ctx.beginPath(); ctx.arc(n.x, n.y, r + 12, 0, Math.PI * 2);
-        ctx.fillStyle = color; ctx.globalAlpha *= 0.13; ctx.fill(); ctx.globalAlpha /= 0.13;
+        ctx.fillStyle = color; ctx.globalAlpha *= 0.18; ctx.fill(); ctx.globalAlpha /= 0.18;
       }
 
       // Dot
@@ -804,17 +816,17 @@ const { poemId, world } = Astro.props;
       else if (deg >= 70 && deg <= 110)   { ly = n.y + gap + 2; tb = 'top'; ta = 'center'; }
       else                                { ly = n.y - gap - 2; tb = 'bottom'; ta = 'center'; }
 
-      // Active: 18px upright; inactive: 16px italic
-      const fs = active ? 18 : 16;
+      // Active: 18.5px upright; inactive: 16.5px italic
+      const fs = active ? 18.5 : 16.5;
       ctx.font = `${active ? '' : 'italic '}${fs}px Georgia, serif`;
       // WCAG 1.4.3: dot drawn at baseOpacity (0.58 for inactive) but text needs higher opacity.
       // #5a5452 at 58% → 2.62:1 ❌. At 88% → 4.98:1 ✅. Save/restore alpha around text only.
       const preTextAlpha = ctx.globalAlpha;
       if (!active) {
-        // Raise text opacity: divide out baseOpacity (0.58), multiply by 0.88 of fade alpha
-        ctx.globalAlpha = (preTextAlpha / baseOpacity) * 0.88;
+        // Raise text opacity: divide out baseOpacity, keep near-full fade alpha for readability.
+        ctx.globalAlpha = (preTextAlpha / baseOpacity) * 0.98;
       }
-      ctx.fillStyle = isSel ? '#0a0a0a' : active ? '#1a1a1a' : '#5a5452';
+      ctx.fillStyle = isSel ? '#0a0a0a' : active ? this.primaryColor : this.metaColor;
       ctx.textAlign = ta; ctx.textBaseline = tb;
       ctx.fillText(this.formatLabel(n.value!), lx, ly);
       ctx.globalAlpha = preTextAlpha; // restore dot opacity for correct restore at end
