@@ -193,7 +193,7 @@ function truncateLetters(text: string, max = 120): string {
     syncPanels();
 
     // Focus management: remember what triggered the overlay
-    let lastFocusedBefore: HTMLElement | null = null;
+    let lastFocusedBefore = null;
 
     // Focusable elements query for focus trapping
     const FOCUSABLE = [
@@ -202,9 +202,9 @@ function truncateLetters(text: string, max = 120): string {
       '[tabindex]:not([tabindex="-1"])',
     ].join(',');
 
-    function trapFocus(e: KeyboardEvent) {
+    function trapFocus(e) {
       if (!overlay?.classList.contains('is-open')) return;
-      const focusables = Array.from(overlay.querySelectorAll<HTMLElement>(FOCUSABLE));
+      const focusables = Array.from(overlay.querySelectorAll(FOCUSABLE));
       if (!focusables.length) return;
       const first = focusables[0];
       const last = focusables[focusables.length - 1];
@@ -221,7 +221,7 @@ function truncateLetters(text: string, max = 120): string {
 
     function openIndex() {
       if (!overlay) return;
-      lastFocusedBefore = document.activeElement as HTMLElement;
+      lastFocusedBefore = document.activeElement;
       overlay.classList.add('is-open');
       overlay.setAttribute('aria-hidden', 'false');
       document.body.classList.add('index-open');
