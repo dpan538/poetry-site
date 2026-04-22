@@ -100,10 +100,13 @@ function truncateLetters(text: string, max = 120): string {
           aria-hidden={!isActive}
         >
           <ul class="poem-list">
-            {poems.map((poem) => {
+            {poems.map((poem, poemIdx) => {
               const isCurrent = poem.id === currentPoemId && world === currentWorld;
               return (
-                <li class:list={['poem-item', { 'is-current': isCurrent }]}>
+                <li
+                  class:list={['poem-item', { 'is-current': isCurrent }]}
+                  style={`--item-i: ${poemIdx}`}
+                >
                   <a href={`${worldPaths[world]}/${poem.id}`} class="poem-link">
                     <span class="poem-order">{String(poem.order).padStart(2, '0')}</span>
                     <span class="poem-title">{poem.title}</span>
@@ -273,18 +276,23 @@ function truncateLetters(text: string, max = 120): string {
     overflow: hidden;
   }
 
+  /* ── Overlay ─────────────────────────────────────────────────────────────── */
+  /* Entrance: fade + very subtle scale (0.985→1) for a gentle "bloom" feel.
+     Exit: fade only, faster, no scale — avoids visual clutter on close. */
   .index-overlay {
     position: fixed;
     inset: 0;
     background: var(--color-bg, #f8f7f4);
     z-index: 200;
     opacity: 0;
+    transform: scale(0.985);
     pointer-events: none;
     visibility: hidden;
     overflow: hidden;
     transition:
-      opacity 0.25s linear,
-      visibility 0s linear 0.25s;
+      opacity 0.22s ease-in,
+      transform 0.22s ease-in,
+      visibility 0s linear 0.22s;
     padding: var(--site-content-offset) var(--margin-x) var(--space-xl);
     box-sizing: border-box;
     scrollbar-width: none;
@@ -299,21 +307,27 @@ function truncateLetters(text: string, max = 120): string {
 
   .index-overlay.is-open {
     opacity: 1;
+    transform: scale(1);
     pointer-events: auto;
     visibility: visible;
     overflow-y: auto;
+    /* ease-out-expo: snappy open, smooth landing */
     transition:
-      opacity 0.25s linear,
+      opacity 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.32s cubic-bezier(0.16, 1, 0.3, 1),
       visibility 0s linear 0s;
   }
 
+  /* ── Inner container: deeper slide + elastic curve ──────────────────────── */
   .index-inner {
     max-width: var(--content-w);
     margin: 0 auto;
     position: relative;
-    transform: translateY(10px);
-    opacity: 0.92;
-    transition: transform 0.45s linear, opacity 0.45s linear;
+    transform: translateY(20px);
+    opacity: 0.85;
+    transition:
+      transform 0.58s cubic-bezier(0.16, 1, 0.3, 1),
+      opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .index-overlay.is-open .index-inner {
@@ -321,6 +335,7 @@ function truncateLetters(text: string, max = 120): string {
     opacity: 1;
   }
 
+  /* ── Close button ────────────────────────────────────────────────────────── */
   .index-close {
     position: absolute;
     top: 0;
@@ -334,12 +349,15 @@ function truncateLetters(text: string, max = 120): string {
     cursor: pointer;
     color: var(--color-primary, #1a1a1a);
     padding: 0;
-    opacity: 0.8;
+    opacity: 0.6;
     z-index: 210;
+    transform-origin: center;
+    transition: opacity 0.18s ease, transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
   .index-close:hover {
     opacity: 1;
+    transform: rotate(18deg);
   }
 
   .index-close:focus-visible {
@@ -347,6 +365,7 @@ function truncateLetters(text: string, max = 120): string {
     outline-offset: 4px;
   }
 
+  /* ── World switcher tabs ─────────────────────────────────────────────────── */
   .world-switcher {
     display: flex;
     flex-direction: row;
@@ -359,24 +378,41 @@ function truncateLetters(text: string, max = 120): string {
   .world-tab {
     background: none;
     border: none;
-    padding: 0 0 4px;
+    padding: 0 0 5px;
     cursor: pointer;
     font-family: Georgia, 'Times New Roman', serif;
     font-size: var(--type-display);
     line-height: var(--leading-display);
     font-weight: normal;
     color: var(--color-primary, #1a1a1a);
-    /* Minimum opacity 0.38 to keep text readable for all users */
+    /* Minimum opacity 0.38 to keep text readable (WCAG AA) */
     opacity: 0.38;
-    transition: opacity 0.24s linear;
+    position: relative;
+    transition: opacity 0.2s ease;
+  }
+
+  /* Sliding underline accent for the active tab */
+  .world-tab::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 100%;
+    height: 1.5px;
+    background-color: var(--color-accent, #c0392b);
+    transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .world-tab.is-lead {
     opacity: 1;
   }
 
+  .world-tab.is-lead::after {
+    right: 0;
+  }
+
   .world-tab:hover {
-    opacity: 0.75;
+    opacity: 0.72;
   }
 
   .world-tab:focus-visible {
@@ -384,19 +420,20 @@ function truncateLetters(text: string, max = 120): string {
     outline-offset: 3px;
   }
 
+  /* ── World panels ────────────────────────────────────────────────────────── */
   .world-panel {
     opacity: 0;
     visibility: hidden;
     max-height: 0;
     overflow: hidden;
     padding-top: 0;
-    transform: translateY(6px);
+    transform: translateY(8px);
     transition:
-      opacity 0.24s linear,
-      transform 0.24s linear,
-      max-height 0.28s linear,
-      visibility 0s linear 0.28s,
-      padding-top 0.22s linear;
+      opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+      max-height 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+      visibility 0s linear 0.32s,
+      padding-top 0.24s ease;
   }
 
   .world-panel.is-shown {
@@ -406,11 +443,26 @@ function truncateLetters(text: string, max = 120): string {
     padding-top: var(--space-xl);
     transform: translateY(0);
     transition:
-      opacity 0.24s linear,
-      transform 0.24s linear,
-      max-height 0.28s linear,
+      opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+      max-height 0.32s cubic-bezier(0.16, 1, 0.3, 1),
       visibility 0s linear 0s,
-      padding-top 0.22s linear;
+      padding-top 0.24s ease;
+  }
+
+  /* ── Poem list: staggered item entrance ─────────────────────────────────── */
+  /* Each item fades + slides up with a delay that increases by index.
+     --item-i is set inline on each <li> at SSR time.
+     animation-fill-mode: both keeps items invisible before the delay fires. */
+  @keyframes poem-item-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
   .poem-list {
@@ -423,6 +475,13 @@ function truncateLetters(text: string, max = 120): string {
     margin-bottom: var(--space-lg);
   }
 
+  /* Stagger plays every time the panel becomes is-shown (open + tab switch) */
+  .world-panel.is-shown .poem-item {
+    animation: poem-item-in 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: calc(var(--item-i, 0) * 18ms + 60ms);
+  }
+
+  /* ── Poem links ──────────────────────────────────────────────────────────── */
   .poem-link {
     display: block;
     text-decoration: none;
@@ -432,9 +491,10 @@ function truncateLetters(text: string, max = 120): string {
   .poem-order {
     display: block;
     font-size: 14px;
-    /* Use the calibrated meta token — meets WCAG AA 4.5:1 on all world backgrounds */
     color: var(--color-meta, #595959);
     margin-bottom: 0.15rem;
+    /* Smooth accent flash on hover */
+    transition: color 0.18s ease;
   }
 
   .poem-title {
@@ -443,14 +503,28 @@ function truncateLetters(text: string, max = 120): string {
     line-height: var(--leading-title);
     font-weight: normal;
     margin-bottom: 0.25rem;
+    /* Gentle rightward slide on hover */
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .poem-first-line {
     display: block;
     font-size: 18px;
-    /* #555555 on lightest bg (#f8f7f4) ≈ 7.2:1 ✅ */
     color: #555555;
     line-height: 1.45;
+    transition: color 0.18s ease;
+  }
+
+  .poem-link:hover .poem-order {
+    color: var(--color-accent, #c0392b);
+  }
+
+  .poem-link:hover .poem-title {
+    transform: translateX(5px);
+  }
+
+  .poem-link:hover .poem-first-line {
+    color: var(--color-primary, #1a1a1a);
   }
 
   /* Focus indicator on poem links in index */
