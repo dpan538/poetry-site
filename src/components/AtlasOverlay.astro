@@ -45,12 +45,12 @@ const { poemId, world } = Astro.props;
 
   <!-- Legend -->
   <div class="atlas-legend" aria-hidden="true">
-    <span class="atlas-legend-label">attributes —</span>
-    <span class="atlas-legend-item atlas-legend-mode">speaker</span>
-    <span class="atlas-legend-item atlas-legend-type">act</span>
-    <span class="atlas-legend-item atlas-legend-imagery">image</span>
+    <span class="atlas-legend-item atlas-legend-mode">speaker mode</span>
     <span class="atlas-legend-sep">·</span>
-    <span class="atlas-legend-item atlas-legend-transform">↻ transform</span>
+    <span class="atlas-legend-item atlas-legend-type">poem act</span>
+    <span class="atlas-legend-sep">·</span>
+    <span class="atlas-legend-item atlas-legend-imagery">imagery</span>
+    <span class="atlas-legend-desc">— highlighted = active in this poem</span>
   </div>
 
   <!-- Canvas -->
@@ -58,7 +58,7 @@ const { poemId, world } = Astro.props;
 
   <!-- Hint text -->
   <p id="atlas-hint" class="atlas-hint" aria-live="polite">
-    tap a node to explore — drag to pan — scroll to zoom
+    tap speaker · act · image to explore the poem's structural position
   </p>
 
   <!-- Preview card (shown on poem node click) -->
@@ -170,18 +170,19 @@ const { poemId, world } = Astro.props;
     flex-shrink: 0;
   }
 
-  .atlas-legend-label {
-    font-size: 10px;
-    letter-spacing: 0.05em;
-    color: var(--color-meta, #595959);
-    font-style: italic;
-    margin-right: 2px;
-  }
-
   .atlas-legend-sep {
     font-size: 10px;
     color: var(--color-meta, #595959);
-    opacity: 0.5;
+    opacity: 0.45;
+  }
+
+  .atlas-legend-desc {
+    font-size: 10px;
+    letter-spacing: 0.03em;
+    color: var(--color-meta, #595959);
+    font-style: italic;
+    margin-left: 6px;
+    opacity: 0.7;
   }
 
   .atlas-legend-item {
@@ -327,6 +328,23 @@ const { poemId, world } = Astro.props;
     opacity: 0.5;
   }
 
+  :global(.atlas-preview-active-note) {
+    margin: 0 0 10px;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    color: var(--color-accent, #c0392b);
+    font-style: italic;
+  }
+
+  :global(.atlas-preview-inactive-note) {
+    margin: 0 0 10px;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    color: var(--color-meta, #595959);
+    font-style: italic;
+    opacity: 0.7;
+  }
+
   :global(.atlas-transform-badge) {
     font-style: italic;
     color: var(--color-accent, #c0392b);
@@ -384,6 +402,7 @@ const { poemId, world } = Astro.props;
   }
 </style>
 
+
 <script>
   import atlas from '../data/atlas.json';
   import gsap from 'gsap';
@@ -413,31 +432,46 @@ const { poemId, world } = Astro.props;
     'still-life':  'III — Still Life',
   };
 
+  // Controlled vocabulary — the full conceptual field of the collection.
+  // Active attributes for the current poem are highlighted; everything else
+  // is shown at low opacity so the reader sees the poem's position in context.
+  const VOCAB: Record<string, string[]> = {
+    mode: [
+      'solitary_witness', 'child_perception', 'observer', 'fractured_self',
+      'addressed_speaker', 'devotional_speaker', 'plural_voice', 'absent_other_address',
+    ],
+    type: [
+      'memory_fragment', 'scene', 'witness', 'monologue', 'confession',
+      'lament', 'invocation', 'prayer', 'chant', 'manifesto', 'warning', 'farewell',
+    ],
+    imagery: [
+      'shadow', 'child', 'room', 'house', 'window', 'glass',
+      'light', 'eye', 'voice', 'flowers', 'faith', 'sky',
+    ],
+  };
+
   const ATTR_FULL: Record<string, string> = {
-    mode: 'Speaker mode',
-    type: 'Poem act',
-    imagery: 'Imagery',
+    mode: 'Speaker mode', type: 'Poem act', imagery: 'Imagery',
   };
 
   // ─── Types ────────────────────────────────────────────────────────────────
   interface Node {
-    kind: 'center' | 'attr' | 'related';
-    x: number; y: number;
-    r: number;
-    // center / related fields
+    kind: 'anchor' | 'attr' | 'satellite';
+    x: number; y: number; r: number;
+    // anchor + satellite
     id?: string; title?: string; world?: string; order?: number;
-    firstLine?: string; transform?: boolean; weight?: number;
-    reason?: string[];
-    // attr fields
-    attrType?: string; value?: string;
+    firstLine?: string; url?: string;
+    // attr
+    attrType?: string; value?: string; active?: boolean;
+    // satellite
+    attrNodeRef?: Node; visible?: boolean;
     // animation
-    alpha: number; delay: number;
-    currentAlpha?: number;
+    alpha: number; delay: number; currentAlpha: number;
   }
 
   interface Edge {
     from: Node; to: Node;
-    isTransform?: boolean;
+    color?: string; isSatellite?: boolean;
   }
 
   // ─── AtlasGraph ───────────────────────────────────────────────────────────
@@ -468,7 +502,7 @@ const { poemId, world } = Astro.props;
       this.ctx = canvas.getContext('2d')!;
       this.poemId = poemId;
       this.worldKey = worldKey;
-      this.poem = atlas.poems.find((p: any) => p.id === poemId) ?? null;
+      this.poem = (atlas.poems as any[]).find((p: any) => p.id === poemId) ?? null;
       this.nodes = [];
       this.edges = [];
       this.selectedNode = null;
@@ -483,137 +517,144 @@ const { poemId, world } = Astro.props;
       this.pointerDownPos = null;
       this.pointerDownTime = 0;
       this.rafId = 0;
-      this.isStub = false;
+      this.isStub = !this.poem?.mode;
 
       this.resize();
       this.buildGraph();
+      this.fitToCanvas();
       this.setupEvents();
       this.startLoop();
     }
 
-    // ── Deterministic hash (0-1) for organic jitter ─────────────────────────
-    hashStr(s: string): number {
-      let h = 0;
-      for (let i = 0; i < s.length; i++) h = (Math.imul(31, h) + s.charCodeAt(i)) | 0;
-      return (h >>> 0) / 4294967296;
-    }
-
-    // ── Graph construction ──────────────────────────────────────────────────
+    // ── Graph construction ────────────────────────────────────────────────────
+    // Architecture: attribute-first.
+    //   • All vocabulary attr nodes are always pre-rendered.
+    //   • Active attrs (belonging to current poem) are full opacity.
+    //   • Inactive attrs are 22% opacity — visible as context, not as clutter.
+    //   • Poem (anchor) sits at center as a positional marker.
+    //   • Satellite poems appear around an attr node when it is tapped.
     buildGraph() {
       this.nodes = [];
       this.edges = [];
       const poem = this.poem;
 
-      // Center node
-      const center: Node = {
-        kind: 'center', id: poem?.id, title: poem?.title ?? this.poemId,
+      // Current poem's active attribute sets
+      const activeSets: Record<string, Set<string>> = {
+        mode:    new Set<string>(poem?.mode    || []),
+        type:    new Set<string>(poem?.type    || []),
+        imagery: new Set<string>(poem?.imagery || []),
+      };
+
+      // ── Anchor (current poem) — the positional marker ──────────────────────
+      const anchor: Node = {
+        kind: 'anchor',
+        x: 0, y: 0, r: 26,
+        id: poem?.id, title: poem?.title ?? this.poemId,
         world: poem?.world ?? this.worldKey,
-        x: 0, y: 0, r: 32, alpha: 1, delay: 0, currentAlpha: 1,
+        alpha: 1, delay: 0, currentAlpha: 1,
       };
-      this.nodes.push(center);
+      this.nodes.push(anchor);
 
-      if (!poem?.mode) {
-        // Stub poem — relations not yet mapped.
-        // Show the nearest poems from the same world by order as navigable neighbours,
-        // with organic jitter so they don't form a rigid circle.
-        this.isStub = true;
-        const currentOrder: number = poem?.order ?? 0;
-        const worldPoems = (atlas.poems as any[])
-          .filter((p: any) => p.world === this.worldKey && p.id !== this.poemId)
-          .map((p: any) => ({ ...p, _dist: Math.abs(p.order - currentOrder) }))
-          .sort((a: any, b: any) => a._dist - b._dist)
-          .slice(0, 6);
-
-        worldPoems.forEach((rp: any, i: number) => {
-          // Organic angle: base from even spacing + jitter from id hash
-          const baseAngle = (i / worldPoems.length) * Math.PI * 2 - Math.PI / 2;
-          const jitter = (this.hashStr(rp.id) - 0.5) * 0.55;
-          const angle = baseAngle + jitter;
-          const radius = 190 + Math.floor(this.hashStr(rp.id + '_r') * 55);
-          const node: Node = {
-            kind: 'related', id: rp.id, title: rp.title,
-            world: rp.world, order: rp.order,
-            firstLine: rp.firstLine,
-            weight: 1,
-            reason: ['sequential'],
-            transform: false,
-            x: Math.cos(angle) * radius, y: Math.sin(angle) * radius,
-            r: 22, alpha: 0, delay: 0.15 + i * 0.1,
-            currentAlpha: 0,
-          };
-          this.nodes.push(node);
-          this.edges.push({ from: center, to: node });
-        });
-        return;
-      }
-
-      // ── Attribute nodes — grouped by type into organic sectors ─────────────
-      // mode: upper-left quadrant, type: upper-right, imagery: lower half
-      const SECTORS: Record<string, { base: number; span: number }> = {
-        mode:    { base: 195, span: 90 },   // 195–285° (left side)
-        type:    { base: 285, span: 90 },   // 285–375° / 285–15° (upper right)
-        imagery: { base: 30,  span: 150 },  // 30–180° (right & bottom)
-      };
-      // Track sector usage to space values within sector
-      const sectorCounts: Record<string, number> = { mode: 0, type: 0, imagery: 0 };
-      const sectorTotals: Record<string, number> = {
-        mode: (poem.mode || []).length,
-        type: (poem.type || []).length,
-        imagery: (poem.imagery || []).length,
-      };
-
-      const attrs: { attrType: string; value: string }[] = [];
-      (poem.mode    || []).forEach((v: string) => attrs.push({ attrType: 'mode',    value: v }));
-      (poem.type    || []).forEach((v: string) => attrs.push({ attrType: 'type',    value: v }));
-      (poem.imagery || []).forEach((v: string) => attrs.push({ attrType: 'imagery', value: v }));
-
-      const attrNodes: Node[] = attrs.map((a, i) => {
-        const sector = SECTORS[a.attrType] || { base: 0, span: 120 };
-        const idx    = sectorCounts[a.attrType]++;
-        const total  = sectorTotals[a.attrType] || 1;
-        // Spread evenly within sector + small hash jitter (±12°)
-        const tFrac  = total > 1 ? idx / (total - 1) : 0.5;
-        const jitter = (this.hashStr(a.value + '_a') - 0.5) * 0.21;  // ±12°
-        const deg    = sector.base + tFrac * sector.span;
-        const angle  = (deg * Math.PI / 180) + jitter;
-        // Radius variation: 145–190 based on value hash
-        const radius = 145 + Math.floor(this.hashStr(a.value + '_r') * 48);
-
-        return {
-          kind: 'attr' as const, attrType: a.attrType, value: a.value,
-          x: Math.cos(angle) * radius, y: Math.sin(angle) * radius,
-          r: 7, alpha: 0, delay: 0.08 + i * 0.055, currentAlpha: 0,
+      // ── Mode column — left (x = −252) ─────────────────────────────────────
+      const modeColX = -252;
+      const modeSpacing = 40;
+      VOCAB.mode.forEach((value, i) => {
+        const y = (i - (VOCAB.mode.length - 1) / 2) * modeSpacing;
+        const active = activeSets.mode.has(value);
+        const n: Node = {
+          kind: 'attr', attrType: 'mode', value,
+          x: modeColX, y, r: 7,
+          active, alpha: 0, delay: 0.04 + i * 0.045, currentAlpha: 0,
         };
-      });
-      attrNodes.forEach(n => {
         this.nodes.push(n);
-        this.edges.push({ from: center, to: n });
+        if (active) this.edges.push({ from: anchor, to: n, color: ATTR_COLORS.mode });
+        this.buildSatellites(n, -1, 0);
       });
 
-      // ── Related poem nodes — outer ring with organic jitter ─────────────────
-      const related = poem.related_poems || [];
-      related.forEach((rel: any, i: number) => {
-        const rp = (atlas.poems as any[]).find((p: any) => p.id === rel.id);
-        if (!rp) return;
-        const baseAngle = (i / related.length) * Math.PI * 2 - Math.PI / 4;
-        const jitter    = (this.hashStr(rel.id + '_pa') - 0.5) * 0.5;
-        const angle     = baseAngle + jitter;
-        const radius    = 285 + Math.floor(this.hashStr(rel.id + '_pr') * 60);
-        const node: Node = {
-          kind: 'related', id: rp.id, title: rp.title,
-          world: rp.world, order: rp.order,
-          firstLine: rp.firstLine,
-          weight: rel.weight, reason: rel.reason,
-          transform: rel.relation === 'transform',
-          x: Math.cos(angle) * radius, y: Math.sin(angle) * radius,
-          r: 22, alpha: 0, delay: 0.5 + i * 0.09, currentAlpha: 0,
+      // ── Type column — right (x = +258) ────────────────────────────────────
+      const typeColX = 258;
+      const typeSpacing = 34;
+      VOCAB.type.forEach((value, i) => {
+        const y = (i - (VOCAB.type.length - 1) / 2) * typeSpacing;
+        const active = activeSets.type.has(value);
+        const n: Node = {
+          kind: 'attr', attrType: 'type', value,
+          x: typeColX, y, r: 7,
+          active, alpha: 0, delay: 0.06 + i * 0.04, currentAlpha: 0,
         };
-        this.nodes.push(node);
-        this.edges.push({ from: center, to: node, isTransform: rel.relation === 'transform' });
+        this.nodes.push(n);
+        if (active) this.edges.push({ from: anchor, to: n, color: ATTR_COLORS.type });
+        this.buildSatellites(n, 1, 0);
+      });
+
+      // ── Imagery row — bottom (y = +198) ───────────────────────────────────
+      const imageryRowY = 198;
+      const imagerySpacing = 46;
+      const imageryTotalW = (VOCAB.imagery.length - 1) * imagerySpacing;
+      VOCAB.imagery.forEach((value, i) => {
+        const x = i * imagerySpacing - imageryTotalW / 2;
+        const active = activeSets.imagery.has(value);
+        const n: Node = {
+          kind: 'attr', attrType: 'imagery', value,
+          x, y: imageryRowY, r: 7,
+          active, alpha: 0, delay: 0.08 + i * 0.04, currentAlpha: 0,
+        };
+        this.nodes.push(n);
+        if (active) this.edges.push({ from: anchor, to: n, color: ATTR_COLORS.imagery });
+        this.buildSatellites(n, 0, 1);
       });
     }
 
-    // ── Layout helpers ──────────────────────────────────────────────────────
+    // Build satellite poem nodes fanning outward from an attr node.
+    // dirX/dirY is the unit direction from anchor zone to attr zone (−1/0/1).
+    buildSatellites(attrNode: Node, dirX: number, dirY: number) {
+      const matches = (atlas.poems as any[])
+        .filter((p: any) => {
+          if (p.id === this.poemId) return false;
+          const arr: string[] = p[attrNode.attrType!] || [];
+          return arr.includes(attrNode.value!);
+        })
+        .slice(0, 5);
+
+      const count = matches.length;
+      const fanAngle = Math.PI * 0.5; // 90° spread
+      const baseAngle = Math.atan2(dirY, dirX);
+      const satDist = 68;
+
+      matches.forEach((p: any, i: number) => {
+        const t = count > 1 ? i / (count - 1) : 0.5;
+        const angle = baseAngle + (t - 0.5) * fanAngle;
+        const sat: Node = {
+          kind: 'satellite',
+          attrNodeRef: attrNode,
+          id: p.id, title: p.title, world: p.world,
+          firstLine: p.firstLine, url: p.url,
+          x: attrNode.x + Math.cos(angle) * satDist,
+          y: attrNode.y + Math.sin(angle) * satDist,
+          r: 15, visible: false,
+          alpha: 0, delay: i * 0.06, currentAlpha: 0,
+        };
+        this.nodes.push(sat);
+        this.edges.push({
+          from: attrNode, to: sat,
+          color: ATTR_COLORS[attrNode.attrType!], isSatellite: true,
+        });
+      });
+    }
+
+    // ── Fit the full vocabulary field into the visible canvas on open ─────────
+    fitToCanvas() {
+      // Layout extents: mode x=−252, type x=258, imagery y=198+label, top ≈−200
+      const spanW = 560;  // total horizontal span
+      const spanH = 450;  // total vertical span
+      const scaleW = (this.cx * 2 * 0.86) / spanW;
+      const scaleH = (this.cy * 2 * 0.86) / spanH;
+      this.scale = Math.min(scaleW, scaleH, 1.2);
+      // Bias ty upward slightly so imagery row has breathing room
+      this.ty = -18 * this.scale;
+    }
+
+    // ── Layout helpers ────────────────────────────────────────────────────────
     resize() {
       const el = this.canvas.parentElement!;
       const rect = el.getBoundingClientRect();
@@ -627,50 +668,68 @@ const { poemId, world } = Astro.props;
       this.cy = H / 2;
     }
 
-    // ── Render loop ─────────────────────────────────────────────────────────
-    // Runs only for the entry animation (1 s). All subsequent redraws are
-    // event-driven: pointermove, pointerup, wheel, and handleTap each call draw().
+    // ── Entry animation — runs once on open ───────────────────────────────────
+    // Satellites are excluded here; their alpha is managed by selectAttr().
     startLoop() {
       const start = performance.now();
-      const totalDur = 1000;
-
+      const totalDur = 1200;
       const tick = (now: number) => {
         const t = Math.min(1, (now - start) / totalDur);
-        // Advance per-node alpha
         this.nodes.forEach(n => {
+          if (n.kind === 'satellite') return;
           const progress = Math.max(0, Math.min(1, (t - n.delay) / 0.35));
           n.currentAlpha = this.easeOut(progress);
         });
         this.draw();
-        if (t < 1) {
-          this.rafId = requestAnimationFrame(tick);
-        }
+        if (t < 1) this.rafId = requestAnimationFrame(tick);
       };
       this.rafId = requestAnimationFrame(tick);
     }
 
-    easeOut(t: number) {
-      return 1 - Math.pow(1 - t, 3);
-    }
+    easeOut(t: number) { return 1 - Math.pow(1 - t, 3); }
 
-    // ── Drawing ─────────────────────────────────────────────────────────────
+    // ── Drawing ───────────────────────────────────────────────────────────────
     draw() {
       const ctx = this.ctx;
       const dpr = this.dpr;
       const W = this.canvas.width / dpr;
       const H = this.canvas.height / dpr;
-
       ctx.save();
       ctx.scale(dpr, dpr);
       ctx.clearRect(0, 0, W, H);
-
       ctx.translate(this.cx + this.tx, this.cy + this.ty);
       ctx.scale(this.scale, this.scale);
-
+      this.drawZoneLabels();
       this.drawEdges();
       this.drawNodes();
-      this.drawSectorLabels();
-      if (this.isStub) this.drawStubNote();
+      ctx.restore();
+    }
+
+    // Faint column/row labels (MODE / TYPE / IMAGE) for spatial orientation
+    drawZoneLabels() {
+      const ctx = this.ctx;
+      ctx.save();
+
+      const modeTopY  = -(VOCAB.mode.length - 1) / 2 * 40 - 22;
+      const typeTopY  = -(VOCAB.type.length - 1) / 2 * 34 - 22;
+      const imageryX  = -(VOCAB.imagery.length - 1) * 46 / 2 - 20;
+
+      ctx.font = `10px Georgia, serif`;
+      ctx.textBaseline = 'bottom';
+
+      ctx.fillStyle = ATTR_COLORS.mode;
+      ctx.globalAlpha = 0.45;
+      ctx.textAlign = 'right';
+      ctx.fillText('MODE', -252 + 6, modeTopY);
+
+      ctx.fillStyle = ATTR_COLORS.type;
+      ctx.textAlign = 'left';
+      ctx.fillText('TYPE', 258 - 6, typeTopY);
+
+      ctx.fillStyle = ATTR_COLORS.imagery;
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('IMAGE', imageryX, 198);
 
       ctx.restore();
     }
@@ -678,21 +737,30 @@ const { poemId, world } = Astro.props;
     drawEdges() {
       const ctx = this.ctx;
       this.edges.forEach(edge => {
+        if (edge.isSatellite) {
+          if (!edge.to.visible || (edge.to.currentAlpha ?? 0) <= 0.01) return;
+        }
         const fa = edge.from.currentAlpha ?? 0;
         const ta = edge.to.currentAlpha ?? 0;
         const alpha = Math.min(fa, ta);
-        if (alpha <= 0) return;
+        if (alpha <= 0.01) return;
 
-        const isHighlighted =
-          this.selectedNode === edge.from ||
-          this.selectedNode === edge.to   ||
-          (this.hoveredNode && (this.hoveredNode === edge.from || this.hoveredNode === edge.to));
+        const isSel = this.selectedNode === edge.from || this.selectedNode === edge.to;
+        const color = edge.color || '#1a1a1a';
 
         ctx.save();
-        ctx.globalAlpha = alpha * (isHighlighted ? 0.4 : (edge.isTransform ? 0.18 : 0.1));
-        ctx.strokeStyle = '#1a1a1a';
-        ctx.lineWidth = edge.isTransform ? 1 : 0.6;
-        if (edge.isTransform) ctx.setLineDash([3, 5]);
+        if (edge.isSatellite) {
+          ctx.globalAlpha = alpha * 0.4;
+          ctx.strokeStyle = color;
+          ctx.lineWidth = 0.8;
+          ctx.setLineDash([3, 4]);
+        } else {
+          // Anchor→attr edges: only active attrs; inactive stay unconnected
+          if (!edge.to.active) { ctx.restore(); return; }
+          ctx.globalAlpha = alpha * (isSel ? 0.55 : 0.2);
+          ctx.strokeStyle = color;
+          ctx.lineWidth = isSel ? 1.3 : 0.9;
+        }
         ctx.beginPath();
         ctx.moveTo(edge.from.x, edge.from.y);
         ctx.lineTo(edge.to.x, edge.to.y);
@@ -700,110 +768,59 @@ const { poemId, world } = Astro.props;
         ctx.setLineDash([]);
         ctx.restore();
       });
-
-      // If attr node selected: phantom connections to all matching related poems
-      if (this.selectedNode?.kind === 'attr') {
-        const sel = this.selectedNode;
-        const matchingIds = this.getAttrMatches(sel.attrType!, sel.value!).map((p: any) => p.id);
-        this.nodes.filter(n => n.kind === 'related' && matchingIds.includes(n.id!)).forEach(n => {
-          if ((n.currentAlpha ?? 0) <= 0) return;
-          ctx.save();
-          ctx.globalAlpha = 0.4;
-          ctx.strokeStyle = ATTR_COLORS[sel.attrType!] || '#888';
-          ctx.lineWidth = 1.2;
-          ctx.setLineDash([4, 4]);
-          ctx.beginPath();
-          ctx.moveTo(sel.x, sel.y);
-          ctx.lineTo(n.x, n.y);
-          ctx.stroke();
-          ctx.setLineDash([]);
-          ctx.restore();
-        });
-      }
-
-      // If related poem selected: draw colored pathways through matching attr nodes
-      if (this.selectedNode?.kind === 'related') {
-        const sel = this.selectedNode;
-        const reasons = sel.reason || [];
-        reasons.forEach((reason: string) => {
-          const color = ATTR_COLORS[reason] || '#888';
-          this.nodes
-            .filter(n => n.kind === 'attr' && n.attrType === reason)
-            .forEach(attrNode => {
-              if ((attrNode.currentAlpha ?? 0) <= 0) return;
-              ctx.save();
-              ctx.globalAlpha = 0.55;
-              ctx.strokeStyle = color;
-              ctx.lineWidth = 1.5;
-              ctx.setLineDash([4, 5]);
-              ctx.beginPath();
-              ctx.moveTo(attrNode.x, attrNode.y);
-              ctx.lineTo(sel.x, sel.y);
-              ctx.stroke();
-              ctx.setLineDash([]);
-              ctx.restore();
-            });
-        });
-      }
     }
 
     drawNodes() {
-      // Draw in order: edges first, then related, attr, center last (on top)
-      const order = ['related', 'attr', 'center'];
-      order.forEach(kind => {
+      // Render order: satellite (deepest) → attr → anchor (topmost)
+      (['satellite', 'attr', 'anchor'] as const).forEach(kind => {
         this.nodes.filter(n => n.kind === kind).forEach(n => this.drawNode(n));
       });
     }
 
     drawNode(node: Node) {
+      if (node.kind === 'satellite' && !node.visible) return;
       const alpha = node.currentAlpha ?? 0;
-      if (alpha <= 0) return;
+      if (alpha <= 0.01 && node.kind !== 'anchor') return;
       const ctx = this.ctx;
       ctx.save();
-      ctx.globalAlpha = alpha;
-
-      if (node.kind === 'center')  this.drawCenterNode(node);
-      if (node.kind === 'attr')    this.drawAttrNode(node);
-      if (node.kind === 'related') this.drawRelatedNode(node);
-
+      ctx.globalAlpha = Math.max(0, Math.min(1, alpha));
+      if (node.kind === 'anchor')    this.drawAnchorNode(node);
+      if (node.kind === 'attr')      this.drawAttrNode(node);
+      if (node.kind === 'satellite') this.drawSatelliteNode(node);
       ctx.restore();
     }
 
-    drawCenterNode(node: Node) {
+    drawAnchorNode(node: Node) {
       const ctx = this.ctx;
       const wc = WORLD_COLORS[node.world || this.worldKey] || WORLD_COLORS['their-world'];
       const r = node.r;
-
-      // Outer ring
+      // Outer pulse ring
       ctx.beginPath();
-      ctx.arc(0, 0, r + 5, 0, Math.PI * 2);
+      ctx.arc(node.x, node.y, r + 7, 0, Math.PI * 2);
       ctx.strokeStyle = wc.accent;
-      ctx.lineWidth = 1.5;
-      ctx.globalAlpha *= 0.5;
+      ctx.lineWidth = 1;
+      ctx.globalAlpha *= 0.22;
       ctx.stroke();
-      ctx.globalAlpha /= 0.5;
-
+      ctx.globalAlpha /= 0.22;
       // Fill
       ctx.beginPath();
-      ctx.arc(0, 0, r, 0, Math.PI * 2);
+      ctx.arc(node.x, node.y, r, 0, Math.PI * 2);
       ctx.fillStyle = wc.bg;
       ctx.fill();
       ctx.strokeStyle = wc.accent;
-      ctx.lineWidth = 1.5;
+      ctx.lineWidth = 1.8;
       ctx.stroke();
-
-      // "current" label above — italic, muted
-      ctx.font = `italic 11px Georgia, serif`;
-      ctx.fillStyle = '#aaa';
+      // Label above
+      ctx.font = `italic 10px Georgia, serif`;
+      ctx.fillStyle = '#bbb';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'bottom';
-      ctx.fillText('current', 0, -r - 12);
-
-      // Title below — 15px, well below the ring
+      ctx.fillText('current', node.x, node.y - r - 11);
+      // Title below
       ctx.font = `15px Georgia, serif`;
       ctx.fillStyle = '#1a1a1a';
       ctx.textBaseline = 'top';
-      this.wrapText(node.title || '', 0, r + 14, 130, 19);
+      this.wrapText(node.title || '', node.x, node.y + r + 12, 130, 18);
     }
 
     drawAttrNode(node: Node) {
@@ -811,263 +828,204 @@ const { poemId, world } = Astro.props;
       const color = ATTR_COLORS[node.attrType!] || '#888';
       const isHovered  = this.hoveredNode === node;
       const isSelected = this.selectedNode === node;
-      // Is this attr node in the pathway of a selected related poem?
-      const isPathway = this.selectedNode?.kind === 'related' &&
-        (this.selectedNode.reason || []).includes(node.attrType!);
+      const active     = node.active ?? false;
 
-      const r = node.r * (isHovered || isSelected || isPathway ? 1.85 : 1);
+      // Active: full opacity. Inactive: 22% — present but receded.
+      const baseOpacity = active ? 1 : 0.22;
+      ctx.globalAlpha *= baseOpacity;
 
+      const r = node.r * (isHovered || isSelected ? 1.75 : 1);
+
+      // Dot
       ctx.beginPath();
       ctx.arc(node.x, node.y, r, 0, Math.PI * 2);
-      ctx.fillStyle = isSelected ? '#1a1a1a' : isPathway ? color : color;
-      ctx.globalAlpha *= isPathway ? 1 : 1;
+      ctx.fillStyle = isSelected ? '#1a1a1a' : color;
       ctx.fill();
-      ctx.globalAlpha /= isPathway ? 1 : 1;
 
-      if (isSelected || isPathway) {
+      // Selection ring
+      if (isSelected) {
         ctx.beginPath();
         ctx.arc(node.x, node.y, r + 5, 0, Math.PI * 2);
         ctx.strokeStyle = color;
-        ctx.lineWidth = 1;
+        ctx.lineWidth = 0.9;
         ctx.globalAlpha *= 0.6;
         ctx.stroke();
         ctx.globalAlpha /= 0.6;
       }
 
-      // Label — radially outward, larger and more readable
-      const angle = Math.atan2(node.y, node.x);
-      const labelDist = r + 11;
-      const lx = node.x + Math.cos(angle) * labelDist;
-      const ly = node.y + Math.sin(angle) * labelDist;
+      // Label — direction depends on zone
+      const gap = r + 11;
+      let lx = node.x, ly = node.y;
+      let ta: CanvasTextAlign     = 'center';
+      let tb: CanvasTextBaseline  = 'middle';
 
-      ctx.font = `italic 12px Georgia, serif`;
-      ctx.fillStyle = isSelected || isPathway ? '#1a1a1a' : '#5a5a5a';
-      ctx.textBaseline = 'middle';
-
-      // Horizontal alignment based on angle
-      const deg = angle * 180 / Math.PI;
-      if (deg > -60 && deg < 60) {
-        ctx.textAlign = 'left';
-      } else if (deg > 120 || deg < -120) {
-        ctx.textAlign = 'right';
+      if (node.attrType === 'mode') {
+        lx = node.x - gap; ta = 'right';
+      } else if (node.attrType === 'type') {
+        lx = node.x + gap; ta = 'left';
       } else {
-        ctx.textAlign = 'center';
+        // imagery: label below dot
+        ly = node.y + gap + 2; tb = 'top';
       }
+
+      const fs = active ? 13 : 11;
+      ctx.font = `${active ? '' : 'italic '}${fs}px Georgia, serif`;
+      ctx.fillStyle = isSelected ? '#1a1a1a' : active ? '#222' : '#aaa';
+      ctx.textAlign = ta;
+      ctx.textBaseline = tb;
       ctx.fillText(this.formatLabel(node.value!), lx, ly);
+
+      ctx.globalAlpha /= baseOpacity;
     }
 
-    drawRelatedNode(node: Node) {
+    drawSatelliteNode(node: Node) {
       const ctx = this.ctx;
       const wc = WORLD_COLORS[node.world!] || WORLD_COLORS['their-world'];
-      const isHovered  = this.hoveredNode === node;
-      const isSelected = this.selectedNode === node;
-      const r = node.r * (isHovered ? 1.12 : 1);
-
-      // Is this node highlighted by an attr selection?
-      let attrHighlighted = false;
-      if (this.selectedNode?.kind === 'attr') {
-        const matches = this.getAttrMatches(this.selectedNode.attrType!, this.selectedNode.value!);
-        attrHighlighted = matches.some((p: any) => p.id === node.id);
-      }
-
-      // Fill
+      const isSel = this.selectedNode === node;
+      const isHov = this.hoveredNode  === node;
+      const r = node.r;
+      // Circle
       ctx.beginPath();
       ctx.arc(node.x, node.y, r, 0, Math.PI * 2);
-      ctx.fillStyle = isSelected || attrHighlighted ? wc.soft : 'rgba(248,246,242,0.9)';
+      ctx.fillStyle = isSel ? wc.soft : 'rgba(248,246,242,0.95)';
       ctx.fill();
-
-      // Ring
-      ctx.beginPath();
-      ctx.arc(node.x, node.y, r, 0, Math.PI * 2);
-      ctx.strokeStyle = isSelected || attrHighlighted ? wc.accent : wc.soft;
-      ctx.lineWidth = isSelected ? 1.8 : 1;
+      ctx.strokeStyle = isSel ? wc.accent : wc.soft;
+      ctx.lineWidth = isSel ? 1.5 : 1;
       ctx.stroke();
-
-      // Transformation marker — centred glyph
-      if (node.transform) {
-        ctx.font = `10px Georgia, serif`;
-        ctx.fillStyle = wc.accent;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('↻', node.x, node.y);
-      }
-
-      // Volume label — tiny, sits directly below the circle
-      const volLabel = VOL_LABELS[node.world!] || '';
-      const titleTopY = node.y + r + 9;
+      // Vol label
       ctx.font = `10px Georgia, serif`;
       ctx.fillStyle = wc.accent;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'top';
-      ctx.fillText(volLabel, node.x, titleTopY);
-
-      // Title — below vol label, 13px so it's readable
-      const titleFontSize = isHovered || isSelected ? 14 : 13;
-      ctx.font = `${titleFontSize}px Georgia, serif`;
-      ctx.fillStyle = isHovered || isSelected ? '#1a1a1a' : '#333';
-      ctx.textBaseline = 'top';
-      this.wrapText(node.title || '', node.x, titleTopY + 13, 96, 16);
+      ctx.fillText(VOL_LABELS[node.world!] || '', node.x, node.y + r + 6);
+      // Title
+      const titleFs = isHov || isSel ? 13 : 11.5;
+      ctx.font = `${titleFs}px Georgia, serif`;
+      ctx.fillStyle = isHov || isSel ? '#1a1a1a' : '#444';
+      this.wrapText(node.title || '', node.x, node.y + r + 18, 80, 14);
     }
 
-    // ── Sector group labels (annotated poems only) ───────────────────────────
-    // Floats at the centroid of each attr-type cluster, gives spatial context.
-    drawSectorLabels() {
-      if (this.isStub) return;
-      const ctx = this.ctx;
-
-      // Compute centroid per attr type from actual node positions
-      const centroids: Record<string, { sx: number; sy: number; n: number }> = {
-        mode:    { sx: 0, sy: 0, n: 0 },
-        type:    { sx: 0, sy: 0, n: 0 },
-        imagery: { sx: 0, sy: 0, n: 0 },
-      };
-      this.nodes.filter(nd => nd.kind === 'attr').forEach(nd => {
-        const key = nd.attrType!;
-        if (centroids[key]) {
-          centroids[key].sx += nd.x;
-          centroids[key].sy += nd.y;
-          centroids[key].n++;
-        }
-      });
-
-      const LABELS: Record<string, string> = {
-        mode: 'speaker', type: 'act', imagery: 'image',
-      };
-      const avgAlpha = this.nodes.filter(n => n.kind === 'attr')
-        .reduce((s, n) => s + (n.currentAlpha ?? 0), 0) /
-        Math.max(1, this.nodes.filter(n => n.kind === 'attr').length);
-
-      if (avgAlpha < 0.05) return;
-
-      ctx.save();
-      ctx.globalAlpha = avgAlpha * 0.38;
-      Object.entries(centroids).forEach(([key, c]) => {
-        if (c.n === 0) return;
-        // Place label 28px further outward from centroid
-        const cx = c.sx / c.n;
-        const cy = c.sy / c.n;
-        const dist = Math.sqrt(cx * cx + cy * cy) || 1;
-        const lx = cx + (cx / dist) * 28;
-        const ly = cy + (cy / dist) * 28;
-
-        ctx.font = `10px Georgia, serif`;
-        ctx.fillStyle = ATTR_COLORS[key] || '#888';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.letterSpacing = '0.08em';
-        ctx.fillText(LABELS[key] || key, lx, ly);
-      });
-      ctx.restore();
-    }
-
-    // ── Stub annotation ─────────────────────────────────────────────────────
-    drawStubNote() {
-      const ctx = this.ctx;
-      ctx.save();
-      // Note below the title — r=32, title starts at 46, title is ~19px tall,
-      // so safe position is r + 14 + 19 + 14 = 79+. Use 90 to be safe.
-      ctx.font = `italic 11px Georgia, serif`;
-      ctx.fillStyle = 'rgba(100,90,80,0.45)';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'top';
-      ctx.fillText('relation data not yet mapped', 0, 90);
-      ctx.restore();
-    }
-
-    // ── Text utilities ──────────────────────────────────────────────────────
+    // ── Text helpers ──────────────────────────────────────────────────────────
     wrapText(text: string, x: number, y: number, maxW: number, lineH: number) {
       const ctx = this.ctx;
       const words = text.split(' ');
-      let line = '';
-      let cy = y;
+      let line = '', cy = y;
       for (let i = 0; i < words.length; i++) {
         const test = line + words[i] + ' ';
         if (ctx.measureText(test).width > maxW && i > 0) {
           ctx.fillText(line.trim(), x, cy);
           line = words[i] + ' ';
           cy += lineH;
-        } else {
-          line = test;
-        }
+        } else { line = test; }
       }
       ctx.fillText(line.trim(), x, cy);
     }
 
-    formatLabel(val: string) {
-      return val.replace(/_/g, ' ');
-    }
+    formatLabel(val: string) { return val.replace(/_/g, ' '); }
 
-    // ── Hit testing ─────────────────────────────────────────────────────────
+    // ── Hit testing ───────────────────────────────────────────────────────────
     hitTest(px: number, py: number): Node | null {
-      // Convert screen px → world coords
       const wx = (px - this.cx - this.tx) / this.scale;
       const wy = (py - this.cy - this.ty) / this.scale;
-
-      let best: Node | null = null;
-      let bestDist = Infinity;
+      let best: Node | null = null, bestDist = Infinity;
       for (const n of this.nodes) {
-        if (n.kind === 'center') continue;
+        if (n.kind === 'satellite' && !n.visible) continue;
         const dx = n.x - wx, dy = n.y - wy;
         const dist = Math.sqrt(dx * dx + dy * dy);
-        const hitR = Math.max(n.r + 14, 20);
-        if (dist < hitR && dist < bestDist) {
-          best = n;
-          bestDist = dist;
-        }
+        const hitR = n.kind === 'anchor'
+          ? n.r + 10
+          : n.kind === 'satellite'
+            ? Math.max(n.r + 14, 22)
+            : Math.max(n.r + 16, 24); // attr nodes get generous hit area
+        if (dist < hitR && dist < bestDist) { best = n; bestDist = dist; }
       }
       return best;
     }
 
-    // ── Attr-based matching ─────────────────────────────────────────────────
-    getAttrMatches(attrType: string, value: string): any[] {
-      return atlas.poems.filter((p: any) => {
-        const arr: string[] = p[attrType] || [];
-        return arr.includes(value) && p.id !== this.poemId;
+    // ── Interaction ───────────────────────────────────────────────────────────
+    clearSelection() {
+      this.selectedNode = null;
+      this.nodes.filter(n => n.kind === 'satellite').forEach(n => {
+        n.visible = false;
+        n.currentAlpha = 0;
       });
+      document.getElementById('atlas-preview')?.classList.remove('is-visible');
+      this.updateHint(
+        this.isStub
+          ? 'tap an attribute to find poems with that quality'
+          : 'tap speaker · act · image to explore this poem\'s position'
+      );
+      this.draw();
     }
 
-    // ── Interaction handlers ────────────────────────────────────────────────
-    handleTap(x: number, y: number) {
-      const hit = this.hitTest(x, y);
-      if (!hit) {
-        this.selectedNode = null;
-        this.updatePreview(null);
-        const defaultHint = this.isStub
-          ? 'nearby poems in this volume — tap to preview'
-          : 'tap a node to explore — drag to pan — scroll to zoom';
-        this.updateHint(defaultHint);
-        this.draw();
-        return;
-      }
+    handleTap(px: number, py: number) {
+      const hit = this.hitTest(px, py);
+      if (!hit) { this.clearSelection(); return; }
+
+      // Second tap on same node
       if (hit === this.selectedNode) {
-        // Second tap on same node — navigate to poem or deselect attr
-        if (hit.kind === 'related') {
-          window.location.href = (atlas.poems as any[]).find((p: any) => p.id === hit.id)?.url || '#';
+        if (hit.kind === 'satellite') {
+          window.location.href = hit.url || '#';
         } else {
-          this.selectedNode = null;
-          this.updatePreview(null);
-          this.draw();
+          this.clearSelection();
         }
         return;
       }
+
+      // Hide any active satellites first
+      this.nodes.filter(n => n.kind === 'satellite').forEach(n => {
+        n.visible = false; n.currentAlpha = 0;
+      });
       this.selectedNode = hit;
-      if (hit.kind === 'attr')    this.showAttrPanel(hit);
-      if (hit.kind === 'related') this.showPoemPreview(hit);
-      this.draw(); // ensure selected-state highlight renders immediately
+
+      if (hit.kind === 'anchor')    { this.showAnchorInfo(); this.draw(); return; }
+      if (hit.kind === 'attr')      { this.selectAttr(hit); return; }
+      if (hit.kind === 'satellite') { this.showSatellitePreview(hit); this.draw(); return; }
+    }
+
+    // Select an attr node: animate its satellite poems in
+    selectAttr(node: Node) {
+      const sats = this.nodes.filter(n => n.kind === 'satellite' && n.attrNodeRef === node);
+      sats.forEach((n, i) => { n.visible = true; n.currentAlpha = 0; n.delay = i * 0.06; });
+
+      const start = performance.now();
+      const dur = 420;
+      const tick = (now: number) => {
+        const t = Math.min(1, (now - start) / dur);
+        sats.forEach(n => {
+          const p = Math.max(0, Math.min(1, (t - n.delay) / 0.35));
+          n.currentAlpha = this.easeOut(p);
+        });
+        this.draw();
+        if (t < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+
+      this.showAttrPanel(node);
     }
 
     showAttrPanel(node: Node) {
-      const matches = this.getAttrMatches(node.attrType!, node.value!).slice(0, 6);
       const typeLabel = ATTR_FULL[node.attrType!] || node.attrType!;
       const label = this.formatLabel(node.value!);
       const tagClass = `tag-${node.attrType}`;
+      const active = node.active;
+      const matches = (atlas.poems as any[])
+        .filter((p: any) => {
+          const arr: string[] = p[node.attrType!] || [];
+          return arr.includes(node.value!) && p.id !== this.poemId;
+        })
+        .slice(0, 6);
 
       const preview = document.getElementById('atlas-preview')!;
       preview.innerHTML = `
         <span class="atlas-preview-tag ${tagClass}">${typeLabel}</span>
         <h3 class="atlas-preview-title">${label}</h3>
+        ${active
+          ? `<p class="atlas-preview-active-note">↳ active in this poem</p>`
+          : `<p class="atlas-preview-inactive-note">not in this poem</p>`
+        }
         <ul class="atlas-attr-list">
-          ${matches.map(p => `
+          ${matches.map((p: any) => `
             <li>
               <a href="${p.url}" class="atlas-attr-poem">
                 <span class="atlas-attr-vol">${VOL_LABELS[p.world] || ''}</span>
@@ -1075,77 +1033,82 @@ const { poemId, world } = Astro.props;
               </a>
             </li>
           `).join('')}
-          ${matches.length === 0 ? `<li style="font-size:11px;color:#888;font-style:italic;padding:4px 0">Only this poem in the map</li>` : ''}
+          ${matches.length === 0
+            ? `<li style="font-size:11px;color:#aaa;font-style:italic;padding:4px 0">No other poems mapped yet</li>`
+            : ''}
         </ul>
       `;
       preview.classList.add('is-visible');
-      this.updateHint('tap a poem to preview · tap again to read');
+      this.updateHint(
+        matches.length > 0
+          ? 'tap a poem node to preview · tap again to read'
+          : 'drag · scroll to zoom · tap another attribute'
+      );
     }
 
-    showPoemPreview(node: Node) {
-      const REASON_LABELS: Record<string, string> = {
-        sequential: 'in this volume',
-        mode:       'same speaker',
-        type:       'same act',
-        imagery:    'shared image',
-      };
-      const REASON_COLORS: Record<string, string> = {
-        mode:    '#b8a898',
-        type:    '#8a96a8',
-        imagery: '#8a9e8a',
-      };
+    showAnchorInfo() {
+      const poem = this.poem;
+      const preview = document.getElementById('atlas-preview')!;
+      if (!poem?.mode) {
+        preview.innerHTML = `
+          <h3 class="atlas-preview-title">${poem?.title ?? this.poemId}</h3>
+          <p class="atlas-preview-inactive-note">
+            This poem's position in the atlas has not yet been mapped.<br>
+            Tap any attribute node to find poems that share that quality.
+          </p>
+        `;
+        preview.classList.add('is-visible');
+        this.updateHint('tap the attribute nodes to explore the collection');
+        return;
+      }
+      const modeList    = (poem.mode    || []).map((v: string) => this.formatLabel(v)).join(', ');
+      const typeList    = (poem.type    || []).map((v: string) => this.formatLabel(v)).join(', ');
+      const imageryList = (poem.imagery || []).map((v: string) => this.formatLabel(v)).join(', ');
+      preview.innerHTML = `
+        <h3 class="atlas-preview-title">${poem.title}</h3>
+        ${modeList    ? `<p class="atlas-preview-reason"><span style="color:${ATTR_COLORS.mode};font-style:italic">speaker</span> &thinsp;${modeList}</p>`    : ''}
+        ${typeList    ? `<p class="atlas-preview-reason"><span style="color:${ATTR_COLORS.type};font-style:italic">act</span> &thinsp;${typeList}</p>`    : ''}
+        ${imageryList ? `<p class="atlas-preview-reason"><span style="color:${ATTR_COLORS.imagery};font-style:italic">image</span> &thinsp;${imageryList}</p>` : ''}
+        <p style="font-size:11px;color:#aaa;font-style:italic;margin-top:8px">
+          tap an attribute node to see related poems
+        </p>
+      `;
+      preview.classList.add('is-visible');
+      this.updateHint('tap speaker · act · image to explore');
+    }
 
-      const reasonTags = (node.reason || [])
-        .map(r => {
-          const color = REASON_COLORS[r] || 'inherit';
-          const label = REASON_LABELS[r] || r;
-          return `<span class="atlas-reason-tag" style="color:${color}">${label}</span>`;
-        })
-        .join('<span class="atlas-reason-sep"> · </span>');
-
-      const transformBadge = node.transform
-        ? `<span class="atlas-transform-badge">↻ transformation</span>` : '';
-
-      const rp = (atlas.poems as any[]).find((p: any) => p.id === node.id);
-      const url = rp?.url || '#';
-
+    showSatellitePreview(node: Node) {
+      const parent = node.attrNodeRef;
+      const parentLabel = parent ? this.formatLabel(parent.value!) : '';
+      const parentColor = parent ? (ATTR_COLORS[parent.attrType!] || '#888') : '#888';
       const preview = document.getElementById('atlas-preview')!;
       preview.innerHTML = `
         <span class="atlas-preview-vol-label">${VOL_FULL[node.world!] || node.world}</span>
         <h3 class="atlas-preview-title">${node.title}</h3>
         ${node.firstLine ? `<p class="atlas-preview-firstline">"${node.firstLine}"</p>` : ''}
-        <p class="atlas-preview-reason">${reasonTags}${transformBadge}</p>
-        <a href="${url}" class="atlas-preview-cta">Read this poem →</a>
+        <p class="atlas-preview-reason">
+          <span style="color:${parentColor};font-style:italic">${parentLabel}</span>
+        </p>
+        <a href="${node.url || '#'}" class="atlas-preview-cta">Read this poem →</a>
       `;
       preview.classList.add('is-visible');
       this.updateHint('tap again to navigate to this poem');
     }
 
-    updatePreview(node: Node | null) {
-      const preview = document.getElementById('atlas-preview')!;
-      if (!node) {
-        preview.classList.remove('is-visible');
-      }
-    }
-
     updateHint(text: string) {
-      const hint = document.getElementById('atlas-hint')!;
-      hint.textContent = text;
+      const el = document.getElementById('atlas-hint');
+      if (el) el.textContent = text;
     }
 
-    // ── Events ──────────────────────────────────────────────────────────────
+    // ── Events ────────────────────────────────────────────────────────────────
     setupEvents() {
       const canvas = this.canvas;
 
-      // Pointer move — hover
       canvas.addEventListener('pointermove', (e: PointerEvent) => {
         if (this.isDragging && this.dragStart) {
-          const dx = e.clientX - this.dragStart.x;
-          const dy = e.clientY - this.dragStart.y;
-          this.tx = this.dragStart.tx + dx;
-          this.ty = this.dragStart.ty + dy;
-          this.draw();
-          return;
+          this.tx = this.dragStart.tx + (e.clientX - this.dragStart.x);
+          this.ty = this.dragStart.ty + (e.clientY - this.dragStart.y);
+          this.draw(); return;
         }
         const rect = canvas.getBoundingClientRect();
         const hit = this.hitTest(e.clientX - rect.left, e.clientY - rect.top);
@@ -1156,124 +1119,91 @@ const { poemId, world } = Astro.props;
         }
       });
 
-      // Pointer down
       canvas.addEventListener('pointerdown', (e: PointerEvent) => {
         canvas.setPointerCapture(e.pointerId);
-        this.pointerDownPos = { x: e.clientX, y: e.clientY };
+        this.pointerDownPos  = { x: e.clientX, y: e.clientY };
         this.pointerDownTime = Date.now();
         this.dragStart = { x: e.clientX, y: e.clientY, tx: this.tx, ty: this.ty };
         canvas.style.cursor = 'grabbing';
       });
 
-      // Pointer up — distinguish tap vs drag
       canvas.addEventListener('pointerup', (e: PointerEvent) => {
         if (!this.pointerDownPos) return;
         const elapsed = Date.now() - this.pointerDownTime;
         const dx = e.clientX - this.pointerDownPos.x;
         const dy = e.clientY - this.pointerDownPos.y;
-        const moved = Math.sqrt(dx * dx + dy * dy);
-
-        if (elapsed < 350 && moved < 12) {
+        if (elapsed < 350 && Math.sqrt(dx * dx + dy * dy) < 12) {
           const rect = canvas.getBoundingClientRect();
           this.handleTap(e.clientX - rect.left, e.clientY - rect.top);
         }
-
         this.isDragging = false;
-        this.dragStart = null;
+        this.dragStart  = null;
         this.pointerDownPos = null;
         canvas.style.cursor = this.hoveredNode ? 'pointer' : 'grab';
         this.draw();
       });
 
-      // Mark as dragging once movement threshold exceeded
+      // Drag detection
       canvas.addEventListener('pointermove', (e: PointerEvent) => {
         if (!this.pointerDownPos || this.isDragging) return;
         const dx = e.clientX - this.pointerDownPos.x;
         const dy = e.clientY - this.pointerDownPos.y;
-        if (Math.sqrt(dx * dx + dy * dy) > 8) {
-          this.isDragging = true;
-        }
+        if (Math.sqrt(dx * dx + dy * dy) > 8) this.isDragging = true;
       });
 
       // Wheel zoom
       canvas.addEventListener('wheel', (e: WheelEvent) => {
         e.preventDefault();
-        const factor = e.deltaY > 0 ? 0.9 : 1.1;
-        this.scale = Math.max(0.35, Math.min(2.8, this.scale * factor));
+        this.scale = Math.max(0.3, Math.min(3.5, this.scale * (e.deltaY > 0 ? 0.9 : 1.1)));
         this.draw();
       }, { passive: false });
 
-      // Pinch zoom (touch)
+      // Pinch zoom
       const getPinchDist = (e: TouchEvent) => {
         const dx = e.touches[0].clientX - e.touches[1].clientX;
         const dy = e.touches[0].clientY - e.touches[1].clientY;
         return Math.sqrt(dx * dx + dy * dy);
       };
-
       canvas.addEventListener('touchstart', (e: TouchEvent) => {
-        if (e.touches.length === 2) {
-          this.pinchStart = getPinchDist(e);
-          this.pinchScale = this.scale;
-        }
+        if (e.touches.length === 2) { this.pinchStart = getPinchDist(e); this.pinchScale = this.scale; }
       }, { passive: true });
-
       canvas.addEventListener('touchmove', (e: TouchEvent) => {
         if (e.touches.length === 2 && this.pinchStart !== null) {
-          const dist = getPinchDist(e);
-          const ratio = dist / this.pinchStart;
-          this.scale = Math.max(0.35, Math.min(2.8, this.pinchScale * ratio));
-          this.draw();
-          e.preventDefault();
+          this.scale = Math.max(0.3, Math.min(3.5, this.pinchScale * (getPinchDist(e) / this.pinchStart)));
+          this.draw(); e.preventDefault();
         }
       }, { passive: false });
-
       canvas.addEventListener('touchend', () => { this.pinchStart = null; });
 
-      // Resize
-      window.addEventListener('resize', () => {
-        this.resize();
-        this.draw();
-      });
+      window.addEventListener('resize', () => { this.resize(); this.fitToCanvas(); this.draw(); });
     }
 
-    destroy() {
-      cancelAnimationFrame(this.rafId);
-    }
+    destroy() { cancelAnimationFrame(this.rafId); }
   }
 
   // ─── Overlay lifecycle ────────────────────────────────────────────────────
   let graph: AtlasGraph | null = null;
-  const overlay = document.getElementById('atlas-overlay')!;
-  const trigger = document.getElementById('atlas-trigger')!;
+  const overlay  = document.getElementById('atlas-overlay')!;
+  const trigger  = document.getElementById('atlas-trigger')!;
   const closeBtn = document.getElementById('atlas-close')!;
-  const canvas = document.getElementById('atlas-canvas') as HTMLCanvasElement;
-
-  const poemId  = (overlay as HTMLElement).dataset.poemId!;
+  const canvas   = document.getElementById('atlas-canvas') as HTMLCanvasElement;
+  const poemId   = (overlay as HTMLElement).dataset.poemId!;
   const worldKey = (overlay as HTMLElement).dataset.world!;
-
-  // Save scroll position when ATLAS opens
   let savedScroll = 0;
 
   function openAtlas() {
     savedScroll = window.scrollY;
     overlay.setAttribute('aria-hidden', 'false');
     overlay.classList.add('is-open');
-
     gsap.fromTo(overlay,
       { opacity: 0, y: 8 },
       { opacity: 1, y: 0, duration: 0.32, ease: 'power2.out' }
     );
-
-    // Build / rebuild graph each open (handles resize)
     if (graph) graph.destroy();
     graph = new AtlasGraph(canvas, poemId, worldKey);
-
-    // Set contextual hint based on whether this poem has relation data
-    const hint = document.getElementById('atlas-hint')!;
-    hint.textContent = graph.isStub
-      ? 'nearby poems in this volume — tap to preview · relation map coming soon'
-      : 'tap speaker · act · image nodes to find shared poems';
-
+    document.getElementById('atlas-hint')!.textContent = graph.isStub
+      ? 'tap any attribute to find poems with that quality — this poem\'s position is not yet mapped'
+      : 'highlighted attributes belong to this poem — tap one to explore the field';
     document.body.style.overflow = 'hidden';
     closeBtn.focus();
   }
@@ -1287,32 +1217,25 @@ const { poemId, world } = Astro.props;
         document.body.style.overflow = '';
         window.scrollTo({ top: savedScroll, behavior: 'instant' });
         trigger.focus();
-      }
+      },
     });
   }
 
   trigger.addEventListener('click', openAtlas);
   closeBtn.addEventListener('click', closeAtlas);
 
-  // ESC closes
   document.addEventListener('keydown', (e: KeyboardEvent) => {
-    if (e.key === 'Escape' && overlay.classList.contains('is-open')) {
-      closeAtlas();
-    }
+    if (e.key === 'Escape' && overlay.classList.contains('is-open')) closeAtlas();
   });
 
-  // Focus trap inside overlay
   overlay.addEventListener('keydown', (e: KeyboardEvent) => {
     if (e.key !== 'Tab') return;
-    const focusable = overlay.querySelectorAll<HTMLElement>(
-      'button, a, [tabindex="0"]'
-    );
-    const first = focusable[0];
-    const last = focusable[focusable.length - 1];
+    const focusable = overlay.querySelectorAll<HTMLElement>('button, a, [tabindex="0"]');
+    const first = focusable[0], last = focusable[focusable.length - 1];
     if (e.shiftKey) {
       if (document.activeElement === first) { e.preventDefault(); last.focus(); }
     } else {
-      if (document.activeElement === last) { e.preventDefault(); first.focus(); }
+      if (document.activeElement === last)  { e.preventDefault(); first.focus(); }
     }
   });
 </script>
