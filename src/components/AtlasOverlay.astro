@@ -842,14 +842,6 @@ const { poemId, world } = Astro.props;
       const label = this.formatLabel(n.value!);
       const catLabel = ATTR_LABELS[n.attrType!] || n.attrType!;
       const description = ATTR_DESCRIPTIONS[n.value!] || '';
-      const active = n.active ?? false;
-
-      // Count mapped poems sharing this attribute (not including current poem)
-      const sharedCount = (atlas.poems as any[]).filter((p: any) => {
-        const arr: string[] = p[n.attrType!] || [];
-        return arr.includes(n.value!) && p.id !== this.poemId && p[n.attrType!]?.length > 0;
-      }).length;
-
       const annoEl = document.getElementById('atlas-anno')!;
       annoEl.innerHTML = `
         <div class="atlas-anno-header">
@@ -857,12 +849,6 @@ const { poemId, world } = Astro.props;
           <h3 class="atlas-anno-name">${label}</h3>
         </div>
         ${description ? `<p class="atlas-anno-def">${description}</p>` : ''}
-        <p class="atlas-anno-meta">
-          <span class="${active ? 'atlas-anno-active' : 'atlas-anno-inactive'}">
-            ${active ? 'active in this poem' : 'not present in this poem'}
-          </span>
-          ${sharedCount > 0 ? `<span class="atlas-anno-sep">·</span><span class="atlas-anno-count">appears in ${sharedCount} other poem${sharedCount > 1 ? 's' : ''} in the collection</span>` : ''}
-        </p>
       `;
       annoEl.classList.add('is-open');
       if (!this.rafId) this.draw();
