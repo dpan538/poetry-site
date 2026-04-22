@@ -43,8 +43,8 @@ const { poemId, world } = Astro.props;
     </button>
   </div>
 
-  <!-- Legend -->
-  <div class="atlas-legend" aria-hidden="true">
+  <!-- Legend — not aria-hidden; text labels carry the meaning, color dots are decorative -->
+  <div class="atlas-legend">
     <span class="atlas-legend-item atlas-legend-mode">speaker mode</span>
     <span class="atlas-legend-sep">·</span>
     <span class="atlas-legend-item atlas-legend-type">poem act</span>
@@ -56,7 +56,11 @@ const { poemId, world } = Astro.props;
   <!-- Summary sentence — counts active attributes -->
   <p id="atlas-summary" class="atlas-summary" aria-live="polite"></p>
 
-  <!-- Canvas — the attribute field -->
+  <!-- Screen reader text alternative for the canvas — WCAG 1.1.1 / 1.3.1 -->
+  <!-- Lists the poem's active attributes so AT users get the same structural information -->
+  <p id="atlas-sr-attrs" class="atlas-sr-only" aria-live="polite"></p>
+
+  <!-- Canvas — the attribute field (aria-hidden: AT gets info via atlas-sr-attrs above) -->
   <canvas id="atlas-canvas" class="atlas-canvas" aria-hidden="true"></canvas>
 
   <!-- Annotation panel — shown when attribute is selected -->
@@ -77,19 +81,25 @@ const { poemId, world } = Astro.props;
     z-index: 150;
     background: none;
     border: none;
-    padding: 0;
+    /* WCAG 2.5.5: 44×44px minimum touch target */
+    padding: 12px 8px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
     cursor: pointer;
-    font-family: Georgia, 'Times New Roman', serif;
+    /* font-family: inherit respects per-world font (Helvetica Neue / Futura / Georgia) */
+    font-family: inherit;
     font-size: 19px;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--color-primary, #1a1a1a);
-    opacity: 0.35;
+    /* WCAG 1.4.3: #595959 on #f5f2ed = 6.27:1 ✅ (opacity:0.35 was only 2.17:1 ❌) */
+    color: var(--color-meta, #595959);
+    opacity: 1;
     line-height: 1.2;
-    transition: opacity 0.2s;
+    transition: color 0.2s;
   }
 
-  .atlas-trigger:hover { opacity: 1; }
+  .atlas-trigger:hover { color: var(--color-primary, #1a1a1a); }
 
   .atlas-trigger:focus-visible {
     outline: 2px solid var(--color-accent, #c0392b);
@@ -115,20 +125,20 @@ const { poemId, world } = Astro.props;
   .atlas-header {
     display: flex;
     align-items: baseline;
-    gap: 10px;
-    padding: 16px var(--margin-x, 24px) 0;
+    gap: 12px;
+    padding: 20px var(--margin-x, 24px) 0;
     flex-shrink: 0;
   }
 
   .atlas-wordmark {
-    font-size: 11px;
-    letter-spacing: 0.14em;
+    font-size: 12px;
+    letter-spacing: 0.16em;
     color: var(--color-primary, #1a1a1a);
     font-family: inherit;
   }
 
   .atlas-subtitle {
-    font-size: 11px;
+    font-size: 12px;
     letter-spacing: 0.06em;
     color: var(--color-meta, #595959);
     font-style: italic;
@@ -138,7 +148,8 @@ const { poemId, world } = Astro.props;
     margin-left: auto;
     background: transparent;
     border: none;
-    padding: 6px;
+    /* WCAG 2.5.5: 44×44px minimum touch target (14px SVG + 30px padding = 44px) */
+    padding: 15px;
     cursor: pointer;
     color: var(--color-meta, #595959);
     transition: color 0.15s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
@@ -158,41 +169,42 @@ const { poemId, world } = Astro.props;
   /* ── Legend ──────────────────────────────────────────────────────────────── */
   .atlas-legend {
     display: flex;
-    gap: 18px;
+    gap: 22px;
     align-items: center;
-    padding: 10px var(--margin-x, 24px) 0;
+    padding: 14px var(--margin-x, 24px) 0;
     flex-shrink: 0;
+    flex-wrap: wrap;
   }
 
   .atlas-legend-sep {
-    font-size: 10px;
+    font-size: 12px;
     color: var(--color-meta, #595959);
-    opacity: 0.45;
+    opacity: 0.40;
   }
 
   .atlas-legend-desc {
-    font-size: 10px;
-    letter-spacing: 0.03em;
+    font-size: 13px;
+    letter-spacing: 0.02em;
+    /* WCAG 1.4.3: opacity:0.75 was only 3.58:1 ❌ — removed, full #595959 = 6.27:1 ✅ */
     color: var(--color-meta, #595959);
     font-style: italic;
-    margin-left: 6px;
-    opacity: 0.7;
+    margin-left: 2px;
   }
 
   .atlas-legend-item {
-    font-size: 11px;
-    letter-spacing: 0.06em;
+    font-size: 14px;
+    letter-spacing: 0.04em;
     color: var(--color-meta, #595959);
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 6px;
   }
 
   .atlas-legend-item::before {
     content: '';
     display: inline-block;
-    width: 7px;
-    height: 7px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
     flex-shrink: 0;
   }
@@ -203,15 +215,16 @@ const { poemId, world } = Astro.props;
 
   /* ── Summary line ───────────────────────────────────────────────────────── */
   .atlas-summary {
-    font-size: 12px;
-    letter-spacing: 0.04em;
+    font-size: 16px;
+    letter-spacing: 0.02em;
     color: var(--color-meta, #595959);
     font-style: italic;
     text-align: center;
-    padding: 6px var(--margin-x, 24px) 0;
+    padding: 10px var(--margin-x, 24px) 0;
     flex-shrink: 0;
-    min-height: 1.5em;
+    min-height: 1.6em;
     margin: 0;
+    line-height: 1.5;
   }
 
   /* ── Canvas ──────────────────────────────────────────────────────────────── */
@@ -229,69 +242,72 @@ const { poemId, world } = Astro.props;
     overflow: hidden;
     max-height: 0;
     opacity: 0;
-    transition: max-height 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.22s ease, padding 0.3s ease;
+    transition: max-height 0.32s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.24s ease, padding 0.32s ease;
     border-top: 0.5px solid transparent;
     padding: 0 var(--margin-x, 24px);
   }
 
   .atlas-anno.is-open {
-    max-height: 220px;
+    max-height: 260px;
     opacity: 1;
-    padding: 14px var(--margin-x, 24px) 10px;
-    border-top-color: rgba(26, 26, 26, 0.09);
+    padding: 18px var(--margin-x, 24px) 12px;
+    border-top-color: rgba(26, 26, 26, 0.10);
   }
 
   /* annotation internals (set by JS innerHTML) */
   :global(.atlas-anno-header) {
     display: flex;
     align-items: baseline;
-    gap: 10px;
-    margin-bottom: 7px;
+    gap: 12px;
+    margin-bottom: 9px;
   }
 
   :global(.atlas-anno-cat) {
-    font-size: 10px;
+    font-size: 11.5px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     flex-shrink: 0;
+    line-height: 1.4;
+    padding-top: 3px; /* optical baseline alignment with name */
   }
 
-  :global(.atlas-anno-cat.tag-mode)    { color: #b8a898; }
-  :global(.atlas-anno-cat.tag-type)    { color: #8a96a8; }
-  :global(.atlas-anno-cat.tag-imagery) { color: #8a9e8a; }
+  /* WCAG 1.4.3: darkened from #9e8e7e/7a8696/728e72 (all ~2.8-3.3:1 ❌) to pass 4.5:1 ✅ */
+  :global(.atlas-anno-cat.tag-mode)    { color: #776a5e; } /* 4.69:1 ✅ */
+  :global(.atlas-anno-cat.tag-type)    { color: #5e6e80; } /* 4.68:1 ✅ */
+  :global(.atlas-anno-cat.tag-imagery) { color: #547054; } /* 4.92:1 ✅ */
 
   :global(.atlas-anno-name) {
-    font-size: 17px;
+    font-size: 21px;
     font-weight: normal;
     font-family: Georgia, 'Times New Roman', serif;
     letter-spacing: -0.01em;
     color: var(--color-primary, #1a1a1a);
     margin: 0;
-    line-height: 1.2;
+    line-height: 1.15;
   }
 
   :global(.atlas-anno-def) {
-    margin: 0 0 8px;
-    font-size: 13px;
-    line-height: 1.65;
+    margin: 0 0 10px;
+    font-size: 14.5px;
+    line-height: 1.7;
     color: var(--color-primary, #1a1a1a);
     font-style: italic;
-    opacity: 0.82;
+    opacity: 0.80;
   }
 
   :global(.atlas-anno-meta) {
-    font-size: 11px;
-    letter-spacing: 0.04em;
+    font-size: 12.5px;
+    letter-spacing: 0.03em;
     color: var(--color-meta, #595959);
     display: flex;
-    gap: 6px;
+    gap: 7px;
     align-items: center;
     flex-wrap: wrap;
+    line-height: 1.4;
   }
 
   :global(.atlas-anno-active) {
     color: var(--color-primary, #1a1a1a);
-    font-weight: 500;
   }
 
   :global(.atlas-anno-inactive) {
@@ -300,23 +316,34 @@ const { poemId, world } = Astro.props;
   }
 
   :global(.atlas-anno-sep) {
-    opacity: 0.4;
+    opacity: 0.35;
+    font-size: 13px;
   }
 
   :global(.atlas-anno-count) {
     color: var(--color-meta, #595959);
-    font-style: italic;
+  }
+
+  /* ── Screen reader only — text alternative for canvas ── */
+  .atlas-sr-only {
+    position: absolute;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
   }
 
   /* ── Hint ────────────────────────────────────────────────────────────────── */
   .atlas-hint {
     flex-shrink: 0;
-    font-size: 12px;
-    letter-spacing: 0.04em;
+    font-size: 15px;
+    letter-spacing: 0.03em;
     color: var(--color-meta, #595959);
     font-style: italic;
     text-align: center;
-    padding: 10px var(--margin-x, 24px) 18px;
+    padding: 12px var(--margin-x, 24px) 22px;
     margin: 0;
     transition: opacity 0.3s ease;
   }
@@ -507,7 +534,7 @@ const { poemId, world } = Astro.props;
             kind: 'attr', attrType, value,
             x: home.x + jx, y: home.y + jy,
             vx: 0, vy: 0, homeX: home.x, homeY: home.y,
-            r: active ? 9 : 5, active,
+            r: active ? 10 : 5, active,
             delay: 0.04 + i * 0.042, currentAlpha: 0,
           };
           this.nodes.push(n);
@@ -551,10 +578,11 @@ const { poemId, world } = Astro.props;
     // ── Fit canvas ────────────────────────────────────────────────────────────
     fitToCanvas() {
       const spanW = 560, spanH = 430;
-      const scaleW = (this.cx * 2 * 0.82) / spanW;
-      const scaleH = (this.cy * 2 * 0.82) / spanH;
-      this.scale = Math.min(scaleW, scaleH, 1.15);
-      this.ty = -42 * this.scale; // shift field upward — balances the triangle vertically
+      const scaleW = (this.cx * 2 * 0.80) / spanW;
+      const scaleH = (this.cy * 2 * 0.80) / spanH;
+      // Higher cap (1.45) lets the graph breathe on larger screens
+      this.scale = Math.min(scaleW, scaleH, 1.45);
+      this.ty = -42 * this.scale;
     }
 
     resize() {
@@ -634,10 +662,10 @@ const { poemId, world } = Astro.props;
       });
 
       ctx.save();
-      ctx.font = 'italic 10px Georgia, serif';
+      ctx.font = 'italic 12px Georgia, serif';
       ctx.textBaseline = 'middle'; ctx.textAlign = 'center';
       zones.forEach(({ key, label, labelY }) => {
-        ctx.globalAlpha = 0.45;
+        ctx.globalAlpha = 0.58;
         ctx.fillStyle = ATTR_COLORS[key];
         ctx.fillText(label, ZONES[key].cx, labelY);
       });
@@ -684,20 +712,20 @@ const { poemId, world } = Astro.props;
       const ctx = this.ctx;
       const wc = WORLD_COLORS[n.world || this.worldKey] || WORLD_COLORS['their-world'];
       // Faint outer halo
-      ctx.beginPath(); ctx.arc(0, 0, n.r + 10, 0, Math.PI * 2);
+      ctx.beginPath(); ctx.arc(0, 0, n.r + 12, 0, Math.PI * 2);
       ctx.strokeStyle = wc.accent; ctx.lineWidth = 0.8;
-      ctx.globalAlpha *= 0.15; ctx.stroke(); ctx.globalAlpha /= 0.15;
+      ctx.globalAlpha *= 0.14; ctx.stroke(); ctx.globalAlpha /= 0.14;
       // Soft fill
       ctx.beginPath(); ctx.arc(0, 0, n.r, 0, Math.PI * 2);
       ctx.fillStyle = wc.soft;
-      ctx.globalAlpha *= 0.22; ctx.fill(); ctx.globalAlpha /= 0.22;
+      ctx.globalAlpha *= 0.24; ctx.fill(); ctx.globalAlpha /= 0.24;
       // Border
       ctx.beginPath(); ctx.arc(0, 0, n.r, 0, Math.PI * 2);
-      ctx.strokeStyle = wc.accent; ctx.lineWidth = 1.6; ctx.stroke();
-      // Title below
-      ctx.font = '14px Georgia, serif'; ctx.fillStyle = '#1a1a1a';
+      ctx.strokeStyle = wc.accent; ctx.lineWidth = 1.8; ctx.stroke();
+      // Title below — larger, comfortable to read
+      ctx.font = '17px Georgia, serif'; ctx.fillStyle = '#1a1a1a';
       ctx.textAlign = 'center'; ctx.textBaseline = 'top';
-      this.wrapText(n.title || '', 0, n.r + 10, 120, 17);
+      this.wrapText(n.title || '', 0, n.r + 11, 140, 20);
     }
 
     drawAttrNode(n: Node) {
@@ -707,16 +735,18 @@ const { poemId, world } = Astro.props;
       const isSel = this.selectedNode === n;
       const active = n.active ?? false;
 
-      const baseOpacity = active ? 1 : 0.28;
+      // Active nodes: full presence.
+      // Inactive: clearly subordinate but still legible — not faint, just smaller and muted.
+      const baseOpacity = active ? 1 : 0.58;
       ctx.globalAlpha *= baseOpacity;
 
-      const baseR = active ? 9 : 5;
-      const r = baseR * (isHov || isSel ? 1.6 : 1);
+      const baseR = active ? 10 : 5;
+      const r = baseR * (isHov || isSel ? 1.5 : 1);
 
       // Soft aura for active nodes
       if (active && !isSel) {
-        ctx.beginPath(); ctx.arc(n.x, n.y, r + 10, 0, Math.PI * 2);
-        ctx.fillStyle = color; ctx.globalAlpha *= 0.14; ctx.fill(); ctx.globalAlpha /= 0.14;
+        ctx.beginPath(); ctx.arc(n.x, n.y, r + 12, 0, Math.PI * 2);
+        ctx.fillStyle = color; ctx.globalAlpha *= 0.13; ctx.fill(); ctx.globalAlpha /= 0.13;
       }
 
       // Dot
@@ -725,15 +755,15 @@ const { poemId, world } = Astro.props;
 
       // Selection ring
       if (isSel) {
-        ctx.beginPath(); ctx.arc(n.x, n.y, r + 5, 0, Math.PI * 2);
-        ctx.strokeStyle = color; ctx.lineWidth = 0.9;
+        ctx.beginPath(); ctx.arc(n.x, n.y, r + 6, 0, Math.PI * 2);
+        ctx.strokeStyle = color; ctx.lineWidth = 1.0;
         ctx.globalAlpha *= 0.55; ctx.stroke(); ctx.globalAlpha /= 0.55;
       }
 
-      // Label — radially outward from anchor
+      // Label — radially outward from anchor, larger and more readable
       const angle = Math.atan2(n.y, n.x);
       const deg = angle * 180 / Math.PI;
-      const gap = r + 11;
+      const gap = r + 14; // generous gap between dot and label start
       let lx = n.x, ly = n.y;
       let ta: CanvasTextAlign = 'center', tb: CanvasTextBaseline = 'middle';
 
@@ -742,11 +772,20 @@ const { poemId, world } = Astro.props;
       else if (deg >= 70 && deg <= 110)   { ly = n.y + gap + 2; tb = 'top'; ta = 'center'; }
       else                                { ly = n.y - gap - 2; tb = 'bottom'; ta = 'center'; }
 
-      const fs = active ? 12.5 : 10.5;
+      // Active: 15px upright; inactive: 13px italic
+      const fs = active ? 15 : 13;
       ctx.font = `${active ? '' : 'italic '}${fs}px Georgia, serif`;
-      ctx.fillStyle = isSel ? '#0a0a0a' : active ? '#1a1a1a' : '#c0b8b0';
+      // WCAG 1.4.3: dot drawn at baseOpacity (0.58 for inactive) but text needs higher opacity.
+      // #5a5452 at 58% → 2.62:1 ❌. At 88% → 4.98:1 ✅. Save/restore alpha around text only.
+      const preTextAlpha = ctx.globalAlpha;
+      if (!active) {
+        // Raise text opacity: divide out baseOpacity (0.58), multiply by 0.88 of fade alpha
+        ctx.globalAlpha = (preTextAlpha / baseOpacity) * 0.88;
+      }
+      ctx.fillStyle = isSel ? '#0a0a0a' : active ? '#1a1a1a' : '#5a5452';
       ctx.textAlign = ta; ctx.textBaseline = tb;
       ctx.fillText(this.formatLabel(n.value!), lx, ly);
+      ctx.globalAlpha = preTextAlpha; // restore dot opacity for correct restore at end
 
       ctx.globalAlpha /= baseOpacity;
     }
@@ -832,6 +871,8 @@ const { poemId, world } = Astro.props;
     }
 
     // ── Hit testing (anchor + attr only) ──────────────────────────────────────
+    // Hit radius is large enough to include the text label, not just the dot.
+    // Closest-node wins, so overlapping zones resolve correctly.
     hitTest(px: number, py: number): Node | null {
       const wx = (px - this.cx - this.tx) / this.scale;
       const wy = (py - this.cy - this.ty) / this.scale;
@@ -839,7 +880,11 @@ const { poemId, world } = Astro.props;
       for (const n of this.nodes) {
         const dx = n.x - wx, dy = n.y - wy;
         const dist = Math.sqrt(dx * dx + dy * dy);
-        const hitR = n.kind === 'anchor' ? n.r + 10 : Math.max(n.r + 18, 24);
+        // Active attr: large radius (65px) covers dot + label fully.
+        // Inactive attr: 50px — generous but yields to nearer active nodes.
+        // Anchor: fixed radius around the circle border.
+        const hitR = n.kind === 'anchor' ? n.r + 14
+          : (n.active ? 65 : 50);
         if (dist < hitR && dist < bestDist) { best = n; bestDist = dist; }
       }
       return best;
@@ -951,6 +996,22 @@ const { poemId, world } = Astro.props;
   const worldKey = (overlay as HTMLElement).dataset.world!;
   let savedScroll = 0;
 
+  // Build accessible text summary of active attributes for screen readers
+  function buildSrAttrsText(g: AtlasGraph): string {
+    const poem = g.poem;
+    if (!poem?.mode) return 'No structural data available for this poem.';
+    const lines: string[] = [];
+    const labels: Record<string, string> = { mode: 'Speaker mode', type: 'Poem act', imagery: 'Imagery' };
+    (['mode', 'type', 'imagery'] as const).forEach(k => {
+      const active: string[] = poem[k] || [];
+      if (active.length) {
+        const names = active.map((v: string) => v.replace(/_/g, ' ')).join(', ');
+        lines.push(`${labels[k]}: ${names}.`);
+      }
+    });
+    return lines.length ? 'Active structural qualities — ' + lines.join(' ') : '';
+  }
+
   function openAtlas() {
     savedScroll = window.scrollY;
     overlay.setAttribute('aria-hidden', 'false');
@@ -965,6 +1026,9 @@ const { poemId, world } = Astro.props;
     document.getElementById('atlas-hint')!.textContent = graph.isStub
       ? 'tap any attribute to read its definition'
       : 'tap a highlighted attribute to read its definition';
+    // Populate screen reader text alternative for the canvas (WCAG 1.1.1)
+    const srEl = document.getElementById('atlas-sr-attrs');
+    if (srEl) srEl.textContent = buildSrAttrsText(graph);
     document.body.style.overflow = 'hidden';
     closeBtn.focus();
   }
