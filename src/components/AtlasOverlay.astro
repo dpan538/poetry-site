@@ -45,9 +45,11 @@ const { poemId, world } = Astro.props;
 
   <!-- Legend -->
   <div class="atlas-legend" aria-hidden="true">
+    <span class="atlas-legend-label">attributes —</span>
     <span class="atlas-legend-item atlas-legend-mode">speaker</span>
     <span class="atlas-legend-item atlas-legend-type">act</span>
     <span class="atlas-legend-item atlas-legend-imagery">image</span>
+    <span class="atlas-legend-sep">·</span>
     <span class="atlas-legend-item atlas-legend-transform">↻ transform</span>
   </div>
 
@@ -56,7 +58,7 @@ const { poemId, world } = Astro.props;
 
   <!-- Hint text -->
   <p id="atlas-hint" class="atlas-hint" aria-live="polite">
-    tap a node to explore relations
+    tap a node to explore — drag to pan — scroll to zoom
   </p>
 
   <!-- Preview card (shown on poem node click) -->
@@ -166,6 +168,20 @@ const { poemId, world } = Astro.props;
     align-items: center;
     padding: 10px var(--margin-x, 24px) 0;
     flex-shrink: 0;
+  }
+
+  .atlas-legend-label {
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    color: var(--color-meta, #595959);
+    font-style: italic;
+    margin-right: 2px;
+  }
+
+  .atlas-legend-sep {
+    font-size: 10px;
+    color: var(--color-meta, #595959);
+    opacity: 0.5;
   }
 
   .atlas-legend-item {
@@ -429,6 +445,7 @@ const { poemId, world } = Astro.props;
     pointerDownPos: { x: number; y: number } | null;
     pointerDownTime: number;
     rafId: number;
+    isStub: boolean;
 
     constructor(canvas: HTMLCanvasElement, poemId: string, worldKey: string) {
       this.canvas = canvas;
@@ -450,6 +467,7 @@ const { poemId, world } = Astro.props;
       this.pointerDownPos = null;
       this.pointerDownTime = 0;
       this.rafId = 0;
+      this.isStub = false;
 
       this.resize();
       this.buildGraph();
@@ -471,7 +489,36 @@ const { poemId, world } = Astro.props;
       };
       this.nodes.push(center);
 
-      if (!poem?.mode) return; // stub poem — just center node
+      if (!poem?.mode) {
+        // Stub poem — relations not yet mapped.
+        // Show the nearest poems from the same world by order as navigable neighbours.
+        this.isStub = true;
+        const currentOrder: number = poem?.order ?? 0;
+        const worldPoems = (atlas.poems as any[])
+          .filter((p: any) => p.world === this.worldKey && p.id !== this.poemId)
+          .map((p: any) => ({ ...p, _dist: Math.abs(p.order - currentOrder) }))
+          .sort((a: any, b: any) => a._dist - b._dist)
+          .slice(0, 5);
+
+        const relR = 200;
+        worldPoems.forEach((rp: any, i: number) => {
+          const angle = (i / worldPoems.length) * Math.PI * 2 - Math.PI / 2;
+          const node: Node = {
+            kind: 'related', id: rp.id, title: rp.title,
+            world: rp.world, order: rp.order,
+            firstLine: rp.firstLine,
+            weight: 1,
+            reason: ['sequential'],
+            transform: false,
+            x: Math.cos(angle) * relR, y: Math.sin(angle) * relR,
+            r: 20, alpha: 0, delay: 0.18 + i * 0.12,
+            currentAlpha: 0,
+          };
+          this.nodes.push(node);
+          this.edges.push({ from: center, to: node });
+        });
+        return;
+      }
 
       // Attribute nodes
       const attrs: { attrType: string; value: string }[] = [];
@@ -529,23 +576,23 @@ const { poemId, world } = Astro.props;
     }
 
     // ── Render loop ─────────────────────────────────────────────────────────
+    // Runs only for the entry animation (1 s). All subsequent redraws are
+    // event-driven: pointermove, pointerup, wheel, and handleTap each call draw().
     startLoop() {
       const start = performance.now();
       const totalDur = 1000;
-      let running = true;
 
       const tick = (now: number) => {
         const t = Math.min(1, (now - start) / totalDur);
-        // Update per-node alpha from delay/duration
+        // Advance per-node alpha
         this.nodes.forEach(n => {
           const progress = Math.max(0, Math.min(1, (t - n.delay) / 0.35));
           n.currentAlpha = this.easeOut(progress);
         });
         this.draw();
-        if (running || this.hoveredNode || this.selectedNode) {
+        if (t < 1) {
           this.rafId = requestAnimationFrame(tick);
         }
-        if (t >= 1) running = false;
       };
       this.rafId = requestAnimationFrame(tick);
     }
@@ -570,6 +617,7 @@ const { poemId, world } = Astro.props;
 
       this.drawEdges();
       this.drawNodes();
+      if (this.isStub) this.drawStubNote();
 
       ctx.restore();
     }
@@ -772,6 +820,19 @@ const { poemId, world } = Astro.props;
       ctx.fillText(volLabel, node.x, node.y + r + 8 + 14 + 2);
     }
 
+    // ── Stub annotation ─────────────────────────────────────────────────────
+    drawStubNote() {
+      const ctx = this.ctx;
+      ctx.save();
+      // Small italicised note below the center circle
+      ctx.font = `italic 10.5px Georgia, serif`;
+      ctx.fillStyle = 'rgba(90,80,70,0.55)';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      ctx.fillText('relation data not yet mapped', 0, 46);
+      ctx.restore();
+    }
+
     // ── Text utilities ──────────────────────────────────────────────────────
     wrapText(text: string, x: number, y: number, maxW: number, lineH: number) {
       const ctx = this.ctx;
@@ -830,22 +891,28 @@ const { poemId, world } = Astro.props;
       if (!hit) {
         this.selectedNode = null;
         this.updatePreview(null);
-        this.updateHint('tap a node to explore relations');
+        const defaultHint = this.isStub
+          ? 'nearby poems in this volume — tap to preview'
+          : 'tap a node to explore — drag to pan — scroll to zoom';
+        this.updateHint(defaultHint);
+        this.draw();
         return;
       }
       if (hit === this.selectedNode) {
-        // Second tap on same node — deselect (attr) or navigate (poem)
+        // Second tap on same node — navigate to poem or deselect attr
         if (hit.kind === 'related') {
-          window.location.href = atlas.poems.find((p: any) => p.id === hit.id)?.url || '#';
+          window.location.href = (atlas.poems as any[]).find((p: any) => p.id === hit.id)?.url || '#';
         } else {
           this.selectedNode = null;
           this.updatePreview(null);
+          this.draw();
         }
         return;
       }
       this.selectedNode = hit;
       if (hit.kind === 'attr')    this.showAttrPanel(hit);
       if (hit.kind === 'related') this.showPoemPreview(hit);
+      this.draw(); // ensure selected-state highlight renders immediately
     }
 
     showAttrPanel(node: Node) {
@@ -876,6 +943,7 @@ const { poemId, world } = Astro.props;
 
     showPoemPreview(node: Node) {
       const reasons = (node.reason || []).map(r => {
+        if (r === 'sequential') return 'in this volume';
         if (r === 'mode') return 'same speaker position';
         if (r === 'type') return 'same poem act';
         if (r === 'imagery') return 'shared imagery';
@@ -1046,6 +1114,12 @@ const { poemId, world } = Astro.props;
     // Build / rebuild graph each open (handles resize)
     if (graph) graph.destroy();
     graph = new AtlasGraph(canvas, poemId, worldKey);
+
+    // Set contextual hint based on whether this poem has relation data
+    const hint = document.getElementById('atlas-hint')!;
+    hint.textContent = graph.isStub
+      ? 'nearby poems in this volume — tap to preview · relation map coming soon'
+      : 'tap speaker · act · image nodes to find shared poems';
 
     document.body.style.overflow = 'hidden';
     closeBtn.focus();
