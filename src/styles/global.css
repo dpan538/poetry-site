@@ -77,13 +77,14 @@ html[data-world='still-life'] {
 }
 
 /**
- * Shared “Collection” reading layout: centered column, display title, meta line, prose.
+ * Shared reading layout — about, preface, collection, world-index.
+ * Centered editorial column with consistent typography.
  * Lives in global CSS so it is not weakened by Astro scoped-selector + Tailwind cascade order.
  */
 @keyframes reading-page-in {
   from {
-    opacity: 0.9;
-    transform: translateY(6px);
+    opacity: 0;
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
@@ -97,37 +98,41 @@ html[data-world='still-life'] {
   max-width: min(68ch, 100%);
   margin-inline: auto;
   margin-block: 0;
-  padding-bottom: var(--space-xl);
-  animation: reading-page-in 0.35s linear both;
+  padding-bottom: calc(var(--space-xl) * 2);
+  animation: reading-page-in 0.38s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
+/* ── Reading header shared by about/preface/collection ── */
 .reading-header {
   padding-top: 0;
-  margin-bottom: calc(var(--space-xl) + var(--space-sm));
+  padding-bottom: var(--space-xl);
+  margin-bottom: var(--space-xl);
+  border-bottom: 1px solid rgba(26, 26, 26, 0.1);
 }
 
 .reading-header h1 {
   margin: 0 0 var(--space-sm);
-  margin-top: 0;
-  font-size: calc(var(--type-display) - 18px);
-  line-height: 1.06;
-  font-weight: bold;
-  color: #1a1a1a;
+  font-size: var(--type-display);
+  line-height: var(--leading-display);
+  font-weight: normal;
+  letter-spacing: -0.01em;
+  color: var(--color-primary, #1a1a1a);
 }
 
 .reading-meta {
   margin: 0;
-  font-size: var(--type-body);
-  font-weight: 400;
-  color: #5a5f66;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  color: var(--color-meta, #595959);
 }
 
+/* ── Prose body ── */
 .reading-prose p {
   margin: 0 0 var(--space-lg);
-  font-size: calc(var(--type-body) + 2px);
-  line-height: 1.65;
+  font-size: calc(var(--type-body) + 1px);
+  line-height: 1.68;
   font-weight: 400;
-  color: #3d4249;
+  color: var(--color-primary, #1a1a1a);
   max-width: none;
 }
 
@@ -137,15 +142,16 @@ html[data-world='still-life'] {
 
 .reading-prose .reading-copyright-block {
   margin-top: var(--space-xl);
+  padding-top: var(--space-lg);
+  border-top: 0.5px solid rgba(26, 26, 26, 0.1);
 }
 
 .reading-prose .reading-copyright-block p {
-  margin: 0 0 var(--space-lg);
-  font-size: calc(var(--type-body) + 2px);
-  line-height: 1.65;
-  font-weight: 400;
-  color: #3d4249;
-  max-width: none;
+  margin: 0 0 var(--space-md);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--color-meta, #595959);
+  letter-spacing: 0.02em;
 }
 
 .reading-prose .reading-copyright-block p:last-child {
@@ -154,8 +160,7 @@ html[data-world='still-life'] {
 
 .reading-prose em {
   font-style: italic;
-  font-weight: 400;
-  color: #454a52;
+  color: inherit;
 }
 
 .preface-header h1,

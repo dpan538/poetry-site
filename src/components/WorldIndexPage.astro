@@ -14,21 +14,42 @@ const metaDescription = truncateChars(description, 160);
 
 const list = await getCollection(world);
 const poems = [...list].sort((a, b) => a.data.order - b.data.order);
+
+const breadcrumbs = [
+  { name: 'Three Worlds', url: 'https://daipan.ink/' },
+  { name: title, url: `https://daipan.ink/${world}` },
+];
+
+const volumeNumber: Record<string, string> = {
+  'their-world': 'I',
+  'bless-you': 'II',
+  'still-life': 'III',
+};
 ---
 
-<BaseLayout title={title} world={world} description={metaDescription}>
+<BaseLayout title={title} world={world} description={metaDescription} breadcrumbs={breadcrumbs}>
   <main class="world-index">
     <header class="world-header">
+      <p class="world-volume-label">
+        <span class="volume-roman">{volumeNumber[world]}</span>
+        <span class="volume-divider">—</span>
+        <span class="volume-count">{poems.length} poems</span>
+      </p>
       <h1>{title}</h1>
       <p class="world-desc">{description}</p>
     </header>
 
-    <ol class="poem-nums" start="1">
+    <ol class="poem-index-list" start="1">
       {poems.map((poem) => (
-        <li>
-          <a href={`/${world}/${poem.id}`} class="poem-num-link">
-            <span class="poem-num">{String(poem.data.order).padStart(2, '0')}</span>
-            <span class="poem-num-title">{poem.data.title}</span>
+        <li class="poem-index-item">
+          <a href={`/${world}/${poem.id}`} class="poem-index-link">
+            <span class="poem-index-num">{String(poem.data.order).padStart(2, '0')}</span>
+            <span class="poem-index-text">
+              <span class="poem-index-title">{poem.data.title}</span>
+              {poem.data.firstLine && (
+                <span class="poem-index-first-line">{poem.data.firstLine}</span>
+              )}
+            </span>
           </a>
         </li>
       ))}
@@ -38,22 +59,48 @@ const poems = [...list].sort((a, b) => a.data.order - b.data.order);
 
 <style>
   .world-index {
-    padding-left: 0;
-    padding-right: 0;
-    padding-bottom: 0;
-    max-width: none;
+    box-sizing: border-box;
     width: 100%;
-    margin: 0;
+    max-width: min(72ch, 100%);
+    margin-inline: auto;
+    padding-bottom: calc(var(--space-xl) * 2);
   }
 
+  /* ── Header ─────────────────────────────────────────────────────────────── */
   .world-header {
-    padding: var(--space-xl) 0 var(--space-lg);
-    border-bottom: 0.5px solid rgba(26, 26, 26, 0.15);
-    margin-bottom: var(--space-lg);
+    padding-top: 0;
+    padding-bottom: var(--space-xl);
+    border-bottom: 1px solid rgba(26, 26, 26, 0.1);
+    margin-bottom: var(--space-xl);
+  }
+
+  .world-volume-label {
+    margin: 0 0 var(--space-md);
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-sm);
+    font-size: 13px;
+    letter-spacing: 0.12em;
+    color: var(--color-accent, #c0392b);
+    font-family: Georgia, 'Times New Roman', serif;
+  }
+
+  .volume-roman {
+    font-size: 13px;
+    letter-spacing: 0.1em;
+  }
+
+  .volume-divider {
+    opacity: 0.5;
+  }
+
+  .volume-count {
+    opacity: 0.7;
+    letter-spacing: 0.08em;
   }
 
   .world-header h1 {
-    margin: 0 0 var(--space-sm);
+    margin: 0 0 var(--space-md);
     font-size: var(--type-display);
     line-height: var(--leading-display);
     font-weight: normal;
@@ -61,47 +108,89 @@ const poems = [...list].sort((a, b) => a.data.order - b.data.order);
 
   .world-desc {
     margin: 0;
-    max-width: 42rem;
+    max-width: 46ch;
     font-size: var(--type-body);
     line-height: var(--leading-body);
-    color: #888888;
+    color: var(--color-meta, #595959);
   }
 
-  .poem-nums {
+  /* ── Poem index list ─────────────────────────────────────────────────────── */
+  .poem-index-list {
     list-style: none;
     margin: 0;
     padding: 0;
     display: flex;
     flex-direction: column;
-    gap: var(--space-sm);
   }
 
-  .poem-nums li {
+  .poem-index-item {
     margin: 0;
+    border-bottom: 0.5px solid rgba(26, 26, 26, 0.07);
   }
 
-  .poem-num-link {
+  .poem-index-link {
     display: flex;
     align-items: baseline;
-    gap: var(--space-md);
+    gap: var(--space-lg);
     text-decoration: none;
     color: inherit;
+    padding: var(--space-md) 0;
+    transition: padding-left 0.18s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  .poem-num {
+  .poem-index-link:hover {
+    padding-left: 6px;
+  }
+
+  .poem-index-num {
     font-size: 13px;
-    color: #888888;
-    min-width: 1.75rem;
+    color: var(--color-meta, #595959);
+    min-width: 2rem;
+    flex-shrink: 0;
+    transition: color 0.18s ease;
+    font-variant-numeric: tabular-nums;
   }
 
-  .poem-num-title {
-    font-size: var(--type-title);
-    line-height: var(--leading-title);
+  .poem-index-link:hover .poem-index-num {
+    color: var(--color-accent, #c0392b);
+  }
+
+  .poem-index-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    min-width: 0;
+  }
+
+  .poem-index-title {
+    font-size: calc(var(--type-body) + 4px);
+    line-height: 1.2;
     font-weight: normal;
+    transition: text-decoration 0.1s ease;
   }
 
-  .poem-num-link:hover .poem-num-title {
+  .poem-index-link:hover .poem-index-title {
     text-decoration: underline;
     text-underline-offset: 4px;
+  }
+
+  .poem-index-first-line {
+    display: block;
+    font-size: calc(var(--type-body) - 3px);
+    line-height: 1.5;
+    color: var(--color-meta, #595959);
+    font-style: italic;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 52ch;
+  }
+
+  /* Focus indicator */
+  .poem-index-link:focus-visible {
+    outline: 2px solid var(--color-accent, #c0392b);
+    outline-offset: 3px;
+    border-radius: 1px;
+    padding-left: 4px;
   }
 </style>

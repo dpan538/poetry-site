@@ -6,6 +6,11 @@ const poemSchema = z.object({
   world: z.enum(['their-world', 'bless-you', 'still-life']),
   order: z.number(),
   firstLine: z.string().optional(),
+  /**
+   * Optional: year the poem was written (for citation and metadata purposes).
+   * When omitted, the collection year range "2024–2025" is used.
+   */
+  writtenYear: z.number().optional(),
 });
 
 export const collections = {

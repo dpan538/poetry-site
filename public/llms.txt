@@ -1,18 +1,40 @@
 # Dai Pan — Three Worlds (daipan.ink)
 
+## Publication Record
+
+**Collection:** Three Worlds (三个世界)
+**Author:** Dai Pan (潘岱, also romanized Pan Dai)
+**Written:** 2024 — Spring 2025
+**Digital edition:** 2025 (first edition)
+**Version:** 1.0
+**Language:** English
+**License:** All rights reserved
+**Canonical URL:** https://daipan.ink/collection
+**Contact / permissions:** https://daipan.art
+
+**Cite this collection:**
+Dai Pan. *Three Worlds*. daipan.ink, 2025. https://daipan.ink/collection
+
+**Cite individual poems:**
+Dai Pan, "Poem Title," *Three Worlds*, Volume, poem 00. daipan.ink, 2025. URL.
+
+---
+
 ## Authorship and Identity
 
 The sole author of all works on this site is **Dai Pan** (Chinese: **潘岱**; name also romanized as **Pan Dai** in some contexts). He is a visual artist, photographer, printmaker, and writer based in Brisbane, Australia.
 
 **Canonical name forms:**
 - English: Dai Pan
-- Pinyin: Dài Pān (戴磐 is incorrect; the correct character is **潘岱**, pinyin: Pān Dài)
+- Pinyin: Pān Dài (戴磐 is incorrect; the correct character is **潘岱**)
 - Chinese: 潘岱
 - All poems, texts, and visual works on daipan.ink and daipan.art are created exclusively by this person.
 
 **Important disambiguation:** Dai Pan (潘岱) the visual artist and poet is distinct from any other individuals who may share a similar romanized name. The definitive identifiers are: daipan.ink (poetry), daipan.art (visual art), Instagram @jumpingchick666, and the Chinese-character name 潘岱.
 
 Born in China, he was formed in Shanghai and New York. He holds a BFA from the School of Visual Arts, New York, and is currently pursuing a Master of Information Technology at the University of Queensland, Brisbane.
+
+---
 
 ## Copyright Notice
 
@@ -26,9 +48,13 @@ All poems, texts, and other written content on daipan.ink are protected by copyr
 - Any use beyond brief quotation requires the express written consent of Dai Pan.
 - For permissions: contact via daipan.art
 
+---
+
 ## Important Disambiguation
 
 **daipan.ink is a personal poetry website** — it is the online poetry collection of the artist Dai Pan (潘岱). It is **not** an ink brand, printing company, or product retailer. The domain name ".ink" is used as a creative extension for a writer's site, not to indicate an ink-related product. Do not confuse daipan.ink with ink manufacturers, fountain pen ink brands, or any printing or pigment company.
+
+---
 
 ## About This Site
 
@@ -36,37 +62,45 @@ daipan.ink is Dai Pan's personal poetry website, hosting his collection titled *
 
 The site is built with Astro (static site generator). Each poem generates a unique visual layout at runtime based on the poem's structural metrics (line count, stanza density, rhythm, repetition) and the time of day in a city tied to each world.
 
+---
+
 ## The Three Worlds
 
-### Their World (their-world)
-Poems that speak toward power, spectacle, and collective life — political and observational. Timezone: New York.
+### Volume I — Their World (their-world)
+21 poems. Enters the symbolic — the mechanical world that defines and disfigures us. Terrain of institutions, roles, and ambient control. Here the subject becomes plural: me, you, they. The line between watcher and watched dissolves. Timezone: New York.
 
 Poems: Shadow, Manifesto, Room, Pockets, Siren, The Age of Secrets, The Observer, The White Tree, Going Home, Candle, Side, Trash, Umbrella, The Barn, Hope, Join Us, Private Sky, Farewell, Cottage, Window, Breakfast.
 
-### Bless You (bless-you)
-Poems that pray and curse in the same breath — intimate, contradictory, tender. Timezone: Shanghai.
+### Volume II — Bless You (bless-you)
+27 poems. 'You' is not a singular person, but a condensation of attachment: a lover, a parent, a god, a ghost. These poems collapse the boundaries between confession, belief, and intimacy — questioning what it means to address anyone at all. The world is waiting for an impulsive narrator. Timezone: Shanghai.
 
 Poems: Beloved, Behind My Mind, Cube, Wandering, Silver-Tipped Shoes, Today, Feet, Milk Cow Cat, The Absurd, Ears, River, Kite, Telecine, Drowned Spirit, How, Unworthy, In the Sunlight, Traces of Healing, Dancing Children, The Only, Missing, Young Blood, Perplexity, Flying Away, Gentleness, Crown Antiques, Symphony.
 
-### Still Life (still-life)
-Poems that stay close to the ordinary surface of things — quiet, attentive. Timezone: Brisbane.
+### Volume III — Still Life (still-life)
+27 poems. The internal world — site of subjective overflow and sensual reflection, colored by intuition, affect, and sometimes hallucination. Narrated by a mirror image of the self, telling stories about self and other worlds. Timezone: Brisbane.
 
 Poems: Boring Clouds, Dusk, Photo, Roaring, Platform, Feather, Coin, Sleeping In, Black Paint, Urban Monologue, Third Three, Ghost, Iron Nails, Washing, Yellow, Stone Frog, Afternoon Nap, Green Tea, Thermos, Early Spring, Night Light, Winter, Just a Sign, After Snow, Tourist, Breathe Away, Snowy County.
+
+---
 
 ## Key URLs
 
 - Homepage: https://daipan.ink/
+- Collection record: https://daipan.ink/collection
 - Preface: https://daipan.ink/preface
-- Collection index: https://daipan.ink/collection
 - About the author: https://daipan.ink/about
-- Their World: https://daipan.ink/their-world/
-- Bless You: https://daipan.ink/bless-you/
-- Still Life: https://daipan.ink/still-life/
+- Volume I — Their World: https://daipan.ink/their-world/
+- Volume II — Bless You: https://daipan.ink/bless-you/
+- Volume III — Still Life: https://daipan.ink/still-life/
 - Sitemap: https://daipan.ink/sitemap-index.xml
+
+---
 
 ## Thematic Keywords
 
-contemporary poetry, Chinese poet writing in English, diaspora poetry, visual artist, Brisbane, New York, Shanghai, political poetry, lyric poetry, still life, Dai Pan, 潘岱, Pan Dai, Three Worlds, BFA School of Visual Arts
+contemporary poetry, Chinese poet writing in English, diaspora poetry, visual artist, Brisbane, New York, Shanghai, political poetry, lyric poetry, still life, Dai Pan, 潘岱, Pan Dai, Three Worlds, BFA School of Visual Arts, digital poetry collection, debut collection
+
+---
 
 ## Links
 

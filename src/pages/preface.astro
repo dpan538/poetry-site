@@ -2,27 +2,46 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 
 const prefaceDescription =
-  'Preface to Three Worlds by Dai Pan — how the collection took shape across Still Life, Bless You, and Their World.';
+  'Preface to Three Worlds by Dai Pan — how the collection took shape across Still Life, Bless You, and Their World. Written 2024–2025.';
+
+const breadcrumbs = [
+  { name: 'Three Worlds', url: 'https://daipan.ink/' },
+  { name: 'Preface', url: 'https://daipan.ink/preface' },
+];
 ---
 
-<BaseLayout title="Preface" description={prefaceDescription}>
-  <main class="preface-page">
-    <header class="preface-header">
+<BaseLayout title="Preface" description={prefaceDescription} breadcrumbs={breadcrumbs}>
+  <main class="reading-page">
+    <header class="reading-header">
       <h1>Preface</h1>
-      <p class="preface-meta">Dai Pan — 2024–2025</p>
+      <p class="reading-meta">Dai Pan — 2024–2025</p>
     </header>
 
-    <section class="preface-body">
+    <section class="reading-prose">
       <p>
-        These poems were written between 2024 and spring 2025, during a stretch of life that felt
-        both crowded and empty — cities changing shape, relationships thinning and thickening, the
-        self trying to keep up with its own revisions.
+        These poems were written between 2024 and the spring of 2025 — a period of quiet
+        withdrawal, largely alone in New York, possibly my last chapter in America. Communication
+        grew sparse. Something harder to name grew in its place: introspection, narrative
+        reconfiguration, and an emotional intensity that had nowhere else to go.
       </p>
       <p>
         I did not set out to build a collection. I wrote when language arrived, and I followed it.
-        Over time, three tones emerged: a voice that speaks toward power and spectacle (<em>Their
-        World</em>), a voice that prays and curses in the same breath (<em>Bless You</em>), and a
-        voice that tries to stay close to the ordinary surface of things (<em>Still Life</em>).
+        Over time, three tones emerged — three worlds I had been carrying without knowing their
+        names. I think of them as a tripartite structure: what can be imagined, what can be
+        represented, and what is governed by social rules.
+      </p>
+      <p>
+        <em>Still Life</em> is the internal world — my world — colored by intuition, affect, and
+        sometimes hallucination, narrated by a mirror image of the self. <em>Bless You</em> reaches
+        toward the other: a 'you' that is not a singular person but a condensation of attachment —
+        a lover, a parent, a god, a ghost — collapsing the boundaries between confession, belief,
+        and intimacy. <em>Their World</em> enters the symbolic — the mechanical world that defines
+        and disfigures us, terrain of institutions and ambient control, where the subject becomes
+        plural and the line between watcher and watched dissolves.
+      </p>
+      <p>
+        These are personal mythologies. There is no unified narrative here, only fragments that
+        momentarily align, like glimpses in a foggy window before the forest vanishes.
       </p>
       <p>
         On this site, each poem is given a layout that responds to its own structure — line count,
@@ -31,50 +50,29 @@ const prefaceDescription =
         different clothes depending on when and where you meet it.
       </p>
       <p>
-        If you are reading this before entering the poems, know that nothing here asks for a single
-        correct interpretation. These are attempts at honesty, not explanations. Take what holds,
-        leave what does not, and move between worlds as you need.
+        Writing, for me, becomes a way of circling the unreachable present. The poems do not
+        capture reality; they return to it again and again, from different angles, hoping to touch
+        a vanishing future.
       </p>
+      <p class="preface-closing">
+        You are invited to pass through them. Not to find meaning or any answer,
+        but to lose yourself in the memory.
+      </p>
+      <p class="preface-signature">— Spring 2025</p>
     </section>
   </main>
 </BaseLayout>
 
 <style>
-  .preface-page {
-    padding-left: 0;
-    padding-right: 0;
-    padding-bottom: 0;
-    max-width: none;
-    width: 100%;
-    margin: 0;
+  .preface-closing {
+    margin-top: var(--space-xl) !important;
+    font-style: italic;
   }
 
-  .preface-header {
-    margin-bottom: var(--space-xl);
-  }
-
-  .preface-header h1 {
-    margin: 0 0 var(--space-sm);
-    font-size: var(--type-display);
-    line-height: var(--leading-display);
-    font-weight: normal;
-  }
-
-  .preface-meta {
-    margin: 0;
-    font-size: var(--type-body);
-    color: #1a1a1a;
-  }
-
-  .preface-body p {
-    margin: 0 0 var(--space-md);
-    font-size: var(--type-body);
-    line-height: var(--leading-body);
-    color: #1a1a1a;
-    max-width: 60ch;
-  }
-
-  .preface-body p:last-child {
-    margin-bottom: 0;
+  .preface-signature {
+    margin-top: calc(var(--space-sm) * 0.5) !important;
+    color: var(--color-meta, #595959);
+    font-size: 13px;
+    letter-spacing: 0.04em;
   }
 </style>

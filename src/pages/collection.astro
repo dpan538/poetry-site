@@ -2,40 +2,346 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 
 const collectionDescription =
-  'A poetry collection by Dai Pan spanning Still Life, Bless You, and Their World — written between 2024 and 2025.';
+  'Three Worlds — a poetry collection by Dai Pan (潘岱). Publication record: volumes, poem count, edition, citation format, and copyright.';
+
+const breadcrumbs = [
+  { name: 'Three Worlds', url: 'https://daipan.ink/' },
+  { name: 'Collection', url: 'https://daipan.ink/collection' },
+];
 ---
 
-<BaseLayout title="Three Worlds" description={collectionDescription}>
-  <main class="reading-page">
-    <header class="reading-header">
-      <h1>Three Worlds</h1>
-      <p class="reading-meta">Dai Pan — 2024–2025</p>
+<BaseLayout title="Collection" description={collectionDescription} breadcrumbs={breadcrumbs}>
+  <main class="reading-page collection-page">
+
+    <!-- ── Colophon / Publication Record ───────────────────────────────────── -->
+    <header class="collection-masthead">
+      <h1 class="collection-title">Three Worlds</h1>
+      <p class="collection-subtitle">Still Life · Bless You · Their World</p>
     </header>
 
-    <section class="reading-prose">
-      <p>
-        Written between 2024 and the spring of 2025, this collection emerged from a quiet withdrawal —
-        a final year in New York spent largely alone, where communication grew sparse and something
-        harder to name grew in its place.
-      </p>
-      <p>
-        Dai Pan was born in Jiangsu, raised in Shanghai, and has since lived across cities that never
-        quite became home. What remains is not rootlessness, but a particular way of seeing: from the
-        edges, in transit, between.
-      </p>
-      <p>
-        The work is organized into three dimensions — <em>Still Life</em>, <em>Bless You</em>, and
-        <em>Their World</em> — porous and overlapping, the way memory actually moves. You are invited
-        not to arrive at anything, but simply to pass through.
-      </p>
-      <div class="reading-copyright-block">
-        <p>
-          All poems collected in Three Worlds are the original work of Dai Pan (潘岱) and are protected
-          under copyright. No part of this collection may be reproduced, distributed, or transmitted in
-          any form without the prior written permission of the author. For permissions and inquiries,
-          visit daipan.art.
+    <section class="colophon" aria-label="Publication record">
+      <dl class="colophon-grid">
+        <div class="colophon-row">
+          <dt>Collection</dt>
+          <dd>Three Worlds (三个世界)</dd>
+        </div>
+        <div class="colophon-row">
+          <dt>Author</dt>
+          <dd>Dai Pan <span class="colophon-zh">潘岱</span></dd>
+        </div>
+        <div class="colophon-row">
+          <dt>Written</dt>
+          <dd>2024 — Spring 2025</dd>
+        </div>
+        <div class="colophon-row">
+          <dt>Digital edition</dt>
+          <dd>2025 (first edition)</dd>
+        </div>
+        <div class="colophon-row">
+          <dt>Version</dt>
+          <dd>1.0</dd>
+        </div>
+        <div class="colophon-row">
+          <dt>Language</dt>
+          <dd>English</dd>
+        </div>
+        <div class="colophon-row">
+          <dt>License</dt>
+          <dd>All rights reserved</dd>
+        </div>
+        <div class="colophon-row">
+          <dt>Contact</dt>
+          <dd><a href="https://daipan.art" target="_blank" rel="noopener noreferrer">daipan.art</a></dd>
+        </div>
+      </dl>
+    </section>
+
+    <!-- ── Volumes ─────────────────────────────────────────────────────────── -->
+    <section class="colophon-volumes" aria-label="Volumes">
+      <h2 class="colophon-section-label">Volumes</h2>
+      <ol class="volume-list">
+        <li class="volume-item">
+          <a href="/their-world" class="volume-link">
+            <span class="volume-roman">I</span>
+            <span class="volume-info">
+              <span class="volume-name">Their World</span>
+              <span class="volume-meta">21 poems · New York</span>
+            </span>
+          </a>
+        </li>
+        <li class="volume-item">
+          <a href="/bless-you" class="volume-link">
+            <span class="volume-roman">II</span>
+            <span class="volume-info">
+              <span class="volume-name">Bless You</span>
+              <span class="volume-meta">27 poems · Shanghai</span>
+            </span>
+          </a>
+        </li>
+        <li class="volume-item">
+          <a href="/still-life" class="volume-link">
+            <span class="volume-roman">III</span>
+            <span class="volume-info">
+              <span class="volume-name">Still Life</span>
+              <span class="volume-meta">27 poems · Brisbane</span>
+            </span>
+          </a>
+        </li>
+      </ol>
+    </section>
+
+    <!-- ── Citation ────────────────────────────────────────────────────────── -->
+    <section class="colophon-citation" aria-label="Citation format">
+      <h2 class="colophon-section-label">Cite this collection</h2>
+      <div class="citation-block">
+        <p class="citation-format">
+          Dai Pan. <em>Three Worlds</em>. daipan.ink, 2025.
+          <span class="citation-url">https://daipan.ink/collection</span>
+        </p>
+        <p class="citation-note">
+          For individual poems: Dai Pan, "<em>Title</em>," <em>Three Worlds</em>, Volume, poem 00.
+          daipan.ink, 2025. URL.
         </p>
       </div>
     </section>
+
+    <!-- ── Editorial note ──────────────────────────────────────────────────── -->
+    <section class="reading-prose collection-note" aria-label="Editorial note">
+      <h2 class="colophon-section-label">Note</h2>
+      <p>
+        Written between 2024 and the spring of 2025, this collection emerged from a period of quiet
+        withdrawal — a final year in New York spent largely alone, where communication grew sparse
+        and something harder to name grew in its place: introspection, narrative reconfiguration,
+        and an emotional intensity that had nowhere else to go.
+      </p>
+      <p>
+        Dai Pan was born in Jiangsu, formed in Shanghai and New York. He has since lived across
+        cities that never quite became home — which is not rootlessness, but a particular way of
+        seeing: from the edges, in transit, between. <em>Three Worlds</em> holds that displacement
+        without resolving it.
+      </p>
+      <p>
+        The three volumes — <em>Still Life</em>, <em>Bless You</em>, and <em>Their World</em> —
+        correspond to three registers of experience: the internal world colored by intuition and
+        affect; the address toward others, collapsing love and belief and grief into a single
+        'you'; and the symbolic exterior, the mechanical world that disfigures and defines us.
+        These worlds are porous and overlapping, the way memory actually moves.
+      </p>
+      <p>
+        Writing, for this author, becomes a way of circling the unreachable present. These poems
+        do not capture reality; they return to it again and again, from different angles, hoping
+        to touch a vanishing future. You are invited not to arrive at any answer, but to lose
+        yourself in the memory.
+      </p>
+      <div class="reading-copyright-block">
+        <p>
+          All poems collected in <em>Three Worlds</em> are the original work of Dai Pan (潘岱)
+          and are protected under copyright. No part of this collection may be reproduced,
+          distributed, or transmitted in any form without the prior written permission of the
+          author. For permissions and inquiries, visit daipan.art.
+        </p>
+      </div>
+    </section>
+
   </main>
 </BaseLayout>
+
+<style>
+  .collection-page {
+    max-width: min(68ch, 100%);
+  }
+
+  /* ── Masthead ───────────────────────────────────────────────────────────── */
+  .collection-masthead {
+    margin-bottom: var(--space-xl);
+    padding-bottom: var(--space-xl);
+    border-bottom: 1px solid rgba(26, 26, 26, 0.12);
+  }
+
+  .collection-title {
+    margin: 0 0 var(--space-sm);
+    font-size: var(--type-display);
+    line-height: var(--leading-display);
+    font-weight: normal;
+    letter-spacing: -0.01em;
+  }
+
+  .collection-subtitle {
+    margin: 0;
+    font-size: var(--type-body);
+    color: var(--color-meta, #595959);
+    letter-spacing: 0.06em;
+  }
+
+  /* ── Colophon grid ──────────────────────────────────────────────────────── */
+  .colophon {
+    margin-bottom: var(--space-xl);
+    padding-bottom: var(--space-xl);
+    border-bottom: 0.5px solid rgba(26, 26, 26, 0.08);
+  }
+
+  .colophon-grid {
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 9rem 1fr;
+    row-gap: 0;
+  }
+
+  .colophon-row {
+    display: contents;
+  }
+
+  .colophon-grid dt,
+  .colophon-grid dd {
+    margin: 0;
+    padding: var(--space-sm) 0;
+    font-size: calc(var(--type-body) - 1px);
+    line-height: var(--leading-body);
+    border-bottom: 0.5px solid rgba(26, 26, 26, 0.06);
+  }
+
+  .colophon-grid dt {
+    color: var(--color-meta, #595959);
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    padding-right: var(--space-md);
+    align-self: baseline;
+  }
+
+  .colophon-grid dd {
+    color: var(--color-primary, #1a1a1a);
+  }
+
+  .colophon-grid a {
+    color: inherit;
+    text-underline-offset: 3px;
+  }
+
+  .colophon-grid a:hover {
+    opacity: 0.75;
+  }
+
+  .colophon-zh {
+    margin-left: var(--space-sm);
+    color: var(--color-meta, #595959);
+    font-size: 13px;
+  }
+
+  /* ── Section label ──────────────────────────────────────────────────────── */
+  .colophon-section-label {
+    margin: 0 0 var(--space-md);
+    font-size: 13px;
+    font-weight: normal;
+    letter-spacing: 0.1em;
+    color: var(--color-accent, #c0392b);
+  }
+
+  /* ── Volumes ────────────────────────────────────────────────────────────── */
+  .colophon-volumes {
+    margin-bottom: var(--space-xl);
+    padding-bottom: var(--space-xl);
+    border-bottom: 0.5px solid rgba(26, 26, 26, 0.08);
+  }
+
+  .volume-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .volume-item {
+    border-bottom: 0.5px solid rgba(26, 26, 26, 0.06);
+  }
+
+  .volume-link {
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+    text-decoration: none;
+    color: inherit;
+    padding: var(--space-md) 0;
+    transition: padding-left 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .volume-link:hover {
+    padding-left: 5px;
+  }
+
+  .volume-roman {
+    font-size: calc(var(--type-body) + 2px);
+    color: var(--color-meta, #595959);
+    min-width: 1.5rem;
+    font-variant-numeric: tabular-nums;
+    transition: color 0.15s ease;
+  }
+
+  .volume-link:hover .volume-roman {
+    color: var(--color-accent, #c0392b);
+  }
+
+  .volume-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .volume-name {
+    font-size: calc(var(--type-body) + 4px);
+    font-weight: normal;
+    line-height: 1.2;
+  }
+
+  .volume-meta {
+    font-size: 13px;
+    color: var(--color-meta, #595959);
+    letter-spacing: 0.04em;
+  }
+
+  .volume-link:focus-visible {
+    outline: 2px solid var(--color-accent, #c0392b);
+    outline-offset: 3px;
+    border-radius: 1px;
+    padding-left: 4px;
+  }
+
+  /* ── Citation ───────────────────────────────────────────────────────────── */
+  .colophon-citation {
+    margin-bottom: var(--space-xl);
+    padding-bottom: var(--space-xl);
+    border-bottom: 0.5px solid rgba(26, 26, 26, 0.08);
+  }
+
+  .citation-block {
+    background: rgba(26, 26, 26, 0.03);
+    border-left: 2px solid var(--color-accent, #c0392b);
+    padding: var(--space-md) var(--space-lg);
+  }
+
+  .citation-format {
+    margin: 0 0 var(--space-sm);
+    font-size: calc(var(--type-body) - 1px);
+    line-height: 1.6;
+    color: var(--color-primary, #1a1a1a);
+  }
+
+  .citation-url {
+    display: block;
+    font-size: 13px;
+    color: var(--color-meta, #595959);
+    margin-top: 0.2rem;
+    word-break: break-all;
+  }
+
+  .citation-note {
+    margin: 0;
+    font-size: 13px;
+    color: var(--color-meta, #595959);
+    line-height: 1.55;
+  }
+
+  /* ── Editorial note ─────────────────────────────────────────────────────── */
+  .collection-note {
+    /* inherits .reading-prose from global.css */
+  }
+</style>

@@ -2,14 +2,19 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 
 const aboutDescription =
-  'Dai Pan (潘岱, also written Pan Dai) is a visual artist, photographer, printmaker and writer based in Brisbane, Australia, with ties to Shanghai and New York. BFA, School of Visual Arts, New York.';
+  'Dai Pan (潘岱, also written Pan Dai) is a visual artist, photographer, printmaker and writer based in Brisbane, Australia. BFA, School of Visual Arts, New York.';
+
+const breadcrumbs = [
+  { name: 'Three Worlds', url: 'https://daipan.ink/' },
+  { name: 'About', url: 'https://daipan.ink/about' },
+];
 ---
 
-<BaseLayout title="About" description={aboutDescription}>
+<BaseLayout title="About" description={aboutDescription} breadcrumbs={breadcrumbs}>
   <main class="reading-page">
     <header class="reading-header">
       <h1>About</h1>
-      <p class="reading-meta">Dai Pan</p>
+      <p class="reading-meta">Dai Pan 潘岱</p>
     </header>
 
     <section class="reading-prose">
@@ -22,11 +27,10 @@ const aboutDescription =
         He holds a BFA from the School of Visual Arts, New York, and is currently pursuing a Master of
         Information Technology at the University of Queensland.
       </p>
-      <p class="about-link">
+      <p class="about-links">
         <a href="https://daipan.art" target="_blank" rel="noopener noreferrer">daipan.art</a>
         <a
           href="https://www.instagram.com/jumpingchick666/"
-          class="about-instagram"
           target="_blank"
           rel="noopener noreferrer">@jumpingchick666</a>
       </p>
@@ -46,32 +50,22 @@ const aboutDescription =
 </BaseLayout>
 
 <style>
-  /* About-only: link row (same prose scale as body; layout only). */
-  .about-link {
+  .about-links {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-lg);
     align-items: baseline;
-    margin-top: var(--space-md);
   }
 
-  .about-link a {
-    font-size: calc(var(--type-body) + 2px);
-    color: #3d4249;
+  .about-links a {
+    font-size: calc(var(--type-body) + 1px);
+    color: var(--color-primary, #1a1a1a);
     text-decoration: underline;
     text-underline-offset: 3px;
-    transition: opacity 0.2s linear;
+    transition: opacity 0.18s ease;
   }
 
-  .about-link a:hover {
-    opacity: 0.82;
-  }
-
-  .about-link a.about-instagram {
-    font-size: var(--type-body);
-    font-weight: 400;
-    color: #5a5f66;
-    text-decoration: underline;
-    text-underline-offset: 3px;
+  .about-links a:hover {
+    opacity: 0.65;
   }
 </style>

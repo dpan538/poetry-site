@@ -4,7 +4,7 @@ interface Props {
   description: string;
   canonicalURL: string;
   ogImage?: string;
-  /** When provided, emits a Poem + CreativeWork JSON-LD block */
+  /** When provided, emits a Poem JSON-LD block */
   poem?: {
     id: string;
     world: string;
@@ -12,9 +12,11 @@ interface Props {
     firstLine?: string;
     rawText?: string;
   };
+  /** When provided, emits a BreadcrumbList JSON-LD for site hierarchy signals */
+  breadcrumbs?: { name: string; url: string }[];
 }
 
-const { title, description, canonicalURL, ogImage, poem } = Astro.props;
+const { title, description, canonicalURL, ogImage, poem, breadcrumbs } = Astro.props;
 
 const fullTitle = `${title} — Dai Pan`;
 const ogSiteName = 'Dai Pan — daipan.ink';
@@ -79,6 +81,29 @@ const websiteLd = {
   license: 'All rights reserved',
 };
 
+// --- Book schema for the collection itself ---
+// Gives Google a stable "Book" entity to associate all poems with.
+const bookLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Book',
+  '@id': 'https://daipan.ink/#collection',
+  name: 'Three Worlds',
+  alternativeHeadline: 'Still Life · Bless You · Their World',
+  url: 'https://daipan.ink/collection',
+  author: { '@id': 'https://daipan.ink/#author' },
+  inLanguage: 'en',
+  datePublished: '2025',
+  publisher: { '@id': 'https://daipan.ink/#author' },
+  copyrightHolder: { '@id': 'https://daipan.ink/#author' },
+  copyrightYear: '2024',
+  license: 'All rights reserved',
+  genre: 'Poetry',
+  numberOfPages: undefined,
+  bookFormat: 'EBook',
+  description:
+    'Three Worlds is the debut poetry collection by Dai Pan (潘岱), organized into three volumes — Still Life, Bless You, and Their World — written between 2024 and spring 2025.',
+};
+
 // --- Poem schema (only on individual poem pages) ---
 let poemLd: object | null = null;
 if (poem) {
@@ -102,22 +127,40 @@ if (poem) {
     name: title,
     url: poemUrl,
     author: { '@id': 'https://daipan.ink/#author' },
-    isPartOf: {
-      '@type': 'Book',
-      name: 'Three Worlds',
-      author: { '@id': 'https://daipan.ink/#author' },
-    },
+    isPartOf: { '@id': 'https://daipan.ink/#collection' },
     genre: worldLabel,
     abstract: abstract,
     inLanguage: 'en',
     copyrightHolder: { '@id': 'https://daipan.ink/#author' },
-    copyrightYear: poem.id ? '2024' : '2024',
+    copyrightYear: '2025',
     license: 'All rights reserved — Dai Pan (潘岱)',
     position: poem.order,
   };
 }
 
-const jsonLdBlocks = [personLd, websiteLd, ...(poemLd ? [poemLd] : [])];
+// --- BreadcrumbList schema (when breadcrumbs are provided) ---
+// Gives Google a clear, stable site hierarchy:  Home > World > Poem
+let breadcrumbLd: object | null = null;
+if (breadcrumbs && breadcrumbs.length > 0) {
+  breadcrumbLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: breadcrumbs.map((crumb, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: crumb.name,
+      item: crumb.url,
+    })),
+  };
+}
+
+const jsonLdBlocks = [
+  personLd,
+  websiteLd,
+  bookLd,
+  ...(poemLd ? [poemLd] : []),
+  ...(breadcrumbLd ? [breadcrumbLd] : []),
+];
 ---
 
 <title>{fullTitle}</title>

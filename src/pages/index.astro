@@ -5,19 +5,10 @@ import IndexMenu from '../components/IndexMenu.astro';
 import { getCollection } from 'astro:content';
 import { loadPoemsByWorldForIndexMenu } from '../lib/index-menu-data';
 import { analyzePoemText, computeEmotionScore } from '../lib/poem-analyzer';
-import { excerptWords } from '../lib/seo';
 
 const poemsByWorld = await loadPoemsByWorldForIndexMenu();
 
-const worlds = ['their-world', 'bless-you', 'still-life'] as const;
-const lists = await Promise.all(worlds.map((w) => getCollection(w)));
-const homeRandomPoems: { id: string; world: (typeof worlds)[number] }[] = [];
-worlds.forEach((w, idx) => {
-  for (const p of lists[idx]) {
-    homeRandomPoems.push({ id: p.id, world: w });
-  }
-});
-
+// Entry poem: first of their-world (stable — not random, so crawlers index a consistent page)
 const list = await getCollection('their-world');
 const sorted = [...list].sort((a, b) => a.data.order - b.data.order);
 const poem = sorted[0];
@@ -31,17 +22,39 @@ const entryWorld = 'their-world' as const;
 const rawText = entryPoem.body ?? '';
 const analysis = analyzePoemText(rawText, entryPoem.data.title);
 const currentEmotionScore = Math.round(computeEmotionScore(analysis.metrics) * 1000) / 1000;
-const homeDescription =
-  excerptWords(rawText, 20) ||
-  'Three Worlds — poetry by Dai Pan across Still Life, Bless You, and Their World.';
+
+// Stable site-level description — not derived from a random poem
+const siteDescription =
+  'Three Worlds is a poetry collection by Dai Pan (潘岱) across three volumes: Still Life, Bless You, and Their World. Written 2024–2025, published as a digital first edition on daipan.ink.';
 ---
 
 <BaseLayout
   title="Three Worlds"
-  description={homeDescription}
+  description={siteDescription}
   world="their-world"
-  homeRandomPoems={homeRandomPoems}
 >
+  <!--
+    SEO anchor for the home page: gives Google a clear, stable h1 that matches
+    the <title> "Three Worlds — Dai Pan". Without this, Google sees the visually
+    prominent poem title in PoemCanvas and rewrites the title to match it.
+    Uses the same clip-rect invisible technique as .poem-seo-text (accessible
+    to screen readers and crawlers, invisible to sighted users).
+  -->
+  <div class="home-seo-anchor">
+    <h1>Three Worlds — A Poetry Collection by Dai Pan</h1>
+    <p>
+      Three Worlds (daipan.ink) is the debut poetry collection by Dai Pan (潘岱, also written Pan Dai),
+      a visual artist and poet based in Brisbane. The collection is organized into three volumes —
+      Still Life, Bless You, and Their World — written between 2024 and spring 2025.
+    </p>
+    <p>
+      Enter the collection at <a href="/collection">/collection</a>, read the preface at
+      <a href="/preface">/preface</a>, or navigate directly to a world:
+      <a href="/their-world">Their World</a>, <a href="/bless-you">Bless You</a>,
+      <a href="/still-life">Still Life</a>.
+    </p>
+  </div>
+
   <main class="home-main">
     <nav class="poem-nav" id="poem-nav">
       <a class="nav-prev" id="nav-prev" href="#" aria-label="Previous poem">←</a>
@@ -234,6 +247,22 @@ const homeDescription =
 </script>
 
 <style>
+  /*
+   * SEO anchor: crawlable by search engines and screen readers,
+   * invisible to sighted users (clip-rect technique, not display:none).
+   */
+  .home-seo-anchor {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
   .home-main {
     padding-left: 0;
     padding-right: 0;

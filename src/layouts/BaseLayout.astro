@@ -9,8 +9,6 @@ interface Props {
   title: string;
   description: string;
   ogImage?: string;
-  /** When set, `/` immediately redirects to a random poem (JS). */
-  homeRandomPoems?: { id: string; world: string }[];
   /** When set, SEO emits Poem JSON-LD and OG article type. */
   poem?: {
     id: string;
@@ -19,9 +17,11 @@ interface Props {
     firstLine?: string;
     rawText?: string;
   };
+  /** Breadcrumb trail for JSON-LD BreadcrumbList and Google site structure signals. */
+  breadcrumbs?: { name: string; url: string }[];
 }
 
-const { world, title, description, ogImage, homeRandomPoems, poem } = Astro.props;
+const { world, title, description, ogImage, poem, breadcrumbs } = Astro.props;
 const pathname = Astro.url.pathname;
 const site = Astro.site ?? new URL('https://daipan.ink');
 const canonicalURL = new URL(pathname, site).href;
@@ -35,22 +35,7 @@ const canonicalURL = new URL(pathname, site).href;
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="manifest" href="/site.webmanifest" />
     <meta name="theme-color" content="#1a1a1a" />
-    <SEO title={title} description={description} canonicalURL={canonicalURL} ogImage={ogImage} poem={poem} />
-    {
-      homeRandomPoems && homeRandomPoems.length > 0 ? (
-        <script is:inline define:vars={{ entries: homeRandomPoems }}>
-          (function () {
-            var path = typeof location !== 'undefined' ? location.pathname : '';
-            if (path !== '/' && path !== '') return;
-            var e = entries;
-            if (!e || !e.length) return;
-            var i = Math.floor(Math.random() * e.length);
-            var p = e[i];
-            location.replace('/' + p.world + '/' + p.id);
-          })();
-        </script>
-      ) : null
-    }
+    <SEO title={title} description={description} canonicalURL={canonicalURL} ogImage={ogImage} poem={poem} breadcrumbs={breadcrumbs} />
   </head>
   <body>
     <Nav pathname={pathname} />

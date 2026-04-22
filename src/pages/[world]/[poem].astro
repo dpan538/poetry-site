@@ -60,12 +60,20 @@ const worldLabels: Record<string, string> = {
   'bless-you': 'Bless You',
   'still-life': 'Still Life',
 };
+
+const poemUrl = `https://daipan.ink/${world}/${poem.id}`;
+const breadcrumbs = [
+  { name: 'Three Worlds', url: 'https://daipan.ink/' },
+  { name: worldLabels[world] ?? world, url: `https://daipan.ink/${world}` },
+  { name: poem.data.title, url: poemUrl },
+];
 ---
 
 <BaseLayout
   world={world}
   title={poem.data.title}
   description={metaDescription}
+  breadcrumbs={breadcrumbs}
   poem={{
     id: poem.id,
     world,
@@ -88,7 +96,8 @@ const worldLabels: Record<string, string> = {
     <article class="poem-seo-text" aria-label={`${poem.data.title} — poem in ${worldLabels[world] ?? world}`}>
       <h1>{poem.data.title}</h1>
       <p class="poem-seo-meta">
-        From <em>{worldLabels[world] ?? world}</em> by Dai Pan (潘岱). Poem {poem.data.order}.
+        From <em>{worldLabels[world] ?? world}</em>, <em>Three Worlds</em> by Dai Pan (潘岱).
+        Poem {String(poem.data.order).padStart(2, '0')}.
       </p>
       {seoStanzas.map((stanza) => (
         <p class="poem-seo-stanza">
@@ -99,6 +108,11 @@ const worldLabels: Record<string, string> = {
           ))}
         </p>
       ))}
+      <p class="poem-seo-citation">
+        Cite as: Dai Pan, "{poem.data.title}," <em>Three Worlds</em>, {worldLabels[world] ?? world},
+        poem {String(poem.data.order).padStart(2, '0')}. daipan.ink, 2025.
+        URL: {poemUrl}
+      </p>
     </article>
 
     <PoemCanvas
