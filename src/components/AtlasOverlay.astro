@@ -53,6 +53,9 @@ const { poemId, world } = Astro.props;
     <span class="atlas-legend-desc">— highlighted = active in this poem</span>
   </div>
 
+  <!-- Interpretation line — updates to describe current state -->
+  <p id="atlas-summary" class="atlas-summary" aria-live="polite"></p>
+
   <!-- Canvas -->
   <canvas id="atlas-canvas" class="atlas-canvas" aria-hidden="true"></canvas>
 
@@ -222,6 +225,20 @@ const { poemId, world } = Astro.props;
     width: 100%;
     display: block;
     touch-action: none;
+  }
+
+  /* ── Summary line ───────────────────────────────────────────────────────── */
+  .atlas-summary {
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    color: var(--color-meta, #595959);
+    font-style: italic;
+    text-align: center;
+    padding: 5px var(--margin-x, 24px) 0;
+    flex-shrink: 0;
+    min-height: 1.5em;
+    transition: opacity 0.4s ease;
+    margin: 0;
   }
 
   /* ── Hint ────────────────────────────────────────────────────────────────── */
@@ -487,7 +504,6 @@ const { poemId, world } = Astro.props;
     pinchStart: number | null; pinchScale: number;
     pointerDownPos: { x: number; y: number } | null; pointerDownTime: number;
     rafId: number; isStub: boolean;
-    noiseResetTime: number;
 
     constructor(canvas: HTMLCanvasElement, poemId: string, worldKey: string) {
       this.canvas = canvas;
@@ -502,7 +518,6 @@ const { poemId, world } = Astro.props;
       this.pinchStart = null; this.pinchScale = 1;
       this.pointerDownPos = null; this.pointerDownTime = 0;
       this.rafId = 0; this.isStub = !this.poem?.mode;
-      this.noiseResetTime = performance.now();
 
       this.resize();
       this.buildGraph();
@@ -604,18 +619,14 @@ const { poemId, world } = Astro.props;
     }
 
     // ── Force simulation ──────────────────────────────────────────────────────
-    // Each step: zone spring + anchor pull (active) + node repulsion + damping + noise.
+    // Zone spring + anchor pull (active) + node repulsion + damping.
+    // No continuous noise — simulation runs during startLoop/runRelayout only.
     simulateStep() {
       const ZONE_K   = 0.036;  // zone spring constant
       const ANCHOR_K = 0.013;  // additional pull for active attrs
       const SEL_K    = 0.022;  // extra pull for selected attr
       const REPEL_K  = 0.65;   // repulsion strength
       const DAMPING  = 0.80;   // velocity decay per step
-
-      // Noise decays from 0.10 over 3 s to resting 0.006 (field always slightly alive)
-      const elapsed  = performance.now() - this.noiseResetTime;
-      const decayT   = Math.max(0, 1 - elapsed / 3000);
-      const NOISE    = 0.006 + 0.09 * decayT;
 
       // Eligible nodes: not anchor, visible (satellites only when visible)
       const active = this.nodes.filter(n =>
@@ -652,17 +663,11 @@ const { poemId, world } = Astro.props;
           }
         });
 
-        // Random noise — keeps field gently alive
-        n.vx += (Math.random() - 0.5) * NOISE;
-        n.vy += (Math.random() - 0.5) * NOISE;
-
-        // Damping + integrate
+        // Damping + integrate (no random noise — layout must stay stable)
         n.vx *= DAMPING; n.vy *= DAMPING;
         n.x  += n.vx;    n.y  += n.vy;
       });
     }
-
-    resetNoise() { this.noiseResetTime = performance.now(); }
 
     // ── Fit canvas to show full vocabulary field ──────────────────────────────
     fitToCanvas() {
@@ -682,13 +687,18 @@ const { poemId, world } = Astro.props;
       this.cx = W / 2; this.cy = H / 2;
     }
 
-    // ── Render loop — always running (simulation + draw each frame) ───────────
+    // ── Render loop — settles then freezes ────────────────────────────────────
+    // Runs the force sim for ~1.8 s then stops RAF. After freeze, interactions
+    // call this.draw() directly on the frozen canvas.
     startLoop() {
+      if (this.rafId) cancelAnimationFrame(this.rafId);
       const start = performance.now();
-      const alphaDur = 1200;
+      const alphaDur = 1200; // fade-in window
+      const simDur   = 1800; // total settling window — RAF stops after this
       const tick = (now: number) => {
+        const elapsed = now - start;
         // Entry animation: fade in attr nodes
-        const t = Math.min(1, (now - start) / alphaDur);
+        const t = Math.min(1, elapsed / alphaDur);
         if (t < 1) {
           this.nodes.forEach(n => {
             if (n.kind === 'satellite') return;
@@ -696,10 +706,38 @@ const { poemId, world } = Astro.props;
             n.currentAlpha = this.easeOut(p);
           });
         }
-        // Force simulation every frame
+        if (elapsed < simDur) {
+          this.simulateStep();
+        }
+        this.draw();
+        if (elapsed < simDur) {
+          this.rafId = requestAnimationFrame(tick);
+        } else {
+          this.rafId = 0; // freeze — interactions draw() directly
+        }
+      };
+      this.rafId = requestAnimationFrame(tick);
+    }
+
+    // ── Short re-layout burst after attr selection (then freezes) ─────────────
+    runRelayout() {
+      if (this.rafId) cancelAnimationFrame(this.rafId);
+      const start = performance.now();
+      const dur = 700; // ms — then freeze
+      const tick = (now: number) => {
+        const elapsed = now - start;
+        // Animate visible satellite alpha
+        this.nodes.filter(n => n.kind === 'satellite' && n.visible).forEach(sat => {
+          const p = Math.max(0, Math.min(1, (elapsed / dur - sat.delay) / 0.40));
+          sat.currentAlpha = this.easeOut(p);
+        });
         this.simulateStep();
         this.draw();
-        this.rafId = requestAnimationFrame(tick);
+        if (elapsed < dur) {
+          this.rafId = requestAnimationFrame(tick);
+        } else {
+          this.rafId = 0;
+        }
       };
       this.rafId = requestAnimationFrame(tick);
     }
@@ -721,46 +759,55 @@ const { poemId, world } = Astro.props;
       ctx.restore();
     }
 
-    // Extremely faint halos indicating zone regions — not labels, just atmosphere
+    // Subtle halos indicating zone regions — fill + stroke ring + label
     drawZoneHalos() {
       const ctx = this.ctx;
-      ctx.save();
-      ctx.globalAlpha = 0.04;
-      // Mode zone halo
-      ctx.beginPath();
-      ctx.ellipse(ZONES.mode.cx, ZONES.mode.cy, ZONES.mode.sx + 50, ZONES.mode.sy + 30, 0, 0, Math.PI * 2);
-      ctx.fillStyle = ATTR_COLORS.mode;
-      ctx.fill();
-      // Type zone halo
-      ctx.beginPath();
-      ctx.ellipse(ZONES.type.cx, ZONES.type.cy, ZONES.type.sx + 50, ZONES.type.sy + 30, 0, 0, Math.PI * 2);
-      ctx.fillStyle = ATTR_COLORS.type;
-      ctx.fill();
-      // Imagery zone halo
-      ctx.beginPath();
-      ctx.ellipse(ZONES.imagery.cx, ZONES.imagery.cy, ZONES.imagery.sx + 40, ZONES.imagery.sy + 50, 0, 0, Math.PI * 2);
-      ctx.fillStyle = ATTR_COLORS.imagery;
-      ctx.fill();
-      ctx.restore();
+      const zones = [
+        { key: 'mode',    label: 'speaker mode', rx: ZONES.mode.sx + 48,    ry: ZONES.mode.sy + 28,    labelY: ZONES.mode.cy - ZONES.mode.sy - 20 },
+        { key: 'type',    label: 'poem act',      rx: ZONES.type.sx + 48,    ry: ZONES.type.sy + 28,    labelY: ZONES.type.cy - ZONES.type.sy - 20 },
+        { key: 'imagery', label: 'imagery',       rx: ZONES.imagery.sx + 38, ry: ZONES.imagery.sy + 48, labelY: ZONES.imagery.cy + ZONES.imagery.sy + 22 },
+      ];
 
-      // Zone labels at zone centroids — very faint text
+      // Fill passes
+      zones.forEach(({ key, rx, ry }) => {
+        const z = ZONES[key];
+        const color = ATTR_COLORS[key];
+        ctx.save();
+        ctx.globalAlpha = 0.07;
+        ctx.beginPath();
+        ctx.ellipse(z.cx, z.cy, rx, ry, 0, 0, Math.PI * 2);
+        ctx.fillStyle = color;
+        ctx.fill();
+        ctx.restore();
+      });
+
+      // Stroke ring passes (slightly outside fill)
+      zones.forEach(({ key, rx, ry }) => {
+        const z = ZONES[key];
+        const color = ATTR_COLORS[key];
+        ctx.save();
+        ctx.globalAlpha = 0.13;
+        ctx.beginPath();
+        ctx.ellipse(z.cx, z.cy, rx + 2, ry + 2, 0, 0, Math.PI * 2);
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 0.8;
+        ctx.setLineDash([4, 5]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.restore();
+      });
+
+      // Zone labels — readable but recessed
       ctx.save();
-      ctx.font = '9px Georgia, serif';
-      ctx.globalAlpha = 0.28;
+      ctx.font = 'italic 10px Georgia, serif';
       ctx.textBaseline = 'middle';
-
-      ctx.fillStyle = ATTR_COLORS.mode;
       ctx.textAlign = 'center';
-      ctx.fillText('mode', ZONES.mode.cx, ZONES.mode.cy - ZONES.mode.sy - 14);
-
-      ctx.fillStyle = ATTR_COLORS.type;
-      ctx.textAlign = 'center';
-      ctx.fillText('type', ZONES.type.cx, ZONES.type.cy - ZONES.type.sy - 14);
-
-      ctx.fillStyle = ATTR_COLORS.imagery;
-      ctx.textAlign = 'center';
-      ctx.fillText('image', ZONES.imagery.cx, ZONES.imagery.cy + ZONES.imagery.sy + 18);
-
+      zones.forEach(({ key, label, labelY }) => {
+        const z = ZONES[key];
+        ctx.globalAlpha = 0.45;
+        ctx.fillStyle = ATTR_COLORS[key];
+        ctx.fillText(label, z.cx, labelY);
+      });
       ctx.restore();
     }
 
@@ -783,9 +830,9 @@ const { poemId, world } = Astro.props;
           ctx.setLineDash([3, 4]);
         } else {
           if (!edge.to.active) { ctx.restore(); return; }
-          ctx.globalAlpha = alpha * (isSel ? 0.60 : 0.20);
+          ctx.globalAlpha = alpha * (isSel ? 0.65 : 0.28);
           ctx.strokeStyle = color;
-          ctx.lineWidth = isSel ? 1.4 : 0.9;
+          ctx.lineWidth = isSel ? 1.5 : 1.0;
         }
         ctx.beginPath();
         ctx.moveTo(edge.from.x, edge.from.y);
@@ -843,15 +890,18 @@ const { poemId, world } = Astro.props;
       const isSel = this.selectedNode === n;
       const active = n.active ?? false;
 
-      const baseOpacity = active ? 1 : 0.22;
+      // Active: full presence. Inactive: clearly recessed (smaller, dimmer, italic label).
+      const baseOpacity = active ? 1 : 0.28;
       ctx.globalAlpha *= baseOpacity;
 
-      const r = n.r * (isHov || isSel ? 1.8 : 1);
+      // Active nodes are slightly larger; inactive are deliberately smaller/quieter
+      const baseR = active ? 9 : 5;
+      const r = baseR * (isHov || isSel ? 1.7 : 1);
 
       // Soft outer aura for active nodes
       if (active && !isSel) {
-        ctx.beginPath(); ctx.arc(n.x, n.y, r + 9, 0, Math.PI * 2);
-        ctx.fillStyle = color; ctx.globalAlpha *= 0.12; ctx.fill(); ctx.globalAlpha /= 0.12;
+        ctx.beginPath(); ctx.arc(n.x, n.y, r + 10, 0, Math.PI * 2);
+        ctx.fillStyle = color; ctx.globalAlpha *= 0.15; ctx.fill(); ctx.globalAlpha /= 0.15;
       }
 
       // Dot
@@ -886,9 +936,10 @@ const { poemId, world } = Astro.props;
         ly = n.y - gap - 2; tb = 'bottom'; ta = 'center';
       }
 
-      const fs = active ? 13 : 11;
+      const fs = active ? 12.5 : 10.5;
       ctx.font = `${active ? '' : 'italic '}${fs}px Georgia, serif`;
-      ctx.fillStyle = isSel ? '#0a0a0a' : active ? '#1a1a1a' : '#b8b0a8';
+      // Inactive labels: warmer muted neutral, clearly distinguishable from active
+      ctx.fillStyle = isSel ? '#0a0a0a' : active ? '#1a1a1a' : '#c0b8b0';
       ctx.textAlign = ta; ctx.textBaseline = tb;
       ctx.fillText(this.formatLabel(n.value!), lx, ly);
 
@@ -931,6 +982,28 @@ const { poemId, world } = Astro.props;
       ctx.fillText(line.trim(), x, cy);
     }
 
+    // ── Summary text ──────────────────────────────────────────────────────────
+    buildSummaryText(): string {
+      const poem = this.poem;
+      if (!poem?.mode) return '';
+      const nMode    = (poem.mode    || []).length;
+      const nType    = (poem.type    || []).length;
+      const nImagery = (poem.imagery || []).length;
+      const parts: string[] = [];
+      if (nMode    > 0) parts.push(`${nMode} speaker ${nMode    === 1 ? 'mode'  : 'modes'}`);
+      if (nType    > 0) parts.push(`${nType} ${nType  === 1 ? 'act'    : 'acts'}`);
+      if (nImagery > 0) parts.push(`${nImagery} imagery ${nImagery === 1 ? 'field' : 'fields'}`);
+      if (parts.length === 0) return '';
+      const listed = parts.length === 1 ? parts[0]
+        : parts.slice(0, -1).join(', ') + ', and ' + parts[parts.length - 1];
+      return `This poem activates ${listed}.`;
+    }
+
+    setSummary(text: string) {
+      const el = document.getElementById('atlas-summary');
+      if (el) el.textContent = text;
+    }
+
     formatLabel(val: string) { return val.replace(/_/g, ' '); }
 
     // ── Hit testing ───────────────────────────────────────────────────────────
@@ -957,11 +1030,13 @@ const { poemId, world } = Astro.props;
         n.visible = false; n.currentAlpha = 0; n.vx = 0; n.vy = 0;
       });
       document.getElementById('atlas-preview')?.classList.remove('is-visible');
+      this.setSummary(this.buildSummaryText());
       this.updateHint(
         this.isStub
           ? 'tap any attribute to find poems with that quality'
           : 'highlighted attributes belong to this poem — tap to explore'
       );
+      if (!this.rafId) this.draw(); // redraw immediately if loop is frozen
     }
 
     handleTap(px: number, py: number) {
@@ -1008,21 +1083,8 @@ const { poemId, world } = Astro.props;
         sat.delay = i * 0.06;
       });
 
-      // Animate satellites in (alpha 0→1) while simulation moves them into place
-      const start = performance.now();
-      const dur = 480;
-      const alphaTick = (now: number) => {
-        const t = Math.min(1, (now - start) / dur);
-        sats.forEach((sat, i) => {
-          const p = Math.max(0, Math.min(1, (t - sat.delay) / 0.35));
-          sat.currentAlpha = this.easeOut(p);
-        });
-        if (t < 1) requestAnimationFrame(alphaTick);
-      };
-      requestAnimationFrame(alphaTick);
-
-      // Burst of noise so the field visibly reorganizes
-      this.resetNoise();
+      // One short re-layout burst, then freeze
+      this.runRelayout();
       this.showAttrPanel(attrNode);
     }
 
@@ -1053,7 +1115,12 @@ const { poemId, world } = Astro.props;
         </ul>
       `;
       preview.classList.add('is-visible');
-      this.updateHint(matches.length > 0 ? 'tap a poem node · tap again to navigate' : 'tap another attribute to continue');
+      // Summary line: contextual interpretation
+      const cnt = matches.length;
+      this.setSummary(cnt > 0
+        ? `${label} links this poem to ${cnt} related ${cnt === 1 ? 'poem' : 'poems'}.`
+        : `${label} appears only in this poem so far.`);
+      this.updateHint(cnt > 0 ? 'tap a poem node · tap again to navigate' : 'tap another attribute to continue');
     }
 
     showAnchorInfo() {
@@ -1081,6 +1148,7 @@ const { poemId, world } = Astro.props;
         <p style="font-size:11px;color:#aaa;font-style:italic;margin-top:8px">tap a highlighted attribute to see related poems</p>
       `;
       preview.classList.add('is-visible');
+      this.setSummary(this.buildSummaryText());
       this.updateHint('tap speaker · act · image to explore');
     }
 
@@ -1113,6 +1181,7 @@ const { poemId, world } = Astro.props;
         if (this.isDragging && this.dragStart) {
           this.tx = this.dragStart.tx + (e.clientX - this.dragStart.x);
           this.ty = this.dragStart.ty + (e.clientY - this.dragStart.y);
+          if (!this.rafId) this.draw(); // redraw pan when frozen
           return;
         }
         const rect = canvas.getBoundingClientRect();
@@ -1120,6 +1189,7 @@ const { poemId, world } = Astro.props;
         if (hit !== this.hoveredNode) {
           this.hoveredNode = hit;
           canvas.style.cursor = hit ? 'pointer' : 'grab';
+          if (!this.rafId) this.draw(); // redraw hover when frozen
         }
       });
 
@@ -1153,6 +1223,7 @@ const { poemId, world } = Astro.props;
       canvas.addEventListener('wheel', (e: WheelEvent) => {
         e.preventDefault();
         this.scale = Math.max(0.3, Math.min(3.5, this.scale * (e.deltaY > 0 ? 0.9 : 1.1)));
+        if (!this.rafId) this.draw(); // redraw zoom when frozen
       }, { passive: false });
 
       const getPD = (e: TouchEvent) => {
@@ -1167,6 +1238,7 @@ const { poemId, world } = Astro.props;
         if (e.touches.length === 2 && this.pinchStart !== null) {
           this.scale = Math.max(0.3, Math.min(3.5, this.pinchScale * (getPD(e) / this.pinchStart)));
           e.preventDefault();
+          if (!this.rafId) this.draw(); // redraw pinch-zoom when frozen
         }
       }, { passive: false });
       canvas.addEventListener('touchend', () => { this.pinchStart = null; });
@@ -1194,6 +1266,9 @@ const { poemId, world } = Astro.props;
     gsap.fromTo(overlay, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.32, ease: 'power2.out' });
     if (graph) graph.destroy();
     graph = new AtlasGraph(canvas, poemId, worldKey);
+    // Set interpretation summary
+    const summaryEl = document.getElementById('atlas-summary');
+    if (summaryEl) summaryEl.textContent = graph.buildSummaryText();
     document.getElementById('atlas-hint')!.textContent = graph.isStub
       ? 'tap any attribute to find poems with that quality — this poem\'s position is not yet mapped'
       : 'highlighted attributes belong to this poem — tap one to explore the field';
