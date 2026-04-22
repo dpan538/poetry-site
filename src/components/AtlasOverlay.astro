@@ -232,13 +232,20 @@ const { poemId, world } = Astro.props;
     flex: 1;
     width: 100%;
     display: block;
-    touch-action: none;
-    min-height: 0; /* allows flex shrink */
+    touch-action: manipulation; /* allows tap; no pan/pinch (drag removed) */
+    min-height: 0;
   }
 
-  /* ── Annotation panel — part of flex flow, slides in from below canvas ── */
+  /* ── Annotation panel — position: absolute so canvas NEVER shrinks ── */
+  /* Root cause of the "squish" bug: when annotation was in the flex flow, the canvas   */
+  /* CSS display height shrank while pixel dimensions stayed at full size → content      */
+  /* appeared vertically compressed. Absolute positioning removes it from flex flow.     */
   .atlas-anno {
-    flex-shrink: 0;
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    z-index: 10;
+    /* Must cover canvas area below — use the overlay's bg color */
+    background: var(--color-bg, #f5f2ed);
     overflow: hidden;
     max-height: 0;
     opacity: 0;
@@ -252,6 +259,12 @@ const { poemId, world } = Astro.props;
     opacity: 1;
     padding: 18px var(--margin-x, 24px) 12px;
     border-top-color: rgba(26, 26, 26, 0.10);
+  }
+
+  /* Hide hint when annotation panel is open — panel overlaps it */
+  #atlas-anno.is-open ~ #atlas-hint {
+    opacity: 0;
+    pointer-events: none;
   }
 
   /* annotation internals (set by JS innerHTML) */
@@ -388,14 +401,14 @@ const { poemId, world } = Astro.props;
   };
 
   // Zone positions: mode upper-left, type upper-right, imagery below.
-  // This forms a triangular field around the anchor poem at the centre.
+  // Zones are generously sized so repulsion can spread 32 nodes without overlap.
   const ZONES: Record<string, { cx: number; cy: number; sx: number; sy: number }> = {
-    mode:    { cx: -205, cy: -65, sx: 62, sy: 118 },
-    type:    { cx:  205, cy: -65, sx: 58, sy: 112 },
-    imagery: { cx:    0, cy: 168, sx: 188, sy: 40 },
+    mode:    { cx: -225, cy: -80, sx: 105, sy: 165 },
+    type:    { cx:  225, cy: -80, sx:  98, sy: 158 },
+    imagery: { cx:    0, cy: 205, sx: 230, sy:  90 },
   };
 
-  const ACTIVE_PULL = 0.42;
+  const ACTIVE_PULL = 0.35;
 
   // ─── Attribute definitions ────────────────────────────────────────────────
   const ATTR_DESCRIPTIONS: Record<string, string> = {
@@ -545,7 +558,9 @@ const { poemId, world } = Astro.props;
 
     // ── Force simulation (used only by primeLayout — not called during render) ─
     simulateStep() {
-      const ZONE_K = 0.036, ANCHOR_K = 0.013, REPEL_K = 0.65, DAMPING = 0.80;
+      // Softer zone pull lets repulsion spread nodes freely across the larger zones.
+      // Higher REPEL_K and minD (75px clearance) prevent dot+label overlap.
+      const ZONE_K = 0.018, ANCHOR_K = 0.009, REPEL_K = 1.6, DAMPING = 0.76;
       const attrNodes = this.nodes.filter(n => n.kind === 'attr');
       attrNodes.forEach(n => {
         n.vx += (n.homeX - n.x) * ZONE_K;
@@ -559,7 +574,8 @@ const { poemId, world } = Astro.props;
           if (other === n) return;
           const dx = n.x - other.x, dy = n.y - other.y;
           const dist = Math.sqrt(dx * dx + dy * dy) || 0.1;
-          const minD = n.r + other.r + 26;
+          // 75px minimum gap between dot surfaces — enough room for label text
+          const minD = n.r + other.r + 75;
           if (dist < minD) {
             const f = REPEL_K * (minD - dist) / dist;
             n.vx += dx * f; n.vy += dy * f;
@@ -570,27 +586,33 @@ const { poemId, world } = Astro.props;
       });
     }
 
-    // Settle layout synchronously before first draw — positions are stable on open
-    primeLayout(steps = 320) {
+    // Settle layout synchronously before first draw — more steps for larger zones
+    primeLayout(steps = 800) {
       for (let i = 0; i < steps; i++) this.simulateStep();
     }
 
     // ── Fit canvas ────────────────────────────────────────────────────────────
     fitToCanvas() {
-      const spanW = 560, spanH = 430;
-      const scaleW = (this.cx * 2 * 0.80) / spanW;
-      const scaleH = (this.cy * 2 * 0.80) / spanH;
-      // Higher cap (1.45) lets the graph breathe on larger screens
-      this.scale = Math.min(scaleW, scaleH, 1.45);
-      this.ty = -42 * this.scale;
+      // Larger span matches the expanded zone footprint
+      const spanW = 760, spanH = 580;
+      const scaleW = (this.cx * 2 * 0.82) / spanW;
+      const scaleH = (this.cy * 2 * 0.82) / spanH;
+      this.scale = Math.min(scaleW, scaleH, 1.3);
+      this.ty = -30 * this.scale;
     }
 
     resize() {
-      const el = this.canvas.parentElement!;
-      const rect = el.getBoundingClientRect();
-      const W = rect.width, H = el.clientHeight || rect.height;
-      this.canvas.width  = W * this.dpr; this.canvas.height = H * this.dpr;
-      this.canvas.style.width = W + 'px'; this.canvas.style.height = H + 'px';
+      // Clear any stale explicit dimensions so CSS/flex controls display size
+      this.canvas.style.width = '';
+      this.canvas.style.height = '';
+      // Measure the canvas's OWN CSS display rect (flex-determined, not the overlay's)
+      // getBoundingClientRect() forces synchronous reflow — returns post-flex size
+      const rect = this.canvas.getBoundingClientRect();
+      const W = Math.max(rect.width,  1);
+      const H = Math.max(rect.height, 1);
+      // Set pixel dimensions to match CSS display size (×dpr for sharpness)
+      this.canvas.width  = W * this.dpr;
+      this.canvas.height = H * this.dpr;
       this.cx = W / 2; this.cy = H / 2;
     }
 
@@ -627,7 +649,6 @@ const { poemId, world } = Astro.props;
       ctx.clearRect(0, 0, W, H);
       ctx.translate(this.cx + this.tx, this.cy + this.ty);
       ctx.scale(this.scale, this.scale);
-      this.drawZoneHalos();
       this.drawEdges();
       this.drawNodes();
       ctx.restore();
@@ -772,8 +793,8 @@ const { poemId, world } = Astro.props;
       else if (deg >= 70 && deg <= 110)   { ly = n.y + gap + 2; tb = 'top'; ta = 'center'; }
       else                                { ly = n.y - gap - 2; tb = 'bottom'; ta = 'center'; }
 
-      // Active: 15px upright; inactive: 13px italic
-      const fs = active ? 15 : 13;
+      // Active: 13px upright; inactive: 11px italic (−2px per design request)
+      const fs = active ? 13 : 11;
       ctx.font = `${active ? '' : 'italic '}${fs}px Georgia, serif`;
       // WCAG 1.4.3: dot drawn at baseOpacity (0.58 for inactive) but text needs higher opacity.
       // #5a5452 at 58% → 2.62:1 ❌. At 88% → 4.98:1 ✅. Save/restore alpha around text only.
@@ -909,35 +930,30 @@ const { poemId, world } = Astro.props;
       if (hit.kind === 'attr') this.showAttrAnnotation(hit);
     }
 
-    // ── Events ────────────────────────────────────────────────────────────────
+    // ── Events — hover + tap only (drag/pan/zoom removed) ────────────────────
     setupEvents() {
       const canvas = this.canvas;
 
+      // Hover: update cursor and hovered node for visual feedback
       canvas.addEventListener('pointermove', (e: PointerEvent) => {
-        if (this.isDragging && this.dragStart) {
-          this.tx = this.dragStart.tx + (e.clientX - this.dragStart.x);
-          this.ty = this.dragStart.ty + (e.clientY - this.dragStart.y);
-          if (!this.rafId) this.draw();
-          return;
-        }
         const rect = canvas.getBoundingClientRect();
         const hit = this.hitTest(e.clientX - rect.left, e.clientY - rect.top);
         const attrHit = hit?.kind === 'attr' ? hit : null;
         if (attrHit !== this.hoveredNode) {
           this.hoveredNode = attrHit;
-          canvas.style.cursor = attrHit ? 'pointer' : 'grab';
+          canvas.style.cursor = attrHit ? 'pointer' : 'default';
           if (!this.rafId) this.draw();
         }
       });
 
+      // Tap: record press position
       canvas.addEventListener('pointerdown', (e: PointerEvent) => {
         canvas.setPointerCapture(e.pointerId);
         this.pointerDownPos = { x: e.clientX, y: e.clientY };
         this.pointerDownTime = Date.now();
-        this.dragStart = { x: e.clientX, y: e.clientY, tx: this.tx, ty: this.ty };
-        canvas.style.cursor = 'grabbing';
       });
 
+      // Tap: fire if pointer didn't move much and elapsed < 350ms
       canvas.addEventListener('pointerup', (e: PointerEvent) => {
         if (!this.pointerDownPos) return;
         const elapsed = Date.now() - this.pointerDownTime;
@@ -947,38 +963,8 @@ const { poemId, world } = Astro.props;
           const rect = canvas.getBoundingClientRect();
           this.handleTap(e.clientX - rect.left, e.clientY - rect.top);
         }
-        this.isDragging = false; this.dragStart = null; this.pointerDownPos = null;
-        canvas.style.cursor = this.hoveredNode ? 'pointer' : 'grab';
+        this.pointerDownPos = null;
       });
-
-      canvas.addEventListener('pointermove', (e: PointerEvent) => {
-        if (!this.pointerDownPos || this.isDragging) return;
-        const dx = e.clientX - this.pointerDownPos.x, dy = e.clientY - this.pointerDownPos.y;
-        if (Math.sqrt(dx * dx + dy * dy) > 8) this.isDragging = true;
-      });
-
-      canvas.addEventListener('wheel', (e: WheelEvent) => {
-        e.preventDefault();
-        this.scale = Math.max(0.3, Math.min(3.5, this.scale * (e.deltaY > 0 ? 0.9 : 1.1)));
-        if (!this.rafId) this.draw();
-      }, { passive: false });
-
-      const getPD = (e: TouchEvent) => {
-        const dx = e.touches[0].clientX - e.touches[1].clientX;
-        const dy = e.touches[0].clientY - e.touches[1].clientY;
-        return Math.sqrt(dx * dx + dy * dy);
-      };
-      canvas.addEventListener('touchstart', (e: TouchEvent) => {
-        if (e.touches.length === 2) { this.pinchStart = getPD(e); this.pinchScale = this.scale; }
-      }, { passive: true });
-      canvas.addEventListener('touchmove', (e: TouchEvent) => {
-        if (e.touches.length === 2 && this.pinchStart !== null) {
-          this.scale = Math.max(0.3, Math.min(3.5, this.pinchScale * (getPD(e) / this.pinchStart)));
-          e.preventDefault();
-          if (!this.rafId) this.draw();
-        }
-      }, { passive: false });
-      canvas.addEventListener('touchend', () => { this.pinchStart = null; });
 
       window.addEventListener('resize', () => { this.resize(); this.fitToCanvas(); if (!this.rafId) this.draw(); });
     }
