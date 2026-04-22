@@ -63,13 +63,14 @@ const { poemId, world } = Astro.props;
   <!-- Canvas — the attribute field (aria-hidden: AT gets info via atlas-sr-attrs above) -->
   <canvas id="atlas-canvas" class="atlas-canvas" aria-hidden="true"></canvas>
 
-  <!-- Annotation panel — shown when attribute is selected -->
-  <div id="atlas-anno" class="atlas-anno" role="region" aria-label="Attribute annotation" aria-live="polite" aria-atomic="true"></div>
-
-  <!-- Hint text -->
-  <p id="atlas-hint" class="atlas-hint">
-    tap a quality to read its definition
-  </p>
+  <!-- Fixed footer zone: always reserves the same height so canvas never moves.
+       Annotation and hint share this space; only one is visible at a time. -->
+  <div class="atlas-footer">
+    <!-- Annotation panel: fades in over the hint when an attribute is selected -->
+    <div id="atlas-anno" class="atlas-anno" role="region" aria-label="Attribute annotation" aria-live="polite" aria-atomic="true"></div>
+    <!-- Hint: centered in the footer, fades out when annotation is visible -->
+    <p id="atlas-hint" class="atlas-hint">tap a quality to read its definition</p>
+  </div>
 </div>
 
 <style>
@@ -131,14 +132,14 @@ const { poemId, world } = Astro.props;
   }
 
   .atlas-wordmark {
-    font-size: 12px;
+    font-size: 13px;
     letter-spacing: 0.16em;
     color: var(--color-primary, #1a1a1a);
     font-family: inherit;
   }
 
   .atlas-subtitle {
-    font-size: 12px;
+    font-size: 13px;
     letter-spacing: 0.06em;
     color: var(--color-meta, #595959);
     font-style: italic;
@@ -183,7 +184,7 @@ const { poemId, world } = Astro.props;
   }
 
   .atlas-legend-desc {
-    font-size: 13px;
+    font-size: 14px;
     letter-spacing: 0.02em;
     /* WCAG 1.4.3: opacity:0.75 was only 3.58:1 ❌ — removed, full #595959 = 6.27:1 ✅ */
     color: var(--color-meta, #595959);
@@ -192,7 +193,7 @@ const { poemId, world } = Astro.props;
   }
 
   .atlas-legend-item {
-    font-size: 14px;
+    font-size: 15px;
     letter-spacing: 0.04em;
     color: var(--color-meta, #595959);
     display: flex;
@@ -236,32 +237,34 @@ const { poemId, world } = Astro.props;
     min-height: 0;
   }
 
-  /* ── Annotation panel — position: absolute so canvas NEVER shrinks ── */
-  /* Root cause of the "squish" bug: when annotation was in the flex flow, the canvas   */
-  /* CSS display height shrank while pixel dimensions stayed at full size → content      */
-  /* appeared vertically compressed. Absolute positioning removes it from flex flow.     */
+  /* ── Fixed footer: canvas height is 100% stable regardless of interaction ── */
+  /* Both annotation and hint live here; the space is always reserved in flex.  */
+  .atlas-footer {
+    flex-shrink: 0;
+    height: 180px;           /* fixed — never changes → canvas never moves */
+    position: relative;
+    border-top: 0.5px solid rgba(26, 26, 26, 0.09);
+  }
+
+  /* Annotation: fills the footer, fades in on top of the hint */
   .atlas-anno {
     position: absolute;
-    bottom: 0; left: 0; right: 0;
-    z-index: 10;
-    /* Must cover canvas area below — use the overlay's bg color */
+    inset: 0;
+    z-index: 1;              /* above hint */
     background: var(--color-bg, #f5f2ed);
     overflow: hidden;
-    max-height: 0;
+    padding: 18px var(--margin-x, 24px) 14px;
     opacity: 0;
-    transition: max-height 0.32s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.24s ease, padding 0.32s ease;
-    border-top: 0.5px solid transparent;
-    padding: 0 var(--margin-x, 24px);
+    pointer-events: none;
+    transition: opacity 0.22s ease;
   }
 
   .atlas-anno.is-open {
-    max-height: 260px;
     opacity: 1;
-    padding: 18px var(--margin-x, 24px) 12px;
-    border-top-color: rgba(26, 26, 26, 0.10);
+    pointer-events: auto;
   }
 
-  /* Hide hint when annotation panel is open — panel overlaps it */
+  /* Hide hint when annotation is visible */
   #atlas-anno.is-open ~ #atlas-hint {
     opacity: 0;
     pointer-events: none;
@@ -276,7 +279,7 @@ const { poemId, world } = Astro.props;
   }
 
   :global(.atlas-anno-cat) {
-    font-size: 11.5px;
+    font-size: 12.5px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     flex-shrink: 0;
@@ -290,7 +293,7 @@ const { poemId, world } = Astro.props;
   :global(.atlas-anno-cat.tag-imagery) { color: #547054; } /* 4.92:1 ✅ */
 
   :global(.atlas-anno-name) {
-    font-size: 21px;
+    font-size: 22px;
     font-weight: normal;
     font-family: Georgia, 'Times New Roman', serif;
     letter-spacing: -0.01em;
@@ -301,7 +304,7 @@ const { poemId, world } = Astro.props;
 
   :global(.atlas-anno-def) {
     margin: 0 0 10px;
-    font-size: 14.5px;
+    font-size: 15.5px;
     line-height: 1.7;
     color: var(--color-primary, #1a1a1a);
     font-style: italic;
@@ -309,7 +312,7 @@ const { poemId, world } = Astro.props;
   }
 
   :global(.atlas-anno-meta) {
-    font-size: 12.5px;
+    font-size: 13.5px;
     letter-spacing: 0.03em;
     color: var(--color-meta, #595959);
     display: flex;
@@ -348,17 +351,22 @@ const { poemId, world } = Astro.props;
     border: 0;
   }
 
-  /* ── Hint ────────────────────────────────────────────────────────────────── */
+  /* ── Hint: centered inside the fixed footer, below annotation layer ── */
   .atlas-hint {
-    flex-shrink: 0;
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-size: 15px;
     letter-spacing: 0.03em;
     color: var(--color-meta, #595959);
     font-style: italic;
     text-align: center;
-    padding: 12px var(--margin-x, 24px) 22px;
+    padding: 0 var(--margin-x, 24px);
     margin: 0;
-    transition: opacity 0.3s ease;
+    transition: opacity 0.22s ease;
   }
 </style>
 
@@ -793,8 +801,8 @@ const { poemId, world } = Astro.props;
       else if (deg >= 70 && deg <= 110)   { ly = n.y + gap + 2; tb = 'top'; ta = 'center'; }
       else                                { ly = n.y - gap - 2; tb = 'bottom'; ta = 'center'; }
 
-      // Active: 13px upright; inactive: 11px italic (−2px per design request)
-      const fs = active ? 13 : 11;
+      // Active: 15px upright; inactive: 13px italic
+      const fs = active ? 15 : 13;
       ctx.font = `${active ? '' : 'italic '}${fs}px Georgia, serif`;
       // WCAG 1.4.3: dot drawn at baseOpacity (0.58 for inactive) but text needs higher opacity.
       // #5a5452 at 58% → 2.62:1 ❌. At 88% → 4.98:1 ✅. Save/restore alpha around text only.
