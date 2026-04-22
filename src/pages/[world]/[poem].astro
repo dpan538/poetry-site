@@ -4,6 +4,7 @@ import type { CollectionEntry } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PoemCanvas from '../../components/PoemCanvas.astro';
 import IndexMenu from '../../components/IndexMenu.astro';
+import AtlasOverlay from '../../components/AtlasOverlay.astro';
 import { loadPoemsByWorldForIndexMenu } from '../../lib/index-menu-data';
 import { analyzePoemText, computeEmotionScore } from '../../lib/poem-analyzer';
 import { excerptWords } from '../../lib/seo';
@@ -123,6 +124,7 @@ const breadcrumbs = [
       order={poem.data.order}
     />
     <IndexMenu currentWorld={world} currentPoemId={poem.id} poemsByWorld={poemsByWorld} />
+    <AtlasOverlay poemId={poem.id} world={world} />
   </main>
 </BaseLayout>
 
