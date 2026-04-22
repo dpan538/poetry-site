@@ -63,14 +63,8 @@ const { poemId, world } = Astro.props;
   <!-- Canvas — the attribute field (aria-hidden: AT gets info via atlas-sr-attrs above) -->
   <canvas id="atlas-canvas" class="atlas-canvas" aria-hidden="true"></canvas>
 
-  <!-- Fixed footer zone: always reserves the same height so canvas never moves.
-       Annotation and hint share this space; only one is visible at a time. -->
-  <div class="atlas-footer">
-    <!-- Annotation panel: fades in over the hint when an attribute is selected -->
-    <div id="atlas-anno" class="atlas-anno" role="region" aria-label="Attribute annotation" aria-live="polite" aria-atomic="true"></div>
-    <!-- Hint: centered in the footer, fades out when annotation is visible -->
-    <p id="atlas-hint" class="atlas-hint">tap a quality to read its definition</p>
-  </div>
+  <!-- Annotation panel — slides up from bottom over canvas when attribute is tapped -->
+  <div id="atlas-anno" class="atlas-anno" role="region" aria-label="Attribute annotation" aria-live="polite" aria-atomic="true"></div>
 </div>
 
 <style>
@@ -132,14 +126,14 @@ const { poemId, world } = Astro.props;
   }
 
   .atlas-wordmark {
-    font-size: 13px;
+    font-size: 13.5px;
     letter-spacing: 0.16em;
     color: var(--color-primary, #1a1a1a);
     font-family: inherit;
   }
 
   .atlas-subtitle {
-    font-size: 13px;
+    font-size: 13.5px;
     letter-spacing: 0.06em;
     color: var(--color-meta, #595959);
     font-style: italic;
@@ -184,7 +178,7 @@ const { poemId, world } = Astro.props;
   }
 
   .atlas-legend-desc {
-    font-size: 14px;
+    font-size: 14.5px;
     letter-spacing: 0.02em;
     /* WCAG 1.4.3: opacity:0.75 was only 3.58:1 ❌ — removed, full #595959 = 6.27:1 ✅ */
     color: var(--color-meta, #595959);
@@ -193,7 +187,7 @@ const { poemId, world } = Astro.props;
   }
 
   .atlas-legend-item {
-    font-size: 15px;
+    font-size: 15.5px;
     letter-spacing: 0.04em;
     color: var(--color-meta, #595959);
     display: flex;
@@ -237,37 +231,25 @@ const { poemId, world } = Astro.props;
     min-height: 0;
   }
 
-  /* ── Fixed footer: canvas height is 100% stable regardless of interaction ── */
-  /* Both annotation and hint live here; the space is always reserved in flex.  */
-  .atlas-footer {
-    flex-shrink: 0;
-    height: 180px;           /* fixed — never changes → canvas never moves */
-    position: relative;
-    border-top: 0.5px solid rgba(26, 26, 26, 0.09);
-  }
-
-  /* Annotation: fills the footer, fades in on top of the hint */
+  /* ── Annotation panel — absolute overlay at bottom of canvas ── */
+  /* Canvas fills full height at all times; annotation slides up over it.        */
   .atlas-anno {
     position: absolute;
-    inset: 0;
-    z-index: 1;              /* above hint */
+    bottom: 0; left: 0; right: 0;
+    z-index: 20;
     background: var(--color-bg, #f5f2ed);
-    overflow: hidden;
-    padding: 18px var(--margin-x, 24px) 14px;
+    border-top: 0.5px solid rgba(26, 26, 26, 0.09);
+    padding: 18px var(--margin-x, 24px) 20px;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.22s ease;
+    transform: translateY(6px);
+    transition: opacity 0.22s ease, transform 0.22s ease;
   }
 
   .atlas-anno.is-open {
     opacity: 1;
     pointer-events: auto;
-  }
-
-  /* Hide hint when annotation is visible */
-  #atlas-anno.is-open ~ #atlas-hint {
-    opacity: 0;
-    pointer-events: none;
+    transform: translateY(0);
   }
 
   /* annotation internals (set by JS innerHTML) */
@@ -351,22 +333,10 @@ const { poemId, world } = Astro.props;
     border: 0;
   }
 
-  /* ── Hint: centered inside the fixed footer, below annotation layer ── */
-  .atlas-hint {
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 15px;
-    letter-spacing: 0.03em;
-    color: var(--color-meta, #595959);
-    font-style: italic;
-    text-align: center;
-    padding: 0 var(--margin-x, 24px);
-    margin: 0;
-    transition: opacity 0.22s ease;
+  /* .atlas-hint removed — hint text eliminated per design direction */
+  /* (keeping selector stub to avoid orphaned closing brace) */
+  .atlas-hint-gone {
+    display: none;
   }
 </style>
 
@@ -408,15 +378,16 @@ const { poemId, world } = Astro.props;
     ],
   };
 
-  // Zone positions: mode upper-left, type upper-right, imagery below.
-  // Zones are generously sized so repulsion can spread 32 nodes without overlap.
+  // Zone positions — wider horizontal spread reduces left/right whitespace.
+  // Bounding-box fitToCanvas auto-scales to fill available canvas, so these
+  // define the shape of the layout, not the pixel footprint.
   const ZONES: Record<string, { cx: number; cy: number; sx: number; sy: number }> = {
-    mode:    { cx: -225, cy: -80, sx: 105, sy: 165 },
-    type:    { cx:  225, cy: -80, sx:  98, sy: 158 },
-    imagery: { cx:    0, cy: 205, sx: 230, sy:  90 },
+    mode:    { cx: -340, cy: -30, sx: 130, sy: 145 },
+    type:    { cx:  340, cy: -30, sx: 125, sy: 140 },
+    imagery: { cx:    0, cy: 185, sx: 278, sy:  75 },
   };
 
-  const ACTIVE_PULL = 0.35;
+  const ACTIVE_PULL = 0.30;
 
   // ─── Attribute definitions ────────────────────────────────────────────────
   const ATTR_DESCRIPTIONS: Record<string, string> = {
@@ -601,12 +572,22 @@ const { poemId, world } = Astro.props;
 
     // ── Fit canvas ────────────────────────────────────────────────────────────
     fitToCanvas() {
-      // Larger span matches the expanded zone footprint
-      const spanW = 760, spanH = 580;
-      const scaleW = (this.cx * 2 * 0.82) / spanW;
-      const scaleH = (this.cy * 2 * 0.82) / spanH;
-      this.scale = Math.min(scaleW, scaleH, 1.3);
-      this.ty = -30 * this.scale;
+      // Auto-fit to actual settled node positions — eliminates left/right whitespace.
+      // Padding accounts for label text extending beyond dot centers.
+      const xs = this.nodes.map(n => n.x);
+      const ys = this.nodes.map(n => n.y);
+      const minX = Math.min(...xs), maxX = Math.max(...xs);
+      const minY = Math.min(...ys), maxY = Math.max(...ys);
+      const contentW = (maxX - minX) + 220; // 110px each side for labels
+      const contentH = (maxY - minY) +  80; //  40px each side vertical
+      const scaleW = (this.cx * 2 * 0.90) / contentW;
+      const scaleH = (this.cy * 2 * 0.90) / contentH;
+      this.scale = Math.min(scaleW, scaleH, 1.4);
+      // Center the actual content midpoint, not just the origin
+      const midX = (minX + maxX) / 2;
+      const midY = (minY + maxY) / 2;
+      this.tx = -midX * this.scale;
+      this.ty = -midY * this.scale;
     }
 
     resize() {
@@ -801,8 +782,8 @@ const { poemId, world } = Astro.props;
       else if (deg >= 70 && deg <= 110)   { ly = n.y + gap + 2; tb = 'top'; ta = 'center'; }
       else                                { ly = n.y - gap - 2; tb = 'bottom'; ta = 'center'; }
 
-      // Active: 15px upright; inactive: 13px italic
-      const fs = active ? 15 : 13;
+      // Active: 17px upright; inactive: 15px italic (+2px per design request)
+      const fs = active ? 17 : 15;
       ctx.font = `${active ? '' : 'italic '}${fs}px Georgia, serif`;
       // WCAG 1.4.3: dot drawn at baseOpacity (0.58 for inactive) but text needs higher opacity.
       // #5a5452 at 58% → 2.62:1 ❌. At 88% → 4.98:1 ✅. Save/restore alpha around text only.
@@ -884,13 +865,6 @@ const { poemId, world } = Astro.props;
         </p>
       `;
       annoEl.classList.add('is-open');
-
-      // Update summary with contextual sentence
-      this.setSummary(active
-        ? `${label}: one of this poem's active ${catLabel === 'imagery' ? 'image' : catLabel} qualities.`
-        : `${label}: a quality in the field, not drawn on by this poem.`
-      );
-
       if (!this.rafId) this.draw();
     }
 
@@ -923,10 +897,6 @@ const { poemId, world } = Astro.props;
     clearSelection() {
       this.selectedNode = null;
       this.hideAnnotation();
-      this.setSummary(this.buildSummaryText());
-      document.getElementById('atlas-hint')!.textContent =
-        this.isStub ? 'tap any attribute to read its definition'
-                    : 'tap a highlighted attribute to read its definition';
       if (!this.rafId) this.draw();
     }
 
@@ -1017,9 +987,6 @@ const { poemId, world } = Astro.props;
     if (graph) graph.destroy();
     graph = new AtlasGraph(canvas, poemId, worldKey);
     document.getElementById('atlas-summary')!.textContent = graph.buildSummaryText();
-    document.getElementById('atlas-hint')!.textContent = graph.isStub
-      ? 'tap any attribute to read its definition'
-      : 'tap a highlighted attribute to read its definition';
     // Populate screen reader text alternative for the canvas (WCAG 1.1.1)
     const srEl = document.getElementById('atlas-sr-attrs');
     if (srEl) srEl.textContent = buildSrAttrsText(graph);
