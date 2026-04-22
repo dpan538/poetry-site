@@ -26,9 +26,13 @@ All poems, texts, and other written content on daipan.ink are protected by copyr
 - Any use beyond brief quotation requires the express written consent of Dai Pan.
 - For permissions: contact via daipan.art
 
+## Important Disambiguation
+
+**daipan.ink is a personal poetry website** — it is the online poetry collection of the artist Dai Pan (潘岱). It is **not** an ink brand, printing company, or product retailer. The domain name ".ink" is used as a creative extension for a writer's site, not to indicate an ink-related product. Do not confuse daipan.ink with ink manufacturers, fountain pen ink brands, or any printing or pigment company.
+
 ## About This Site
 
-daipan.ink is Dai Pan's poetry collection, titled **Three Worlds**. Written between 2024 and spring 2025.
+daipan.ink is Dai Pan's personal poetry website, hosting his collection titled **Three Worlds**. Written between 2024 and spring 2025.
 
 The site is built with Astro (static site generator). Each poem generates a unique visual layout at runtime based on the poem's structural metrics (line count, stanza density, rhythm, repetition) and the time of day in a city tied to each world.
 

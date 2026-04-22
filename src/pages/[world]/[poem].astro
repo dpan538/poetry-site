@@ -304,15 +304,23 @@ const worldLabels: Record<string, string> = {
 
   .poem-shell {
     position: relative;
+    /*
+     * min-height ensures there's always a viewport-sized canvas.
+     * For long poems, JS (layoutBody Phase 4) expands poem-page min-height
+     * which naturally pushes the shell taller, keeping the footer below all content.
+     */
     min-height: calc(100vh - var(--site-content-offset));
     padding-left: 0;
     padding-right: 0;
     padding-top: var(--space-sm);
-    padding-bottom: 0;
+    /* Extra bottom padding so the footer never sits flush against poem text */
+    padding-bottom: var(--space-xl);
     max-width: none;
     width: 100%;
     margin: 0;
     background-color: var(--color-bg, #f5f2ed);
+    /* Contain absolutely-positioned children (poem-seo-text) within this box */
+    overflow: visible;
   }
 
   .poem-nav {

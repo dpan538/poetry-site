@@ -19,9 +19,10 @@ const { title, description, canonicalURL, ogImage, poem } = Astro.props;
 const fullTitle = `${title} — Dai Pan`;
 const ogSiteName = 'Dai Pan — daipan.ink';
 
-// Keywords include canonical name forms and common romanizations to aid search disambiguation
+// Keywords include canonical name forms and explicit subject signals.
+// "daipan.ink" is the personal poetry website of Dai Pan (潘岱) — NOT an ink product brand.
 const keywords =
-  'Dai Pan, Pan Dai, 潘岱, Pān Dài, poetry, contemporary poetry, Chinese poet writing in English, diaspora poetry, visual artist, photographer, printmaker, daipan.art, daipan.ink, Brisbane, New York, Shanghai, Three Worlds, Still Life, Bless You, Their World';
+  'Dai Pan, Pan Dai, 潘岱, Pān Dài, poetry collection, poet, personal website, contemporary poetry, Chinese poet writing in English, diaspora poetry, visual artist, photographer, printmaker, daipan.art, daipan.ink, Brisbane poet, Three Worlds poetry, Still Life poems, Bless You poems, Their World poems';
 
 // --- Person schema ---
 // Includes all canonical name forms to ensure correct attribution and disambiguation.
@@ -59,16 +60,20 @@ const personLd = {
 };
 
 // --- WebSite schema ---
+// Explicitly typed as a personal poetry site to prevent confusion with ink product brands.
 const websiteLd = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
   '@id': 'https://daipan.ink/#website',
   name: 'Three Worlds — Dai Pan',
+  alternateName: 'daipan.ink — poetry by Dai Pan',
   url: 'https://daipan.ink',
   description:
-    'Three Worlds is a poetry collection by Dai Pan (潘岱): Still Life, Bless You, and Their World. Written 2024–2025.',
+    'daipan.ink is the personal poetry website of Dai Pan (潘岱, Pan Dai), a visual artist and poet based in Brisbane. Three Worlds is his debut poetry collection, comprising Still Life, Bless You, and Their World. Written 2024–2025. This site is a poetry collection, not an ink or printing product.',
+  about: { '@type': 'Thing', name: 'Poetry', description: 'Contemporary poetry in English by Dai Pan (潘岱)' },
   author: { '@id': 'https://daipan.ink/#author' },
   inLanguage: 'en',
+  audience: { '@type': 'Audience', audienceType: 'poetry readers, literary readers' },
   copyrightHolder: { '@id': 'https://daipan.ink/#author' },
   copyrightYear: '2024',
   license: 'All rights reserved',

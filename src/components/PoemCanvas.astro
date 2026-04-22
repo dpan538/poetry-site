@@ -61,7 +61,7 @@ stanzas.forEach((stanza, si) => {
         id="index-trigger"
         aria-label="Open poem index"
         aria-expanded="false"
-        aria-controls="index-menu"
+        aria-controls="index-overlay"
       >
         Index
       </button>
@@ -532,34 +532,22 @@ stanzas.forEach((stanza, si) => {
     ];
 
     function layoutBody() {
-      const bodyFontSize = parseFloat(getComputedStyle(document.body).fontSize || '20');
-      const lineHeightRatio = 1.618;
-      const stanzaGapLines = 1;
-      const lineHeightPx = bodyFontSize * lineHeightRatio;
+      // ── Read CSS design tokens (single source of truth) ─────────────────────
+      const cs = getComputedStyle(document.documentElement);
+      const bodyFontSize = parseFloat(getComputedStyle(document.body).fontSize) || 20;
+      const lineHeightPx  = bodyFontSize * 1.618;           // matches --leading-body
+      // Stanza gap: read actual CSS --space-lg so flow math matches rendered margin
+      const stanzaGapPx   = parseFloat(cs.getPropertyValue('--space-lg').trim())  || 34;
+      const cellH          = parseFloat(cs.getPropertyValue('--cell-h').trim())    || 90;
 
       const accentOnFirst = rand() < 0.5;
 
-      function applyFrameSizing(useGrowMode, extraPerFrame) {
-        frameEls.forEach((el, i) => {
-          const bf = frameLayout.bodyFrames[i];
-          if (useGrowMode) {
-            el.style.height = 'auto';
-            if (extraPerFrame > 0) {
-              el.style.minHeight = `calc(${bf.rowSpan} * var(--cell-h) + ${extraPerFrame}px)`;
-            } else {
-              el.style.minHeight = `calc(${bf.rowSpan} * var(--cell-h))`;
-            }
-          } else {
-            el.style.minHeight = '';
-            el.style.height = `calc(${bf.rowSpan} * var(--cell-h))`;
-          }
-        });
-      }
+      // ── Helpers ─────────────────────────────────────────────────────────────
 
-      // Detect parenthetical / stage-direction lines: (…) at start of line
+      // Detect parenthetical / stage-direction lines: (…) occupying the whole line
       const stageDirectionRe = /^\s*\([^)]{1,80}\)\s*$/;
-      // Detect lone section-number lines: (1), (2), (3) etc.
-      const sectionNumberRe = /^\s*\(\d{1,3}\)\s*$/;
+      // Detect section-number lines: (1), (2), (3) etc.
+      const sectionNumberRe  = /^\s*\(\d{1,3}\)\s*$/;
 
       function buildLineEl(text: string, isFirstLine: boolean): HTMLElement {
         const lineEl = document.createElement('div');
@@ -567,139 +555,157 @@ stanzas.forEach((stanza, si) => {
         lineEl.textContent = text;
 
         if (sectionNumberRe.test(text)) {
-          // Section numbers: accent color, small caps feel
           lineEl.classList.add('poem-line--section');
           lineEl.style.color = 'var(--color-accent)';
-          lineEl.style.opacity = '0.75';
+          lineEl.style.opacity = '0.8';
           lineEl.style.fontSize = 'calc(var(--type-body) - 3px)';
           lineEl.style.letterSpacing = '0.12em';
         } else if (stageDirectionRe.test(text)) {
-          // Stage directions: accent color, slightly smaller, italic feel
           lineEl.classList.add('poem-line--stage');
           lineEl.style.color = 'var(--color-accent)';
-          lineEl.style.opacity = '0.8';
+          lineEl.style.opacity = '0.85';
           lineEl.style.fontSize = 'calc(var(--type-body) - 2px)';
         } else if (isFirstLine && accentOnFirst) {
-          // First line accent
           lineEl.style.color = 'var(--color-accent)';
         }
-
         return lineEl;
       }
 
-      function runContentFlow(frameSizes: number[]) {
-        for (const el of frameEls) {
-          el.replaceChildren();
-        }
-
-        let stanzaIdx = 0;
-        let lineInStanza = 0;
-        let isFirstLine = true;
-
-        for (let fi = 0; fi < frameEls.length; fi++) {
-          const frameEl = frameEls[fi];
-          const frameHeight = frameSizes[fi];
-
-          let remainingPx = frameHeight;
-
-          while (stanzaIdx < stanzas.length && remainingPx > lineHeightPx) {
-            const stanza = stanzas[stanzaIdx];
-
-            const stanzaEl = document.createElement('div');
-            stanzaEl.className = 'poem-stanza';
-
-            while (lineInStanza < stanza.length && remainingPx > lineHeightPx) {
-              const lineEl = buildLineEl(stanza[lineInStanza], isFirstLine);
-              stanzaEl.appendChild(lineEl);
-              lineInStanza++;
-              isFirstLine = false;
-              remainingPx -= lineHeightPx;
-            }
-
-            if (stanzaEl.children.length > 0) {
-              frameEl.appendChild(stanzaEl);
-            }
-
-            if (lineInStanza >= stanza.length) {
-              stanzaIdx++;
-              lineInStanza = 0;
-              remainingPx -= lineHeightPx * stanzaGapLines;
-            }
-          }
-        }
-
-        let overflowLines = 0;
-        if (stanzaIdx < stanzas.length) {
-          overflowLines += stanzas[stanzaIdx].length - lineInStanza;
-          for (let j = stanzaIdx + 1; j < stanzas.length; j++) {
-            overflowLines += stanzas[j].length;
-          }
-        }
-        return overflowLines;
-      }
-
-      // Compute total content height needed (without any frame limit)
-      const totalLines = stanzas.reduce((s, st) => s + st.length, 0);
-      const gapLines = Math.max(0, stanzas.length - 1) * stanzaGapLines;
-      const totalContentPx = (totalLines + gapLines) * lineHeightPx;
-
-      // Per-frame natural heights from CSS
-      function getFrameNaturalHeights(extraPerFrame: number): number[] {
-        return frameEls.map((el, i) => {
-          const bf = frameLayout.bodyFrames[i];
-          // Read --cell-h from computed style
-          const cellH = parseFloat(
-            getComputedStyle(document.documentElement).getPropertyValue('--cell-h').trim()
-          ) || 90;
-          return bf.rowSpan * cellH + extraPerFrame;
+      // Set all frames to explicit pixel heights; always keep overflow:hidden
+      // (hidden clips cleanly; visible causes visual overlap with adjacent frames).
+      function applyFrameHeights(heights: number[]) {
+        frameEls.forEach((el, i) => {
+          el.style.height    = `${heights[i]}px`;
+          el.style.minHeight = '';
+          el.style.overflow  = 'hidden';
         });
       }
 
-      // Default: fixed frame heights + single pass.
-      let frameSizes = getFrameNaturalHeights(0);
-      applyFrameSizing(false, 0);
-      let overflowLines = runContentFlow(frameSizes);
+      // Natural heights from the CSS grid (rowSpan × cellH, plus optional extra).
+      function naturalHeights(extra = 0): number[] {
+        return frameLayout.bodyFrames.map((bf) => bf.rowSpan * cellH + extra);
+      }
 
-      // When content overflows: grow frames until all content fits.
-      if (overflowLines > 0) {
-        // Compute how much extra space is needed across all frames
-        const totalFrameHeight = frameSizes.reduce((s, h) => s + h, 0);
-        const neededExtra = Math.max(0, totalContentPx - totalFrameHeight);
-        const n = frameEls.length || 1;
-        // Start with a generous initial bump that should cover most cases
-        let extraPerFrame = Math.ceil((neededExtra * 1.15) / n);
+      // Flow stanzas into frames given explicit pixel heights.
+      // Returns the number of lines that didn't fit (0 = all content placed).
+      function runFlow(heights: number[]): number {
+        for (const el of frameEls) el.replaceChildren();
 
-        const maxGrowIters = 20;
-        for (let grow = 0; grow < maxGrowIters; grow++) {
-          applyFrameSizing(true, extraPerFrame);
-          frameSizes = getFrameNaturalHeights(extraPerFrame);
-          overflowLines = runContentFlow(frameSizes);
-          if (overflowLines === 0) break;
-          const bump = Math.ceil((overflowLines * lineHeightPx * 1.2) / n);
-          extraPerFrame += Math.max(bump, 40);
+        let stanzaIdx   = 0;
+        let lineInStanza = 0;
+        let isFirstLine  = true;
+
+        for (let fi = 0; fi < frameEls.length; fi++) {
+          let remaining = heights[fi];
+          const frameEl = frameEls[fi];
+
+          while (stanzaIdx < stanzas.length) {
+            // Need room for at least one line
+            if (remaining < lineHeightPx) break;
+
+            const stanza   = stanzas[stanzaIdx];
+            const stanzaEl = document.createElement('div');
+            stanzaEl.className = 'poem-stanza';
+
+            while (lineInStanza < stanza.length && remaining >= lineHeightPx) {
+              stanzaEl.appendChild(buildLineEl(stanza[lineInStanza], isFirstLine));
+              lineInStanza++;
+              isFirstLine = false;
+              remaining  -= lineHeightPx;
+            }
+
+            if (stanzaEl.children.length > 0) frameEl.appendChild(stanzaEl);
+
+            if (lineInStanza >= stanza.length) {
+              // Stanza complete → advance and subtract gap
+              stanzaIdx++;
+              lineInStanza = 0;
+              remaining   -= stanzaGapPx;
+            } else {
+              // Stanza incomplete → move to next frame
+              break;
+            }
+          }
         }
 
-        // Safety net: if still overflowing after all iterations,
-        // unlock overflow so no text is ever clipped.
-        if (overflowLines > 0) {
-          frameEls.forEach((el) => {
-            el.style.overflow = 'visible';
-            el.style.height = 'auto';
-          });
-          // Final flow with effectively unlimited height
-          const bigSizes = frameSizes.map((h) => h + overflowLines * lineHeightPx * 2);
-          runContentFlow(bigSizes);
+        // Count lines that didn't fit
+        let overflow = 0;
+        if (stanzaIdx < stanzas.length) {
+          overflow += stanzas[stanzaIdx].length - lineInStanza;
+          for (let j = stanzaIdx + 1; j < stanzas.length; j++) overflow += stanzas[j].length;
+        }
+        return overflow;
+      }
+
+      // ── Phase 1: Initial layout with natural frame heights ───────────────────
+      let heights = naturalHeights(0);
+      applyFrameHeights(heights);
+      let overflowLines = runFlow(heights);
+
+      // ── Phase 2: Grow frames if content overflows ────────────────────────────
+      if (overflowLines > 0) {
+        const n = frameEls.length || 1;
+        // Pre-estimate total content height to start with a generous bump
+        const totalLines = stanzas.reduce((s, st) => s + st.length, 0);
+        const totalGaps  = Math.max(0, stanzas.length - 1) * stanzaGapPx;
+        const contentPx  = totalLines * lineHeightPx + totalGaps;
+        const naturalPx  = heights.reduce((s, h) => s + h, 0);
+        let extra = Math.max(40, Math.ceil((contentPx - naturalPx) * 1.15 / n));
+
+        for (let iter = 0; iter < 24 && overflowLines > 0; iter++) {
+          heights = naturalHeights(extra);
+          applyFrameHeights(heights);
+          overflowLines = runFlow(heights);
+          if (overflowLines > 0) {
+            extra += Math.max(20, Math.ceil(overflowLines * lineHeightPx * 1.25 / n));
+          }
         }
       }
 
+      // ── Phase 3: Detect line-wrapping overflow ───────────────────────────────
+      // Long lines (white-space:pre-wrap) can wrap visually, making scrollHeight
+      // larger than clientHeight even when the flow algorithm placed them.
+      // Expand those frames so content isn't clipped.
+      const wrapExpanded = heights.map((h, i) => Math.max(h, frameEls[i].scrollHeight + lineHeightPx));
+      const needsWrapFix = wrapExpanded.some((h, i) => h > heights[i] + 1);
+      if (needsWrapFix) {
+        applyFrameHeights(wrapExpanded);
+        runFlow(wrapExpanded);
+        heights = wrapExpanded;
+      }
+
+      // ── Phase 4: Expand poem-page to contain all overflowing content ─────────
+      // Prevents the site footer from visually overlapping long poems.
+      requestAnimationFrame(() => {
+        const poemPage = document.getElementById('poem-page');
+        if (!poemPage) return;
+        const pageTop = poemPage.getBoundingClientRect().top;
+        let maxBottom = poemPage.offsetHeight;
+        for (const el of frameEls) {
+          const b = el.getBoundingClientRect().bottom - pageTop;
+          if (b > maxBottom) maxBottom = b;
+        }
+        if (titleFrame) {
+          const b = titleFrame.getBoundingClientRect().bottom - pageTop;
+          if (b > maxBottom) maxBottom = b;
+        }
+        const needed = maxBottom + 80; // 80px breathing room for meta + nav
+        if (needed > poemPage.offsetHeight) {
+          poemPage.style.minHeight = `${needed}px`;
+        }
+      });
+
+      // ── Style meta label ─────────────────────────────────────────────────────
       const metaEl = document.getElementById('poem-meta');
       if (metaEl) {
-        metaEl.style.position = 'absolute';
-        metaEl.style.bottom = '0';
-        metaEl.style.right = '0';
-        // Meta uses accent color with reduced opacity for a decorative touch
-        metaEl.style.color = 'var(--color-accent)';
-        metaEl.style.opacity = '0.55';
+        metaEl.style.position      = 'absolute';
+        metaEl.style.bottom        = '0';
+        metaEl.style.right         = '0';
+        metaEl.style.color         = 'var(--color-accent)';
+        metaEl.style.opacity       = '0.9';
+        metaEl.style.fontSize      = '13px';
+        metaEl.style.letterSpacing = '0.15em';
+        metaEl.style.fontWeight    = '400';
       }
 
       if (window.location.search.includes('debug')) {
@@ -720,10 +726,9 @@ stanzas.forEach((stanza, si) => {
           layout: <em>${frameLayout.id}</em><br>
           frames: ${frameLayout.bodyFrames.length}<br>
           lines: ${metrics.lineCount} / stanzas: ${metrics.stanzaCount}<br>
+          lineH: ${lineHeightPx.toFixed(1)}px / gapH: ${stanzaGapPx}px<br>
           emotion: ${emotionScore.toFixed(3)}<br>
-          seed: ${seed}<br>
-          meta: ${metaCorner}<br>
-          overflow lines: ${overflowLines}
+          overflow: ${overflowLines}
         `;
         document.body.appendChild(overlay);
       }
@@ -777,6 +782,9 @@ stanzas.forEach((stanza, si) => {
     console.groupEnd();
 
     window.addEventListener('resize', () => {
+      // Reset poem-page min-height so layoutBody recalculates correctly on resize
+      const pp = document.getElementById('poem-page');
+      if (pp) pp.style.minHeight = '';
       requestAnimationFrame(layoutBody);
     });
   });
@@ -790,8 +798,24 @@ stanzas.forEach((stanza, si) => {
     position: relative;
     box-sizing: border-box;
     background-color: var(--color-bg, #f5f2ed);
-    /* Clear fixed INDEX when body frames extend below the nominal grid */
-    padding-bottom: calc(var(--space-xl) + 2.5rem);
+    padding-bottom: calc(var(--space-xl) + 3rem);
+  }
+
+  /*
+   * Decorative accent rule at the very top of the poem canvas.
+   * Uses the world accent colour as a thin horizontal bar — adds a visual anchor.
+   */
+  .poem-page::before {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 0;
+    left: var(--margin-x, 48px);
+    right: var(--margin-x, 48px);
+    height: 1px;
+    background-color: var(--color-accent, #c0392b);
+    opacity: 0.25;
+    pointer-events: none;
   }
 
   .poem-page .grid-canvas {
@@ -821,6 +845,11 @@ stanzas.forEach((stanza, si) => {
     justify-content: flex-start;
     min-height: 0;
     background-color: var(--color-bg, #f5f2ed);
+    /* Subtle left-edge accent stripe on the title block */
+    border-left: 2px solid var(--color-accent, #c0392b);
+    padding-left: var(--space-sm, 13px);
+    margin-left: calc(-2px - var(--space-sm, 13px));
+    box-sizing: content-box;
   }
 
   .poem-title {
@@ -829,6 +858,8 @@ stanzas.forEach((stanza, si) => {
     line-height: var(--leading-tight);
     margin: 0;
     padding: 0;
+    /* Optical tracking for large display sizes */
+    letter-spacing: -0.01em;
   }
 
   /*
@@ -836,6 +867,7 @@ stanzas.forEach((stanza, si) => {
    * Astro scoped attributes, so rules must use :global() under a scoped ancestor.
    */
   .poem-page :global(.body-frame) {
+    /* overflow set explicitly by JS; CSS default is hidden to prevent visual bleed */
     overflow: hidden;
     align-self: start;
     position: relative;
@@ -848,7 +880,7 @@ stanzas.forEach((stanza, si) => {
   }
 
   .poem-page :global(.poem-stanza) {
-    margin-bottom: var(--space-lg);
+    margin-bottom: var(--space-lg); /* 34px — must match stanzaGapPx in layoutBody */
   }
 
   .poem-page :global(.poem-stanza:last-child) {
@@ -858,6 +890,7 @@ stanzas.forEach((stanza, si) => {
   .poem-page :global(.poem-line) {
     display: block;
     line-height: var(--leading-body);
+    /* pre-wrap preserves intentional whitespace; long lines trigger Phase 3 wrap detection */
     white-space: pre-wrap;
     min-height: 1.618em;
     font-size: var(--type-body);
@@ -867,14 +900,19 @@ stanzas.forEach((stanza, si) => {
 
   .poem-meta {
     position: absolute;
-    font-size: 10px;
-    letter-spacing: 0.12em;
+    /* JS overrides these at runtime, but define sensible defaults here */
+    font-size: 13px;
+    letter-spacing: 0.15em;
     text-transform: uppercase;
-    color: var(--color-accent, #888888);
-    opacity: 0.55;
+    color: var(--color-accent, #c0392b);
+    opacity: 0.9;
     font-family: Georgia, serif;
     z-index: 2;
     padding: var(--space-xs);
+    font-weight: 400;
+    /* Subtle border-top accent line above the label */
+    border-top: 1px solid currentColor;
+    padding-top: 6px;
   }
 
   /* Stage direction lines: e.g. "(Side of the stage)" */
