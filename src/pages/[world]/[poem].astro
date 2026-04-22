@@ -47,15 +47,59 @@ const { poem, world, poemsByWorld } = Astro.props;
 const rawText = poem.body ?? '';
 const analysis = analyzePoemText(rawText, poem.data.title);
 const currentEmotionScore = Math.round(computeEmotionScore(analysis.metrics) * 1000) / 1000;
-const metaDescription = excerptWords(rawText, 20) || poem.data.title;
+const metaDescription = excerptWords(rawText, 30) || poem.data.title;
+
+// Build stanzas for SSR static rendering (SEO + screen readers)
+const seoStanzas = rawText
+  .split(/\n\s*\n/)
+  .map((s) => s.split('\n').map((l) => l.trimEnd()).filter((l) => l.length > 0))
+  .filter((s) => s.length > 0);
+
+const worldLabels: Record<string, string> = {
+  'their-world': 'Their World',
+  'bless-you': 'Bless You',
+  'still-life': 'Still Life',
+};
 ---
 
-<BaseLayout world={world} title={poem.data.title} description={metaDescription}>
+<BaseLayout
+  world={world}
+  title={poem.data.title}
+  description={metaDescription}
+  poem={{
+    id: poem.id,
+    world,
+    order: poem.data.order,
+    firstLine: poem.data.firstLine,
+    rawText,
+  }}
+>
   <main class="poem-shell">
     <nav class="poem-nav" id="poem-nav">
       <a class="nav-prev" id="nav-prev" href="#" aria-label="Previous poem">←</a>
       <a class="nav-next" id="nav-next" href="#" aria-label="Next poem">→</a>
     </nav>
+
+    <!--
+      SSR-rendered poem text: visually hidden but fully readable by search engines,
+      AI crawlers, and screen readers. The JS layout engine renders a visual version
+      on top of this inside PoemCanvas.
+    -->
+    <article class="poem-seo-text" aria-label={`${poem.data.title} — poem in ${worldLabels[world] ?? world}`}>
+      <h1>{poem.data.title}</h1>
+      <p class="poem-seo-meta">
+        From <em>{worldLabels[world] ?? world}</em> by Dai Pan (潘岱). Poem {poem.data.order}.
+      </p>
+      {seoStanzas.map((stanza) => (
+        <p class="poem-seo-stanza">
+          {stanza.map((line, i) => (
+            <>
+              {line}{i < stanza.length - 1 ? <br /> : null}
+            </>
+          ))}
+        </p>
+      ))}
+    </article>
 
     <PoemCanvas
       poemId={poem.id}
@@ -241,6 +285,23 @@ const metaDescription = excerptWords(rawText, 20) || poem.data.title;
 </script>
 
 <style>
+  /*
+   * SSR poem text: readable by search bots and screen readers;
+   * visually hidden via clip / 0-size technique (not display:none or visibility:hidden,
+   * which would suppress from accessibility tree).
+   */
+  .poem-seo-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
   .poem-shell {
     position: relative;
     min-height: calc(100vh - var(--site-content-offset));
@@ -277,7 +338,13 @@ const metaDescription = excerptWords(rawText, 20) || poem.data.title;
     opacity: 0;
     transition: opacity 0.2s ease;
     pointer-events: all;
+    /* Minimum 44×44 touch target (WCAG 2.5.5) */
     padding: var(--space-md);
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     user-select: none;
   }
 
@@ -297,5 +364,14 @@ const metaDescription = excerptWords(rawText, 20) || poem.data.title;
   .nav-prev:hover,
   .nav-next:hover {
     opacity: 1 !important;
+  }
+
+  /* WCAG 2.4.7: Visible focus indicator for keyboard users */
+  .nav-prev:focus-visible,
+  .nav-next:focus-visible {
+    opacity: 1 !important;
+    outline: 2px solid var(--color-accent, #c0392b);
+    outline-offset: 4px;
+    border-radius: 2px;
   }
 </style>

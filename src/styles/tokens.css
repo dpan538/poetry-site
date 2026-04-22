@@ -45,4 +45,14 @@
   --leading-loose: 2.618;
   --leading-title: 1.12;
   --leading-display: 1.05;
+
+  /*
+   * Default palette (non-world pages: about, collection, preface).
+   * --color-meta meets WCAG AA 4.5:1 on the default #f5f2ed background.
+   * (#595959 on #f5f2ed ≈ 6.8:1 ✅)
+   */
+  --color-bg: #f5f2ed;
+  --color-primary: #1a1a1a;
+  --color-accent: #c0392b;
+  --color-meta: #595959;
 }

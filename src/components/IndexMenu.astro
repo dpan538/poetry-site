@@ -42,10 +42,17 @@ function truncateLetters(text: string, max = 120): string {
 }
 ---
 
-<div class="index-overlay" id="index-overlay" aria-hidden="true">
+<div
+  class="index-overlay"
+  id="index-menu"
+  aria-hidden="true"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Poem index"
+>
   <div class="index-inner">
-    <button type="button" class="index-close" id="index-close" aria-label="Close index">×</button>
-    <div class="world-switcher" role="tablist" aria-label="Worlds">
+    <button type="button" class="index-close" id="index-close" aria-label="Close poem index">×</button>
+    <div class="world-switcher" role="tablist" aria-label="Select world">
       <button
         type="button"
         class="world-tab"
@@ -185,11 +192,45 @@ function truncateLetters(text: string, max = 120): string {
     syncTabs();
     syncPanels();
 
+    // Focus management: remember what triggered the overlay
+    let lastFocusedBefore: HTMLElement | null = null;
+
+    // Focusable elements query for focus trapping
+    const FOCUSABLE = [
+      'a[href]', 'button:not([disabled])', 'input:not([disabled])',
+      'select:not([disabled])', 'textarea:not([disabled])',
+      '[tabindex]:not([tabindex="-1"])',
+    ].join(',');
+
+    function trapFocus(e: KeyboardEvent) {
+      if (!overlay?.classList.contains('is-open')) return;
+      const focusables = Array.from(overlay.querySelectorAll<HTMLElement>(FOCUSABLE));
+      if (!focusables.length) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      if (e.key === 'Tab') {
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    }
+
     function openIndex() {
       if (!overlay) return;
+      lastFocusedBefore = document.activeElement as HTMLElement;
       overlay.classList.add('is-open');
       overlay.setAttribute('aria-hidden', 'false');
       document.body.classList.add('index-open');
+      // Update aria-expanded on the trigger
+      const trigger = document.getElementById('index-trigger');
+      trigger?.setAttribute('aria-expanded', 'true');
+      // Move focus to close button
+      requestAnimationFrame(() => closeBtn?.focus());
+      document.addEventListener('keydown', trapFocus);
     }
 
     window.openIndex = openIndex;
@@ -199,6 +240,12 @@ function truncateLetters(text: string, max = 120): string {
       overlay.classList.remove('is-open');
       overlay.setAttribute('aria-hidden', 'true');
       document.body.classList.remove('index-open');
+      // Update aria-expanded on the trigger
+      const trigger = document.getElementById('index-trigger');
+      trigger?.setAttribute('aria-expanded', 'false');
+      document.removeEventListener('keydown', trapFocus);
+      // Return focus to the element that opened the dialog
+      requestAnimationFrame(() => lastFocusedBefore?.focus());
     }
 
     closeBtn?.addEventListener('click', closeIndex);
@@ -295,6 +342,11 @@ function truncateLetters(text: string, max = 120): string {
     opacity: 1;
   }
 
+  .index-close:focus-visible {
+    outline: 2px solid var(--color-accent, #c0392b);
+    outline-offset: 4px;
+  }
+
   .world-switcher {
     display: flex;
     flex-direction: row;
@@ -307,19 +359,29 @@ function truncateLetters(text: string, max = 120): string {
   .world-tab {
     background: none;
     border: none;
-    padding: 0;
+    padding: 0 0 4px;
     cursor: pointer;
     font-family: Georgia, 'Times New Roman', serif;
     font-size: var(--type-display);
     line-height: var(--leading-display);
     font-weight: normal;
     color: var(--color-primary, #1a1a1a);
-    opacity: 0.2;
+    /* Minimum opacity 0.38 to keep text readable for all users */
+    opacity: 0.38;
     transition: opacity 0.24s linear;
   }
 
   .world-tab.is-lead {
     opacity: 1;
+  }
+
+  .world-tab:hover {
+    opacity: 0.75;
+  }
+
+  .world-tab:focus-visible {
+    outline: 2px solid var(--color-accent, #c0392b);
+    outline-offset: 3px;
   }
 
   .world-panel {
@@ -370,7 +432,8 @@ function truncateLetters(text: string, max = 120): string {
   .poem-order {
     display: block;
     font-size: 14px;
-    color: #888888;
+    /* Use the calibrated meta token — meets WCAG AA 4.5:1 on all world backgrounds */
+    color: var(--color-meta, #595959);
     margin-bottom: 0.15rem;
   }
 
@@ -385,8 +448,16 @@ function truncateLetters(text: string, max = 120): string {
   .poem-first-line {
     display: block;
     font-size: 18px;
-    color: #666666;
+    /* #555555 on lightest bg (#f8f7f4) ≈ 7.2:1 ✅ */
+    color: #555555;
     line-height: 1.45;
+  }
+
+  /* Focus indicator on poem links in index */
+  .poem-link:focus-visible {
+    outline: 2px solid var(--color-accent, #c0392b);
+    outline-offset: 2px;
+    border-radius: 1px;
   }
 
   .poem-item.is-current .poem-title {

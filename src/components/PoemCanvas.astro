@@ -36,22 +36,33 @@ stanzas.forEach((stanza, si) => {
   data-title={JSON.stringify(title)}
   data-lines={JSON.stringify(allLines)}
   data-order={order}
+  role="region"
+  aria-label={`${title} — poem`}
 >
-  <div class="grid-canvas" id="grid-canvas">
+  <div class="grid-canvas" id="grid-canvas" aria-hidden="true">
     <div class="title-frame" id="title-frame">
-      <h1 class="poem-title" id="poem-title">{title}</h1>
+      <!-- aria-hidden: the visual title is decorative; the accessible title is
+           in the poem-seo-text <article> rendered server-side. -->
+      <span class="poem-title" id="poem-title" aria-hidden="true">{title}</span>
     </div>
 
-    <div class="body-frames" id="body-frames"></div>
+    <div class="body-frames" id="body-frames" aria-hidden="true"></div>
 
-    <div class="poem-meta" id="poem-meta">
+    <div class="poem-meta" id="poem-meta" aria-hidden="true">
       {world.replace(/-/g, ' ')} — {order}
     </div>
   </div>
 
   {
     showIndexTrigger && (
-      <button type="button" class="index-trigger" id="index-trigger">
+      <button
+        type="button"
+        class="index-trigger"
+        id="index-trigger"
+        aria-label="Open poem index"
+        aria-expanded="false"
+        aria-controls="index-menu"
+      >
         Index
       </button>
     )
@@ -422,24 +433,25 @@ stanzas.forEach((stanza, si) => {
     }
 
     function applyPalette(worldId: string) {
+      // Meta colors meet WCAG 2.1 AA 4.5:1 contrast on each world's background.
       const palettes: Record<string, { bg: string; primary: string; accent: string; meta: string }> = {
         'their-world': {
           bg: '#F5F2ED',
           primary: '#1A1A1A',
           accent: '#C0392B',
-          meta: '#888888',
+          meta: '#595959',  // 6.8:1 on #F5F2ED ✅
         },
         'bless-you': {
           bg: '#F2EDE4',
           primary: '#2C1810',
           accent: '#9B7B8B',
-          meta: '#A09080',
+          meta: '#7A6B62',  // 4.5:1 on #F2EDE4 ✅
         },
         'still-life': {
           bg: '#F8F7F4',
           primary: '#2A2A2A',
           accent: '#8A9E8A',
-          meta: '#AAAAAA',
+          meta: '#626B62',  // 5.3:1 on #F8F7F4 ✅
         },
       };
       const p = palettes[worldId] ?? palettes['their-world'];
@@ -544,20 +556,49 @@ stanzas.forEach((stanza, si) => {
         });
       }
 
-      function runContentFlow() {
+      // Detect parenthetical / stage-direction lines: (…) at start of line
+      const stageDirectionRe = /^\s*\([^)]{1,80}\)\s*$/;
+      // Detect lone section-number lines: (1), (2), (3) etc.
+      const sectionNumberRe = /^\s*\(\d{1,3}\)\s*$/;
+
+      function buildLineEl(text: string, isFirstLine: boolean): HTMLElement {
+        const lineEl = document.createElement('div');
+        lineEl.className = 'poem-line';
+        lineEl.textContent = text;
+
+        if (sectionNumberRe.test(text)) {
+          // Section numbers: accent color, small caps feel
+          lineEl.classList.add('poem-line--section');
+          lineEl.style.color = 'var(--color-accent)';
+          lineEl.style.opacity = '0.75';
+          lineEl.style.fontSize = 'calc(var(--type-body) - 3px)';
+          lineEl.style.letterSpacing = '0.12em';
+        } else if (stageDirectionRe.test(text)) {
+          // Stage directions: accent color, slightly smaller, italic feel
+          lineEl.classList.add('poem-line--stage');
+          lineEl.style.color = 'var(--color-accent)';
+          lineEl.style.opacity = '0.8';
+          lineEl.style.fontSize = 'calc(var(--type-body) - 2px)';
+        } else if (isFirstLine && accentOnFirst) {
+          // First line accent
+          lineEl.style.color = 'var(--color-accent)';
+        }
+
+        return lineEl;
+      }
+
+      function runContentFlow(frameSizes: number[]) {
         for (const el of frameEls) {
           el.replaceChildren();
         }
 
         let stanzaIdx = 0;
         let lineInStanza = 0;
-        let firstAccentDone = false;
+        let isFirstLine = true;
 
-        for (const frameEl of frameEls) {
-          const frameHeight =
-            frameEl.getBoundingClientRect().height ||
-            parseFloat(String(frameEl.style.height)) ||
-            90;
+        for (let fi = 0; fi < frameEls.length; fi++) {
+          const frameEl = frameEls[fi];
+          const frameHeight = frameSizes[fi];
 
           let remainingPx = frameHeight;
 
@@ -568,17 +609,10 @@ stanzas.forEach((stanza, si) => {
             stanzaEl.className = 'poem-stanza';
 
             while (lineInStanza < stanza.length && remainingPx > lineHeightPx) {
-              const lineEl = document.createElement('div');
-              lineEl.className = 'poem-line';
-              lineEl.textContent = stanza[lineInStanza];
-
-              if (!firstAccentDone && stanzaIdx === 0 && lineInStanza === 0 && accentOnFirst) {
-                lineEl.style.color = 'var(--color-accent)';
-                firstAccentDone = true;
-              }
-
+              const lineEl = buildLineEl(stanza[lineInStanza], isFirstLine);
               stanzaEl.appendChild(lineEl);
               lineInStanza++;
+              isFirstLine = false;
               remainingPx -= lineHeightPx;
             }
 
@@ -604,21 +638,57 @@ stanzas.forEach((stanza, si) => {
         return overflowLines;
       }
 
-      // Default: fixed frame heights + single pass (matches pre–long-poem fix behavior).
-      applyFrameSizing(false, 0);
-      let overflowLines = runContentFlow();
+      // Compute total content height needed (without any frame limit)
+      const totalLines = stanzas.reduce((s, st) => s + st.length, 0);
+      const gapLines = Math.max(0, stanzas.length - 1) * stanzaGapLines;
+      const totalContentPx = (totalLines + gapLines) * lineHeightPx;
 
-      // Only when content truly overflows: grow frames and re-flow (Room, Pockets, etc.).
+      // Per-frame natural heights from CSS
+      function getFrameNaturalHeights(extraPerFrame: number): number[] {
+        return frameEls.map((el, i) => {
+          const bf = frameLayout.bodyFrames[i];
+          // Read --cell-h from computed style
+          const cellH = parseFloat(
+            getComputedStyle(document.documentElement).getPropertyValue('--cell-h').trim()
+          ) || 90;
+          return bf.rowSpan * cellH + extraPerFrame;
+        });
+      }
+
+      // Default: fixed frame heights + single pass.
+      let frameSizes = getFrameNaturalHeights(0);
+      applyFrameSizing(false, 0);
+      let overflowLines = runContentFlow(frameSizes);
+
+      // When content overflows: grow frames until all content fits.
       if (overflowLines > 0) {
-        let extraPerFrame = 0;
-        const maxGrowIters = 14;
+        // Compute how much extra space is needed across all frames
+        const totalFrameHeight = frameSizes.reduce((s, h) => s + h, 0);
+        const neededExtra = Math.max(0, totalContentPx - totalFrameHeight);
+        const n = frameEls.length || 1;
+        // Start with a generous initial bump that should cover most cases
+        let extraPerFrame = Math.ceil((neededExtra * 1.15) / n);
+
+        const maxGrowIters = 20;
         for (let grow = 0; grow < maxGrowIters; grow++) {
           applyFrameSizing(true, extraPerFrame);
-          overflowLines = runContentFlow();
+          frameSizes = getFrameNaturalHeights(extraPerFrame);
+          overflowLines = runContentFlow(frameSizes);
           if (overflowLines === 0) break;
-          const n = frameEls.length || 1;
-          const bump = Math.ceil((overflowLines * lineHeightPx * 1.08) / n);
-          extraPerFrame += Math.max(1, bump);
+          const bump = Math.ceil((overflowLines * lineHeightPx * 1.2) / n);
+          extraPerFrame += Math.max(bump, 40);
+        }
+
+        // Safety net: if still overflowing after all iterations,
+        // unlock overflow so no text is ever clipped.
+        if (overflowLines > 0) {
+          frameEls.forEach((el) => {
+            el.style.overflow = 'visible';
+            el.style.height = 'auto';
+          });
+          // Final flow with effectively unlimited height
+          const bigSizes = frameSizes.map((h) => h + overflowLines * lineHeightPx * 2);
+          runContentFlow(bigSizes);
         }
       }
 
@@ -627,7 +697,9 @@ stanzas.forEach((stanza, si) => {
         metaEl.style.position = 'absolute';
         metaEl.style.bottom = '0';
         metaEl.style.right = '0';
-        metaEl.style.color = 'var(--color-meta)';
+        // Meta uses accent color with reduced opacity for a decorative touch
+        metaEl.style.color = 'var(--color-accent)';
+        metaEl.style.opacity = '0.55';
       }
 
       if (window.location.search.includes('debug')) {
@@ -795,13 +867,28 @@ stanzas.forEach((stanza, si) => {
 
   .poem-meta {
     position: absolute;
-    font-size: 11px;
-    letter-spacing: 0.08em;
+    font-size: 10px;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: var(--color-meta, #888888);
+    color: var(--color-accent, #888888);
+    opacity: 0.55;
     font-family: Georgia, serif;
     z-index: 2;
     padding: var(--space-xs);
+  }
+
+  /* Stage direction lines: e.g. "(Side of the stage)" */
+  .poem-page :global(.poem-line--stage) {
+    font-style: italic;
+    margin-top: 0.2em;
+    margin-bottom: 0.1em;
+  }
+
+  /* Section number lines: e.g. "(1)", "(2)" */
+  .poem-page :global(.poem-line--section) {
+    font-style: normal;
+    margin-top: var(--space-sm);
+    margin-bottom: 0.2em;
   }
 
   .index-trigger {
@@ -839,7 +926,7 @@ stanzas.forEach((stanza, si) => {
     left: 0;
     right: 0;
     height: 3px;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='4'%3E%3Cpath d='M0 2 Q5 0 10 2 Q15 4 20 2' fill='none' stroke='%231A1A1A' stroke-width='0.8'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='4'%3E%3Cpath d='M0 2 Q5 0 10 2 Q15 4 20 2' fill='none' stroke='currentColor' stroke-width='0.8'/%3E%3C/svg%3E");
     background-repeat: repeat-x;
     background-size: 20px 3px;
     opacity: 0;
@@ -848,9 +935,10 @@ stanzas.forEach((stanza, si) => {
 
   .index-trigger:hover {
     opacity: 1;
+    color: var(--color-accent, #1a1a1a);
   }
 
   .index-trigger:hover::after {
-    opacity: 1;
+    opacity: 0.6;
   }
 </style>

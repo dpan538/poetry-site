@@ -11,9 +11,17 @@ interface Props {
   ogImage?: string;
   /** When set, `/` immediately redirects to a random poem (JS). */
   homeRandomPoems?: { id: string; world: string }[];
+  /** When set, SEO emits Poem JSON-LD and OG article type. */
+  poem?: {
+    id: string;
+    world: string;
+    order: number;
+    firstLine?: string;
+    rawText?: string;
+  };
 }
 
-const { world, title, description, ogImage, homeRandomPoems } = Astro.props;
+const { world, title, description, ogImage, homeRandomPoems, poem } = Astro.props;
 const pathname = Astro.url.pathname;
 const site = Astro.site ?? new URL('https://daipan.ink');
 const canonicalURL = new URL(pathname, site).href;
@@ -27,7 +35,7 @@ const canonicalURL = new URL(pathname, site).href;
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="manifest" href="/site.webmanifest" />
     <meta name="theme-color" content="#1a1a1a" />
-    <SEO title={title} description={description} canonicalURL={canonicalURL} ogImage={ogImage} />
+    <SEO title={title} description={description} canonicalURL={canonicalURL} ogImage={ogImage} poem={poem} />
     {
       homeRandomPoems && homeRandomPoems.length > 0 ? (
         <script is:inline define:vars={{ entries: homeRandomPoems }}>
@@ -47,10 +55,11 @@ const canonicalURL = new URL(pathname, site).href;
   <body>
     <Nav pathname={pathname} />
     <div class="site-body-stack">
-      <div class="site-main-slot">
+      <!-- id="main-content" is the skip-link target (WCAG 2.4.1) -->
+      <div class="site-main-slot" id="main-content" tabindex="-1">
         <slot />
       </div>
-      <footer class="site-copyright" aria-label="Copyright">
+      <footer class="site-copyright" role="contentinfo" aria-label="Site copyright">
         <p>
           © 2024–2025 Dai Pan (潘岱). All rights reserved. Poems may not be reproduced without written permission.
         </p>

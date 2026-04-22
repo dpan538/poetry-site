@@ -4,58 +4,153 @@ interface Props {
   description: string;
   canonicalURL: string;
   ogImage?: string;
+  /** When provided, emits a Poem + CreativeWork JSON-LD block */
+  poem?: {
+    id: string;
+    world: string;
+    order: number;
+    firstLine?: string;
+    rawText?: string;
+  };
 }
 
-const { title, description, canonicalURL, ogImage } = Astro.props;
+const { title, description, canonicalURL, ogImage, poem } = Astro.props;
 
 const fullTitle = `${title} — Dai Pan`;
 const ogSiteName = 'Dai Pan — daipan.ink';
 
+// Keywords include canonical name forms and common romanizations to aid search disambiguation
 const keywords =
-  'Dai Pan, 潘岱, poetry, contemporary poetry, Chinese poet, visual artist, daipan.art, Brisbane, Three Worlds, Still Life, Bless You, Their World';
+  'Dai Pan, Pan Dai, 潘岱, Pān Dài, poetry, contemporary poetry, Chinese poet writing in English, diaspora poetry, visual artist, photographer, printmaker, daipan.art, daipan.ink, Brisbane, New York, Shanghai, Three Worlds, Still Life, Bless You, Their World';
 
+// --- Person schema ---
+// Includes all canonical name forms to ensure correct attribution and disambiguation.
 const personLd = {
   '@context': 'https://schema.org',
   '@type': 'Person',
+  '@id': 'https://daipan.ink/#author',
   name: 'Dai Pan',
-  alternateName: '潘岱',
+  // alternateName lists all recognized forms: Chinese characters, pinyin, reversed-order romanization
+  alternateName: ['潘岱', 'Pan Dai', 'Pān Dài', 'Dai Pan (潘岱)'],
   url: 'https://daipan.ink',
-  sameAs: ['https://daipan.art', 'https://instagram.com/jumpingchick666'],
+  sameAs: [
+    'https://daipan.art',
+    'https://instagram.com/jumpingchick666',
+    'https://www.instagram.com/jumpingchick666/',
+  ],
   jobTitle: 'Visual Artist and Writer',
   description:
-    'Dai Pan is a visual artist, photographer, printmaker and writer based in Brisbane.',
-  copyrightHolder: {
-    '@type': 'Person',
-    name: 'Dai Pan',
-  },
+    'Dai Pan (潘岱, also romanized Pan Dai) is a visual artist, photographer, printmaker and writer based in Brisbane, Australia. Born in China, formed in Shanghai and New York.',
+  knowsAbout: ['poetry', 'photography', 'printmaking', 'painting', 'visual art', 'contemporary art'],
+  nationality: { '@type': 'Country', name: 'China' },
+  homeLocation: { '@type': 'Place', name: 'Brisbane, Australia' },
+  alumniOf: [
+    {
+      '@type': 'EducationalOrganization',
+      name: 'School of Visual Arts',
+      address: { '@type': 'PostalAddress', addressLocality: 'New York', addressCountry: 'US' },
+    },
+    {
+      '@type': 'EducationalOrganization',
+      name: 'University of Queensland',
+      address: { '@type': 'PostalAddress', addressLocality: 'Brisbane', addressCountry: 'AU' },
+    },
+  ],
+};
+
+// --- WebSite schema ---
+const websiteLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  '@id': 'https://daipan.ink/#website',
+  name: 'Three Worlds — Dai Pan',
+  url: 'https://daipan.ink',
+  description:
+    'Three Worlds is a poetry collection by Dai Pan (潘岱): Still Life, Bless You, and Their World. Written 2024–2025.',
+  author: { '@id': 'https://daipan.ink/#author' },
+  inLanguage: 'en',
+  copyrightHolder: { '@id': 'https://daipan.ink/#author' },
   copyrightYear: '2024',
   license: 'All rights reserved',
 };
 
-const jsonLd = JSON.stringify(personLd);
+// --- Poem schema (only on individual poem pages) ---
+let poemLd: object | null = null;
+if (poem) {
+  const worldLabels: Record<string, string> = {
+    'their-world': 'Their World',
+    'bless-you': 'Bless You',
+    'still-life': 'Still Life',
+  };
+  const worldLabel = worldLabels[poem.world] ?? poem.world;
+  const poemUrl = `https://daipan.ink/${poem.world}/${poem.id}`;
+
+  // First ~150 chars of text as abstract
+  const abstract = poem.rawText
+    ? poem.rawText.replace(/\s+/g, ' ').trim().slice(0, 150)
+    : description;
+
+  poemLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Poem',
+    '@id': poemUrl,
+    name: title,
+    url: poemUrl,
+    author: { '@id': 'https://daipan.ink/#author' },
+    isPartOf: {
+      '@type': 'Book',
+      name: 'Three Worlds',
+      author: { '@id': 'https://daipan.ink/#author' },
+    },
+    genre: worldLabel,
+    abstract: abstract,
+    inLanguage: 'en',
+    copyrightHolder: { '@id': 'https://daipan.ink/#author' },
+    copyrightYear: poem.id ? '2024' : '2024',
+    license: 'All rights reserved — Dai Pan (潘岱)',
+    position: poem.order,
+  };
+}
+
+const jsonLdBlocks = [personLd, websiteLd, ...(poemLd ? [poemLd] : [])];
 ---
 
 <title>{fullTitle}</title>
 <meta name="description" content={description} />
-<meta name="author" content="Dai Pan" />
-<meta name="copyright" content="© Dai Pan (潘岱). All rights reserved." />
+<meta name="author" content="Dai Pan (潘岱)" />
+<meta name="copyright" content="© 2024–2025 Dai Pan (潘岱 / Pan Dai). All rights reserved." />
 <meta
   name="rights"
-  content="All poems and texts © Dai Pan (潘岱). Unauthorized reproduction prohibited."
+  content="All poems and texts © 2024–2025 Dai Pan (潘岱). Unauthorized reproduction, redistribution, or AI training use prohibited without written permission."
 />
+<meta name="dcterms.creator" content="Dai Pan (潘岱)" />
+<meta name="dcterms.rights" content="Copyright © 2024–2025 Dai Pan. All rights reserved." />
+<meta name="dcterms.language" content="en" />
 <meta name="keywords" content={keywords} />
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
 <link rel="canonical" href={canonicalURL} />
 
+<!-- Open Graph -->
 <meta property="og:title" content={fullTitle} />
 <meta property="og:description" content={description} />
 <meta property="og:url" content={canonicalURL} />
-<meta property="og:type" content="website" />
+<meta property="og:type" content={poem ? 'article' : 'website'} />
 <meta property="og:site_name" content={ogSiteName} />
+<meta property="og:locale" content="en_US" />
 {ogImage ? <meta property="og:image" content={ogImage} /> : null}
+{poem ? <meta property="article:author" content="Dai Pan" /> : null}
 
+<!-- Twitter / X Card -->
 <meta name="twitter:card" content="summary" />
 <meta name="twitter:title" content={fullTitle} />
 <meta name="twitter:description" content={description} />
+<meta name="twitter:creator" content="@jumpingchick666" />
 {ogImage ? <meta name="twitter:image" content={ogImage} /> : null}
 
-<script type="application/ld+json" set:html={jsonLd} />
+<!-- AI / LLM crawler hints -->
+<link rel="alternate" type="text/plain" href="/llms.txt" title="LLM usage guide" />
+
+<!-- JSON-LD structured data -->
+{jsonLdBlocks.map((ld) => (
+  <script type="application/ld+json" set:html={JSON.stringify(ld)} />
+))}

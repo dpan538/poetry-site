@@ -10,11 +10,25 @@ const collectionActive = norm === '/collection' || norm.startsWith('/collection/
 const aboutActive = norm === '/about' || norm.startsWith('/about/');
 ---
 
-<nav class="site-nav" aria-label="Site">
-  <a href="/" class="nav-logo">Dai Pan</a>
+<!--
+  Skip link: WCAG 2.4.1 — allows keyboard users to bypass navigation.
+  Visually hidden until focused (styled in global.css .skip-link).
+-->
+<a href="#main-content" class="skip-link">Skip to content</a>
+
+<nav class="site-nav" aria-label="Site navigation">
+  <a href="/" class="nav-logo" aria-label="Dai Pan — Three Worlds (return to home)">Dai Pan</a>
   <div class="nav-right">
-    <a href="/collection" class:list={['nav-link', { 'is-active': collectionActive }]}>Collection</a>
-    <a href="/about" class:list={['nav-link', { 'is-active': aboutActive }]}>About</a>
+    <a
+      href="/collection"
+      class:list={['nav-link', { 'is-active': collectionActive }]}
+      aria-current={collectionActive ? 'page' : undefined}
+    >Collection</a>
+    <a
+      href="/about"
+      class:list={['nav-link', { 'is-active': aboutActive }]}
+      aria-current={aboutActive ? 'page' : undefined}
+    >About</a>
   </div>
 </nav>
 
@@ -59,6 +73,8 @@ const aboutActive = norm === '/about' || norm.startsWith('/about/');
     color: var(--color-primary, #1a1a1a);
     opacity: 1;
     transition: opacity 0.2s linear, color 0.2s linear, text-decoration 0.2s linear;
+    /* Minimum touch target: pad out to at least 44px tall (WCAG 2.5.5) */
+    padding-block: 15px;
   }
 
   .nav-link.is-active {
