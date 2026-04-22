@@ -382,9 +382,9 @@ const { poemId, world } = Astro.props;
   // Bounding-box fitToCanvas auto-scales to fill available canvas, so these
   // define the shape of the layout, not the pixel footprint.
   const ZONES: Record<string, { cx: number; cy: number; sx: number; sy: number }> = {
-    mode:    { cx: -340, cy: -30, sx: 130, sy: 145 },
-    type:    { cx:  340, cy: -30, sx: 125, sy: 140 },
-    imagery: { cx:    0, cy: 185, sx: 278, sy:  75 },
+    mode:    { cx: -345, cy: -28, sx: 172, sy: 176 },
+    type:    { cx:  345, cy: -28, sx: 170, sy: 174 },
+    imagery: { cx:    0, cy: 192, sx: 332, sy: 108 },
   };
 
   const ACTIVE_PULL = 0.30;
@@ -488,10 +488,17 @@ const { poemId, world } = Astro.props;
     // ── Zone home position ────────────────────────────────────────────────────
     computeHome(attrType: string, value: string, active: boolean): { x: number; y: number } {
       const z = ZONES[attrType] || { cx: 0, cy: 0, sx: 80, sy: 80 };
-      const hx = this.hashStr(value + '_hx') * 2 - 1;
-      const hy = this.hashStr(value + '_hy') * 2 - 1;
-      const rawX = z.cx + hx * z.sx;
-      const rawY = z.cy + hy * z.sy;
+      const vocab = VOCAB[attrType] || [];
+      const n = Math.max(vocab.length, 1);
+      const idx = Math.max(0, vocab.indexOf(value));
+      // Golden-angle distribution gives a much more even, deterministic spread than hash XY.
+      const GOLDEN_ANGLE = 2.399963229728653;
+      const angleSeed = this.hashStr(`${attrType}_angle_seed`) * Math.PI * 2;
+      const angle = angleSeed + idx * GOLDEN_ANGLE;
+      const ring = Math.sqrt((idx + 0.5) / n);
+      const rJitter = 0.92 + this.hashStr(value + '_r') * 0.16;
+      const rawX = z.cx + Math.cos(angle) * z.sx * ring * rJitter;
+      const rawY = z.cy + Math.sin(angle) * z.sy * ring * rJitter;
       if (active) return { x: rawX * (1 - ACTIVE_PULL), y: rawY * (1 - ACTIVE_PULL) };
       return { x: rawX, y: rawY };
     }
@@ -520,8 +527,8 @@ const { poemId, world } = Astro.props;
         VOCAB[attrType].forEach((value, i) => {
           const active = activeSets[attrType].has(value);
           const home = this.computeHome(attrType, value, active);
-          const jx = (this.hashStr(value + '_jx') - 0.5) * 12;
-          const jy = (this.hashStr(value + '_jy') - 0.5) * 12;
+          const jx = (this.hashStr(value + '_jx') - 0.5) * 8;
+          const jy = (this.hashStr(value + '_jy') - 0.5) * 8;
           const n: Node = {
             kind: 'attr', attrType, value,
             x: home.x + jx, y: home.y + jy,
@@ -797,8 +804,8 @@ const { poemId, world } = Astro.props;
       else if (deg >= 70 && deg <= 110)   { ly = n.y + gap + 2; tb = 'top'; ta = 'center'; }
       else                                { ly = n.y - gap - 2; tb = 'bottom'; ta = 'center'; }
 
-      // Active: 17px upright; inactive: 15px italic (+2px per design request)
-      const fs = active ? 17 : 15;
+      // Active: 18px upright; inactive: 16px italic
+      const fs = active ? 18 : 16;
       ctx.font = `${active ? '' : 'italic '}${fs}px Georgia, serif`;
       // WCAG 1.4.3: dot drawn at baseOpacity (0.58 for inactive) but text needs higher opacity.
       // #5a5452 at 58% → 2.62:1 ❌. At 88% → 4.98:1 ✅. Save/restore alpha around text only.
