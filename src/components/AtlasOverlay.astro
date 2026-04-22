@@ -538,8 +538,8 @@ const { poemId, world } = Astro.props;
     // ── Force simulation (used only by primeLayout — not called during render) ─
     simulateStep() {
       // Softer zone pull lets repulsion spread nodes freely across the larger zones.
-      // Higher REPEL_K and minD (75px clearance) prevent dot+label overlap.
-      const ZONE_K = 0.018, ANCHOR_K = 0.009, REPEL_K = 1.6, DAMPING = 0.76;
+      // Higher REPEL_K and larger minD reduce label overlap, especially in dense clusters.
+      const ZONE_K = 0.017, ANCHOR_K = 0.008, REPEL_K = 1.72, DAMPING = 0.76;
       const attrNodes = this.nodes.filter(n => n.kind === 'attr');
       attrNodes.forEach(n => {
         n.vx += (n.homeX - n.x) * ZONE_K;
@@ -553,8 +553,11 @@ const { poemId, world } = Astro.props;
           if (other === n) return;
           const dx = n.x - other.x, dy = n.y - other.y;
           const dist = Math.sqrt(dx * dx + dy * dy) || 0.1;
-          // 75px minimum gap between dot surfaces — enough room for label text
-          const minD = n.r + other.r + 75;
+          // More conservative minimum gap between dot surfaces for label breathing room.
+          const baseGap = n.r + other.r + 92;
+          // Same-category nodes tend to sit near each other; push them a bit farther apart.
+          const typeBoost = n.kind === 'attr' && other.kind === 'attr' && n.attrType === other.attrType ? 14 : 0;
+          const minD = baseGap + typeBoost;
           if (dist < minD) {
             const f = REPEL_K * (minD - dist) / dist;
             n.vx += dx * f; n.vy += dy * f;
@@ -572,22 +575,34 @@ const { poemId, world } = Astro.props;
 
     // ── Fit canvas ────────────────────────────────────────────────────────────
     fitToCanvas() {
-      // Auto-fit to actual settled node positions — eliminates left/right whitespace.
-      // Padding accounts for label text extending beyond dot centers.
+      // Auto-fit to actual settled node positions.
+      // We reserve a larger bottom safe area so the annotation panel never covers nodes.
       const xs = this.nodes.map(n => n.x);
       const ys = this.nodes.map(n => n.y);
       const minX = Math.min(...xs), maxX = Math.max(...xs);
       const minY = Math.min(...ys), maxY = Math.max(...ys);
-      const contentW = (maxX - minX) + 220; // 110px each side for labels
-      const contentH = (maxY - minY) +  80; //  40px each side vertical
-      const scaleW = (this.cx * 2 * 0.90) / contentW;
-      const scaleH = (this.cy * 2 * 0.90) / contentH;
-      this.scale = Math.min(scaleW, scaleH, 1.4);
-      // Center the actual content midpoint, not just the origin
-      const midX = (minX + maxX) / 2;
-      const midY = (minY + maxY) / 2;
-      this.tx = -midX * this.scale;
-      this.ty = -midY * this.scale;
+      const labelPadX = 112;
+      const topSafe = 54;
+      const annoEl = document.getElementById('atlas-anno');
+      const annoH = annoEl ? Math.max(annoEl.getBoundingClientRect().height, 0) : 0;
+      const bottomSafe = Math.max(170, annoH + 34);
+
+      const contentW = (maxX - minX) + labelPadX * 2;
+      const contentH = (maxY - minY) + topSafe + bottomSafe;
+      const usableW = Math.max(this.cx * 2, 1);
+      const usableH = Math.max(this.cy * 2, 1);
+      const scaleW = usableW / contentW;
+      const scaleH = usableH / contentH;
+      this.scale = Math.min(scaleW, scaleH, 1.35);
+
+      // Place content inside asymmetric top/bottom paddings (centered in remaining space).
+      const freeW = Math.max(0, usableW - (labelPadX * 2 + (maxX - minX)) * this.scale);
+      const freeH = Math.max(0, usableH - (topSafe + bottomSafe + (maxY - minY)) * this.scale);
+      const padLeft = labelPadX * this.scale + freeW / 2;
+      const padTop = topSafe * this.scale + freeH / 2;
+
+      this.tx = padLeft - this.cx - minX * this.scale;
+      this.ty = padTop - this.cy - minY * this.scale;
     }
 
     resize() {
@@ -851,12 +866,14 @@ const { poemId, world } = Astro.props;
         ${description ? `<p class="atlas-anno-def">${description}</p>` : ''}
       `;
       annoEl.classList.add('is-open');
+      this.fitToCanvas();
       if (!this.rafId) this.draw();
     }
 
     hideAnnotation() {
       const el = document.getElementById('atlas-anno');
       if (el) el.classList.remove('is-open');
+      this.fitToCanvas();
     }
 
     // ── Hit testing (anchor + attr only) ──────────────────────────────────────
