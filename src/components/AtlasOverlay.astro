@@ -382,6 +382,26 @@ const { poemId, world } = Astro.props;
     opacity: 0.65;
   }
 
+  /* Attribute description paragraph in panel */
+  :global(.atlas-attr-desc) {
+    margin: 0 0 12px;
+    font-size: 13px;
+    line-height: 1.65;
+    color: var(--color-primary, #1a1a1a);
+    font-style: italic;
+    border-left: 1.5px solid rgba(26, 26, 26, 0.1);
+    padding-left: 10px;
+  }
+
+  /* "N poems in this collection" label above poem list */
+  :global(.atlas-attr-shared-label) {
+    margin: 0 0 6px;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    color: var(--color-meta, #595959);
+    text-transform: uppercase;
+  }
+
   :global(.atlas-attr-list) {
     list-style: none;
     margin: 0;
@@ -461,15 +481,56 @@ const { poemId, world } = Astro.props;
     ],
   };
 
-  // Zone definitions: centre + half-extents for each attribute type
+  // Zone definitions: centre + half-extents for each attribute type.
+  // Mode and type zones are shifted upward so the field forms a balanced triangle.
   // Active attrs are pulled 42% toward the anchor (origin), narrowing the zone.
   const ZONES: Record<string, { cx: number; cy: number; sx: number; sy: number }> = {
-    mode:    { cx: -208, cy:   0, sx: 62, sy: 128 },
-    type:    { cx:  208, cy:   0, sx: 58, sy: 118 },
-    imagery: { cx:    0, cy: 186, sx: 188, sy: 42 },
+    mode:    { cx: -205, cy: -65, sx: 62, sy: 118 },
+    type:    { cx:  205, cy: -65, sx: 58, sy: 112 },
+    imagery: { cx:    0, cy: 168, sx: 188, sy: 40 },
   };
 
   const ACTIVE_PULL = 0.42; // how far active attrs move toward anchor (0 = zone edge, 1 = origin)
+
+  // ─── Attribute descriptions ───────────────────────────────────────────────
+  // Explanatory text shown in the panel when an attribute is selected.
+  const ATTR_DESCRIPTIONS: Record<string, string> = {
+    // speaker mode
+    solitary_witness:      'The poem speaks from a position of aloneness — observing without the possibility of intervention.',
+    child_perception:      'The world is rendered through a child\'s consciousness: innocent, partial, uneasy with adult logic.',
+    observer:              'A detached external viewpoint — watching without full participation or self-disclosure.',
+    fractured_self:        'The speaker\'s identity is split, layered, or in contradiction with itself.',
+    addressed_speaker:     'The poem speaks directly to another person, real or imagined, naming them into presence.',
+    devotional_speaker:    'The speaker\'s address carries the quality of prayer or reverence toward something larger.',
+    plural_voice:          'The poem speaks in a collective "we," dissolving individual identity into shared experience.',
+    absent_other_address:  'The poem speaks to someone who is absent, gone, or unreachable — a one-sided conversation.',
+    // poem act
+    memory_fragment:       'A partial, non-linear recollection — the poem captures a piece of the past as it surfaces, incomplete.',
+    scene:                 'A present-tense moment rendered in space — the poem unfolds as a place you can stand inside.',
+    witness:               'The poem enacts the act of seeing and recording, as if giving testimony.',
+    monologue:             'Extended address by a single voice, uninterrupted and self-contained.',
+    confession:            'The disclosure of something difficult or hidden — the poem as an act of speaking what has been held.',
+    lament:                'Sustained mourning — the poem dwells inside grief without seeking resolution.',
+    invocation:            'The poem calls something forth: a person, a quality, a memory, a presence.',
+    prayer:                'Appeal or devotion directed beyond the self, toward the uncertain or the unreachable.',
+    chant:                 'A repetitive incantatory structure — meaning accumulates through rhythm and recurrence.',
+    manifesto:             'Declarative and positional — the poem asserts a way of seeing as if staking ground.',
+    warning:               'The poem speaks in a cautionary or prophetic register, addressed to the future.',
+    farewell:              'Leave-taking — the poem as a form of ending or final departure.',
+    // imagery
+    shadow:                'The trace or absence that follows without being named — what a presence leaves behind.',
+    child:                 'Youth, vulnerability, the past self as a living presence in the poem.',
+    room:                  'Interior space as containment — the poem happens inside enclosure, bounded.',
+    house:                 'Domestic structure as inheritance — what we are sheltered and burdened by.',
+    window:                'A threshold for looking — the poem frames what can and cannot be crossed.',
+    glass:                 'Transparency, fragility, reflection — the permeable border between inner and outer.',
+    light:                 'Illumination as presence, arrival, or revelation — what makes visible.',
+    eye:                   'The organ of witness — perception, judgment, the experience of being seen.',
+    voice:                 'Speech without visible body — presence sustained through sound alone.',
+    flowers:               'Beauty, transience, offering — what blooms briefly and cannot be held.',
+    faith:                 'Belief, trust, devotion — the poem in relation to what cannot be verified.',
+    sky:                   'Expanse, distance, what cannot be held or entered — openness as subject.',
+  };
 
   // ─── Types ────────────────────────────────────────────────────────────────
   interface Node {
@@ -521,6 +582,7 @@ const { poemId, world } = Astro.props;
 
       this.resize();
       this.buildGraph();
+      this.primeLayout(320); // pre-settle synchronously — no animated motion
       this.fitToCanvas();
       this.setupEvents();
       this.startLoop();
@@ -671,11 +733,12 @@ const { poemId, world } = Astro.props;
 
     // ── Fit canvas to show full vocabulary field ──────────────────────────────
     fitToCanvas() {
-      const spanW = 560, spanH = 450;
-      const scaleW = (this.cx * 2 * 0.84) / spanW;
-      const scaleH = (this.cy * 2 * 0.84) / spanH;
-      this.scale = Math.min(scaleW, scaleH, 1.2);
-      this.ty = -18 * this.scale;
+      const spanW = 560, spanH = 430;
+      const scaleW = (this.cx * 2 * 0.82) / spanW;
+      const scaleH = (this.cy * 2 * 0.82) / spanH;
+      this.scale = Math.min(scaleW, scaleH, 1.15);
+      // Shift up slightly so the three-zone triangle is vertically centered
+      this.ty = -42 * this.scale;
     }
 
     resize() {
@@ -687,51 +750,51 @@ const { poemId, world } = Astro.props;
       this.cx = W / 2; this.cy = H / 2;
     }
 
-    // ── Render loop — settles then freezes ────────────────────────────────────
-    // Runs the force sim for ~1.8 s then stops RAF. After freeze, interactions
-    // call this.draw() directly on the frozen canvas.
+    // ── Pre-settle layout (synchronous, before first draw) ───────────────────
+    // Runs the force sim synchronously so nodes open in their final stable
+    // positions. No animated movement — only alpha fades in on screen.
+    primeLayout(steps = 320) {
+      for (let i = 0; i < steps; i++) this.simulateStep();
+    }
+
+    // ── Entry animation — alpha fade only, no position movement ──────────────
     startLoop() {
       if (this.rafId) cancelAnimationFrame(this.rafId);
       const start = performance.now();
-      const alphaDur = 1200; // fade-in window
-      const simDur   = 1800; // total settling window — RAF stops after this
+      const alphaDur = 900; // ms to fade all nodes in
       const tick = (now: number) => {
         const elapsed = now - start;
-        // Entry animation: fade in attr nodes
         const t = Math.min(1, elapsed / alphaDur);
-        if (t < 1) {
-          this.nodes.forEach(n => {
-            if (n.kind === 'satellite') return;
-            const p = Math.max(0, Math.min(1, (t - n.delay) / 0.35));
-            n.currentAlpha = this.easeOut(p);
-          });
-        }
-        if (elapsed < simDur) {
-          this.simulateStep();
-        }
+        this.nodes.forEach(n => {
+          if (n.kind === 'satellite') return;
+          const p = Math.max(0, Math.min(1, (t - n.delay) / 0.35));
+          n.currentAlpha = this.easeOut(p);
+        });
         this.draw();
-        if (elapsed < simDur) {
+        if (t < 1) {
           this.rafId = requestAnimationFrame(tick);
         } else {
-          this.rafId = 0; // freeze — interactions draw() directly
+          this.rafId = 0; // frozen — interactions call draw() directly
         }
       };
       this.rafId = requestAnimationFrame(tick);
     }
 
-    // ── Short re-layout burst after attr selection (then freezes) ─────────────
+    // ── Satellite reveal — place at home immediately, fade alpha in ──────────
+    // No positional animation — satellites appear at their computed homes.
     runRelayout() {
       if (this.rafId) cancelAnimationFrame(this.rafId);
+      const sats = this.nodes.filter(n => n.kind === 'satellite' && n.visible);
+      // Place at final position immediately (no oscillation)
+      sats.forEach(sat => { sat.x = sat.homeX; sat.y = sat.homeY; sat.vx = 0; sat.vy = 0; });
       const start = performance.now();
-      const dur = 700; // ms — then freeze
+      const dur = 380;
       const tick = (now: number) => {
         const elapsed = now - start;
-        // Animate visible satellite alpha
-        this.nodes.filter(n => n.kind === 'satellite' && n.visible).forEach(sat => {
+        sats.forEach(sat => {
           const p = Math.max(0, Math.min(1, (elapsed / dur - sat.delay) / 0.40));
           sat.currentAlpha = this.easeOut(p);
         });
-        this.simulateStep();
         this.draw();
         if (elapsed < dur) {
           this.rafId = requestAnimationFrame(tick);
@@ -763,9 +826,9 @@ const { poemId, world } = Astro.props;
     drawZoneHalos() {
       const ctx = this.ctx;
       const zones = [
-        { key: 'mode',    label: 'speaker mode', rx: ZONES.mode.sx + 48,    ry: ZONES.mode.sy + 28,    labelY: ZONES.mode.cy - ZONES.mode.sy - 20 },
-        { key: 'type',    label: 'poem act',      rx: ZONES.type.sx + 48,    ry: ZONES.type.sy + 28,    labelY: ZONES.type.cy - ZONES.type.sy - 20 },
-        { key: 'imagery', label: 'imagery',       rx: ZONES.imagery.sx + 38, ry: ZONES.imagery.sy + 48, labelY: ZONES.imagery.cy + ZONES.imagery.sy + 22 },
+        { key: 'mode',    label: 'speaker mode', rx: ZONES.mode.sx + 50,    ry: ZONES.mode.sy + 28,    labelY: ZONES.mode.cy - ZONES.mode.sy - 18 },
+        { key: 'type',    label: 'poem act',      rx: ZONES.type.sx + 50,    ry: ZONES.type.sy + 28,    labelY: ZONES.type.cy - ZONES.type.sy - 18 },
+        { key: 'imagery', label: 'imagery',       rx: ZONES.imagery.sx + 40, ry: ZONES.imagery.sy + 46, labelY: ZONES.imagery.cy + ZONES.imagery.sy + 20 },
       ];
 
       // Fill passes
@@ -865,22 +928,21 @@ const { poemId, world } = Astro.props;
     drawAnchorNode(n: Node) {
       const ctx = this.ctx;
       const wc = WORLD_COLORS[n.world || this.worldKey] || WORLD_COLORS['their-world'];
-      // Outer pulse ring
-      ctx.beginPath(); ctx.arc(0, 0, n.r + 8, 0, Math.PI * 2);
-      ctx.strokeStyle = wc.accent; ctx.lineWidth = 1;
-      ctx.globalAlpha *= 0.20; ctx.stroke(); ctx.globalAlpha /= 0.20;
-      // Fill + border
+      // Outer halo ring — very faint, just marks presence
+      ctx.beginPath(); ctx.arc(0, 0, n.r + 10, 0, Math.PI * 2);
+      ctx.strokeStyle = wc.accent; ctx.lineWidth = 0.8;
+      ctx.globalAlpha *= 0.15; ctx.stroke(); ctx.globalAlpha /= 0.15;
+      // Subtle warm fill so the circle doesn't feel hollow
       ctx.beginPath(); ctx.arc(0, 0, n.r, 0, Math.PI * 2);
-      ctx.fillStyle = wc.bg; ctx.fill();
-      ctx.strokeStyle = wc.accent; ctx.lineWidth = 1.8; ctx.stroke();
-      // "current" above
-      ctx.font = 'italic 10px Georgia, serif'; ctx.fillStyle = '#bbb';
-      ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
-      ctx.fillText('current', 0, -n.r - 12);
-      // Title below
-      ctx.font = '15px Georgia, serif'; ctx.fillStyle = '#1a1a1a';
-      ctx.textBaseline = 'top';
-      this.wrapText(n.title || '', 0, n.r + 12, 130, 18);
+      ctx.fillStyle = wc.soft;
+      ctx.globalAlpha *= 0.22; ctx.fill(); ctx.globalAlpha /= 0.22;
+      // Border
+      ctx.beginPath(); ctx.arc(0, 0, n.r, 0, Math.PI * 2);
+      ctx.strokeStyle = wc.accent; ctx.lineWidth = 1.6; ctx.stroke();
+      // Title below — the only label needed
+      ctx.font = '14px Georgia, serif'; ctx.fillStyle = '#1a1a1a';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+      this.wrapText(n.title || '', 0, n.r + 10, 120, 17);
     }
 
     drawAttrNode(n: Node) {
@@ -1089,38 +1151,39 @@ const { poemId, world } = Astro.props;
     }
 
     showAttrPanel(n: Node) {
-      const ATTR_FULL: Record<string, string> = { mode: 'Speaker mode', type: 'Poem act', imagery: 'Imagery' };
+      const ATTR_FULL: Record<string, string> = { mode: 'speaker mode', type: 'poem act', imagery: 'imagery' };
       const label = this.formatLabel(n.value!);
       const typeLabel = ATTR_FULL[n.attrType!] || n.attrType!;
       const tagClass = `tag-${n.attrType}`;
-      const matches = (atlas.poems as any[])
+      const description = ATTR_DESCRIPTIONS[n.value!] || '';
+      // Other poems that share this attribute (excluding current poem)
+      const shared = (atlas.poems as any[])
         .filter((p: any) => { const arr: string[] = p[n.attrType!] || []; return arr.includes(n.value!) && p.id !== this.poemId; })
-        .slice(0, 6);
+        .slice(0, 5);
 
       const preview = document.getElementById('atlas-preview')!;
       preview.innerHTML = `
         <span class="atlas-preview-tag ${tagClass}">${typeLabel}</span>
         <h3 class="atlas-preview-title">${label}</h3>
-        ${n.active
-          ? `<p class="atlas-preview-active-note">↳ active in this poem</p>`
-          : `<p class="atlas-preview-inactive-note">not in this poem</p>`}
-        <ul class="atlas-attr-list">
-          ${matches.map((p: any) => `
-            <li><a href="${p.url}" class="atlas-attr-poem">
-              <span class="atlas-attr-vol">${VOL_LABELS[p.world] || ''}</span>
-              <span>${p.title}</span>
-            </a></li>
-          `).join('')}
-          ${matches.length === 0 ? `<li style="font-size:11px;color:#aaa;font-style:italic;padding:4px 0">No other poems mapped yet</li>` : ''}
-        </ul>
+        ${description ? `<p class="atlas-attr-desc">${description}</p>` : ''}
+        ${shared.length > 0 ? `
+          <p class="atlas-attr-shared-label">${shared.length} poem${shared.length > 1 ? 's' : ''} in this collection</p>
+          <ul class="atlas-attr-list">
+            ${shared.map((p: any) => `
+              <li><a href="${p.url}" class="atlas-attr-poem">
+                <span class="atlas-attr-vol">${VOL_LABELS[p.world] || ''}</span>
+                <span>${p.title}</span>
+              </a></li>
+            `).join('')}
+          </ul>` : ''}
       `;
       preview.classList.add('is-visible');
-      // Summary line: contextual interpretation
-      const cnt = matches.length;
-      this.setSummary(cnt > 0
-        ? `${label} links this poem to ${cnt} related ${cnt === 1 ? 'poem' : 'poems'}.`
-        : `${label} appears only in this poem so far.`);
-      this.updateHint(cnt > 0 ? 'tap a poem node · tap again to navigate' : 'tap another attribute to continue');
+      // Summary line
+      const cnt = shared.length;
+      this.setSummary(n.active
+        ? (cnt > 0 ? `${label} — found in ${cnt + 1} poems including this one.` : `${label} — this poem is the only one with this quality so far.`)
+        : `${label} — not in this poem; found in ${cnt} other${cnt !== 1 ? 's' : ''}.`);
+      this.updateHint(cnt > 0 ? 'tap a poem to preview · tap again to navigate' : 'tap another attribute to continue');
     }
 
     showAnchorInfo() {
