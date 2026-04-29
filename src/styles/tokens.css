@@ -34,6 +34,18 @@
   --space-lg: 34px;
   --space-xl: 55px;
 
+  /* Shared interaction language: overlays, controls, and quiet page chrome. */
+  --ui-line: color-mix(in srgb, var(--color-primary, #1a1a1a) 24%, transparent);
+  --ui-line-strong: color-mix(in srgb, var(--color-primary, #1a1a1a) 46%, transparent);
+  --ui-surface: color-mix(in srgb, var(--color-bg, #f5f2ed) 90%, white);
+  --ui-shadow: 0 14px 42px rgba(26, 26, 26, 0.1);
+  --ui-shadow-strong: 0 18px 54px rgba(26, 26, 26, 0.14);
+  --ui-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ui-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ui-overlay-z: 900;
+  --ui-control-size: 52px;
+  --ui-close-size: 44px;
+
   /* Fixed header (see Nav.astro height) — in-flow content starts below this inset */
   --site-nav-height: 56px;
   --site-content-offset: calc(

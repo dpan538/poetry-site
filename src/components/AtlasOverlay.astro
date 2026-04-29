@@ -93,10 +93,29 @@ const { poemId, world } = Astro.props;
     color: var(--color-meta, #595959);
     opacity: 1;
     line-height: 1.2;
-    transition: color 0.2s;
+    transition: color 0.2s var(--ui-ease-out, ease);
   }
 
-  .atlas-trigger:hover { color: var(--color-primary, #1a1a1a); }
+  .atlas-trigger::after {
+    content: '';
+    position: absolute;
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 0.24s var(--ui-ease-out, ease);
+  }
+
+  .atlas-trigger:hover {
+    color: var(--color-primary, #1a1a1a);
+  }
+
+  .atlas-trigger:hover::after {
+    transform: scaleX(1);
+  }
 
   .atlas-trigger:focus-visible {
     outline: 2px solid var(--color-accent, #c0392b);
@@ -108,7 +127,7 @@ const { poemId, world } = Astro.props;
   .atlas-overlay {
     position: fixed;
     inset: 0;
-    z-index: 900;
+    z-index: var(--ui-overlay-z, 900);
     background: var(--color-bg, #f5f2ed);
     display: flex;
     flex-direction: column;
@@ -152,10 +171,10 @@ const { poemId, world } = Astro.props;
   }
 
   .atlas-control {
-    min-width: 52px;
-    min-height: 52px;
-    border: 1px solid color-mix(in srgb, var(--color-primary, #1a1a1a) 28%, transparent);
-    background: color-mix(in srgb, var(--color-bg, #f5f2ed) 88%, white);
+    min-width: var(--ui-control-size, 52px);
+    min-height: var(--ui-control-size, 52px);
+    border: 1px solid var(--ui-line, color-mix(in srgb, var(--color-primary, #1a1a1a) 24%, transparent));
+    background: var(--ui-surface, color-mix(in srgb, var(--color-bg, #f5f2ed) 90%, white));
     color: var(--color-primary, #1a1a1a);
     font-family: Georgia, 'Times New Roman', serif;
     font-size: 28px;
@@ -163,26 +182,26 @@ const { poemId, world } = Astro.props;
     line-height: 1;
     cursor: pointer;
     padding: 0;
-    opacity: 0.86;
-    box-shadow: 0 10px 34px rgba(26, 26, 26, 0.08);
+    opacity: 1;
+    box-shadow: var(--ui-shadow, 0 14px 42px rgba(26, 26, 26, 0.1));
     transition:
       border-color 0.18s ease,
       box-shadow 0.18s ease,
-      opacity 0.2s ease,
-      transform 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+      color 0.18s ease,
+      transform 0.24s var(--ui-ease-out, ease);
   }
 
   .atlas-control:hover {
-    opacity: 1;
-    border-color: color-mix(in srgb, var(--color-primary, #1a1a1a) 48%, transparent);
-    box-shadow: 0 14px 42px rgba(26, 26, 26, 0.12);
+    border-color: var(--ui-line-strong, color-mix(in srgb, var(--color-primary, #1a1a1a) 46%, transparent));
+    box-shadow: var(--ui-shadow-strong, 0 18px 54px rgba(26, 26, 26, 0.14));
+    color: var(--color-accent, #c0392b);
     transform: translateY(-1px);
   }
 
   .atlas-close {
     margin-left: auto;
-    min-width: 44px;
-    min-height: 44px;
+    min-width: var(--ui-close-size, 44px);
+    min-height: var(--ui-close-size, 44px);
     background: transparent;
     border: none;
     padding: 0;
@@ -192,13 +211,13 @@ const { poemId, world } = Astro.props;
     font-size: 52px;
     line-height: 1;
     font-weight: normal;
-    opacity: 0.78;
+    opacity: 1;
     transform-origin: center;
-    transition: opacity 0.18s ease, transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: color 0.18s ease, transform 0.22s var(--ui-ease-spring, ease);
   }
 
   .atlas-close:hover {
-    opacity: 1;
+    color: var(--color-accent, #c0392b);
     transform: rotate(18deg);
   }
 
@@ -222,7 +241,6 @@ const { poemId, world } = Astro.props;
   .atlas-legend-sep {
     font-size: 12px;
     color: var(--color-meta, #595959);
-    opacity: 0.72;
   }
 
   .atlas-legend-desc {
@@ -415,7 +433,7 @@ const { poemId, world } = Astro.props;
   }
 
   :global(.atlas-anno-sep) {
-    opacity: 0.35;
+    color: var(--color-meta, #595959);
     font-size: 13px;
   }
 

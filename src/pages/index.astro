@@ -1,45 +1,35 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import PoemCanvas from '../components/PoemCanvas.astro';
-import IndexMenu from '../components/IndexMenu.astro';
-import { getCollection } from 'astro:content';
 import { loadPoemsByWorldForIndexMenu } from '../lib/index-menu-data';
-import { analyzePoemText, computeEmotionScore } from '../lib/poem-analyzer';
+import type { IndexWorld } from '../lib/index-menu-data';
 import { publication } from '../lib/publication';
 
 const poemsByWorld = await loadPoemsByWorldForIndexMenu();
+type PoemsByWorld = Awaited<ReturnType<typeof loadPoemsByWorldForIndexMenu>>;
 
-// Entry poem: first of their-world (stable — not random, so crawlers index a consistent page)
-const list = await getCollection('their-world');
-const sorted = [...list].sort((a, b) => a.data.order - b.data.order);
-const poem = sorted[0];
+const entryPoems = (
+  Object.entries(poemsByWorld) as [IndexWorld, PoemsByWorld[IndexWorld]][]
+).flatMap(([world, poems]) =>
+  poems.map((poem) => ({
+    id: poem.id,
+    title: poem.title,
+    world,
+  }))
+);
 
-if (!poem) {
-  throw new Error('No poems in their-world collection');
+if (!entryPoems.length) {
+  throw new Error('No poems available for the collection entry page');
 }
 
-const entryPoem = poem;
-const entryWorld = 'their-world' as const;
-const rawText = entryPoem.body ?? '';
-const analysis = analyzePoemText(rawText, entryPoem.data.title);
-const currentEmotionScore = Math.round(computeEmotionScore(analysis.metrics) * 1000) / 1000;
-
-// Stable site-level description — not derived from a random poem
+// Stable site-level description: the root URL is now an entry point, not a poem page.
 const siteDescription =
   `${publication.collectionTitle} is an ongoing poetry collection by ${publication.authorDisplayName} across three affective volumes: Still Life, Bless You, and Their World. Written and updated ${publication.copyrightYears}, published as a digital edition on daipan.ink.`;
 ---
 
-<BaseLayout
-  title="Three Worlds"
-  description={siteDescription}
-  world="their-world"
->
+<BaseLayout title="Three Worlds" description={siteDescription}>
   <!--
-    SEO anchor for the home page: gives Google a clear, stable h1 that matches
-    the <title> "Three Worlds — Dai Pan". Without this, Google sees the visually
-    prominent poem title in PoemCanvas and rewrites the title to match it.
-    Uses the same clip-rect invisible technique as .poem-seo-text (accessible
-    to screen readers and crawlers, invisible to sighted users).
+    SEO anchor for the home page: gives crawlers and assistive tech a stable
+    description while the visible root page behaves as a collection entry.
   -->
   <div class="home-seo-anchor">
     <h1>Three Worlds — A Poetry Collection by Dai Pan</h1>
@@ -56,204 +46,75 @@ const siteDescription =
     </p>
   </div>
 
-  <main class="home-main">
-    <nav class="poem-nav" id="poem-nav">
-      <a class="nav-prev" id="nav-prev" href="#" aria-label="Previous poem">←</a>
-      <a class="nav-next" id="nav-next" href="#" aria-label="Next poem">→</a>
-    </nav>
-
-    <div class="entry-shell">
-      <PoemCanvas
-        poemId={entryPoem.id}
-        world={entryWorld}
-        title={entryPoem.data.title}
-        rawText={rawText}
-        order={entryPoem.data.order}
-      />
-    </div>
-    <IndexMenu currentWorld="their-world" currentPoemId={entryPoem.id} poemsByWorld={poemsByWorld} />
+  <main class="home-entry" aria-labelledby="home-entry-title">
+    <section class="entry-card" aria-live="polite">
+      <p class="entry-kicker">Three Worlds</p>
+      <h1 id="home-entry-title">Entering the collection</h1>
+      <p class="entry-copy">
+        Opening a different poem each time, then continuing through the collection from that page.
+      </p>
+      <p class="entry-fallback">
+        If nothing opens, <a href="/collection">browse the collection index</a>.
+      </p>
+      <noscript>
+        JavaScript is needed for the rotating entry. You can still
+        <a href="/collection">browse the collection index</a>.
+      </noscript>
+    </section>
   </main>
 </BaseLayout>
 
-<script
-  define:vars={{
-    currentPoemId: entryPoem.id,
-    currentWorld: entryWorld,
-    currentEmotionScore,
-  }}
->
+<script define:vars={{ entryPoems }}>
+  const ENTRY_LAST_KEY = 'three-worlds-entry-last';
   const HISTORY_KEY = 'three-worlds-history';
-  const MAX_HISTORY = 20;
-  let hideTimer;
+  const RECENT_LIMIT = 4;
 
-  function getHistory() {
+  function readRecentIds() {
     try {
       const raw = localStorage.getItem(HISTORY_KEY);
-      return raw ? JSON.parse(raw) : [];
+      const history = raw ? JSON.parse(raw) : [];
+      if (!Array.isArray(history)) return [];
+      return history
+        .map((entry) => entry?.id)
+        .filter((id) => typeof id === 'string')
+        .slice(0, RECENT_LIMIT);
     } catch {
       return [];
     }
   }
 
-  function pushToHistory(entry) {
+  function pickEntryPoem(poems) {
+    const lastId = localStorage.getItem(ENTRY_LAST_KEY);
+    const recentIds = new Set([lastId, ...readRecentIds()].filter(Boolean));
+    let pool = poems.filter((poem) => !recentIds.has(poem.id));
+
+    if (!pool.length && lastId) {
+      pool = poems.filter((poem) => poem.id !== lastId);
+    }
+
+    if (!pool.length) {
+      pool = poems;
+    }
+
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+
+  function enterCollection() {
+    if (!Array.isArray(entryPoems) || !entryPoems.length) return;
+
+    const poem = pickEntryPoem(entryPoems);
+    if (!poem?.world || !poem?.id) return;
+
     try {
-      const h = getHistory().filter((x) => x.id !== entry.id);
-      h.unshift(entry);
-      localStorage.setItem(HISTORY_KEY, JSON.stringify(h.slice(0, MAX_HISTORY)));
+      localStorage.setItem(ENTRY_LAST_KEY, poem.id);
     } catch {
-      // ignore
-    }
-  }
-
-  function contentSimilarity(typesA, typesB) {
-    if (!typesA.length || !typesB.length) return 0;
-    const intersection = typesA.filter((t) => typesB.includes(t)).length;
-    const union = new Set([...typesA, ...typesB]).size;
-    return intersection / union;
-  }
-
-  function atlasRelationScore(current, candidate) {
-    const direct = current.atlasRelations?.find((r) => r.id === candidate.id)?.weight ?? 0;
-    const reciprocal = candidate.atlasRelations?.find((r) => r.id === current.id)?.weight ?? 0;
-    return Math.max(direct, reciprocal * 0.82);
-  }
-
-  function getNextPoemId(ctx, allPoems) {
-    const current = allPoems.find((p) => p.id === ctx.currentId);
-    if (!current) return allPoems[0]?.id ?? ctx.currentId;
-
-    let targetDirection = 'neutral';
-    if (ctx.prev2 && ctx.prev1) {
-      const risingTwice =
-        ctx.prev2.emotionScore < ctx.prev1.emotionScore &&
-        ctx.prev1.emotionScore < ctx.currentEmotionScore;
-      const fallingTwice =
-        ctx.prev2.emotionScore > ctx.prev1.emotionScore &&
-        ctx.prev1.emotionScore > ctx.currentEmotionScore;
-      if (risingTwice) targetDirection = 'down';
-      else if (fallingTwice) targetDirection = 'up';
-      else targetDirection = ctx.prev1.emotionScore < ctx.currentEmotionScore ? 'up' : 'down';
+      // The entry should still work when storage is unavailable.
     }
 
-    const excludeIds = new Set([ctx.currentId, ctx.prev1?.id, ctx.prev2?.id].filter(Boolean));
-
-    const candidates = allPoems
-      .filter((p) => !excludeIds.has(p.id))
-      .map((p) => {
-        let arcScore = 0.5;
-        if (targetDirection === 'up') {
-          arcScore = p.emotionScore > ctx.currentEmotionScore ? 1 : 0.2;
-        } else if (targetDirection === 'down') {
-          arcScore = p.emotionScore < ctx.currentEmotionScore ? 1 : 0.2;
-        } else {
-          arcScore = 1 - Math.abs(p.emotionScore - ctx.currentEmotionScore);
-        }
-
-        const contentScore = contentSimilarity(current.contentTypes || [], p.contentTypes || []);
-        const atlasScore = atlasRelationScore(current, p);
-        const worldScore = p.world !== ctx.currentWorld ? 1 : 0.3;
-        const worldPenalty = ctx.prev1 && p.world === ctx.prev1.world ? 0.6 : 1;
-
-        const total =
-          (atlasScore * 0.35 + arcScore * 0.25 + contentScore * 0.25 + worldScore * 0.1 + 0.05) *
-          worldPenalty;
-
-        return { poem: p, score: total };
-      });
-
-    candidates.sort((a, b) => b.score - a.score);
-
-    const top5 = candidates.slice(0, 5);
-    const idx = Math.floor(Math.random() * top5.length);
-    return top5[idx]?.poem.id ?? candidates[0]?.poem.id ?? ctx.currentId;
+    window.location.replace(`/${poem.world}/${poem.id}`);
   }
 
-  function getPrevPoemId(ctx) {
-    return ctx.prev1?.id ?? null;
-  }
-
-  function bindKeyboard() {
-    document.addEventListener('keydown', (e) => {
-      if (document.body.classList.contains('index-open')) return;
-      const t = e.target;
-      if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
-      if (e.key === 'ArrowLeft') {
-        document.getElementById('nav-prev')?.click();
-      } else if (e.key === 'ArrowRight') {
-        document.getElementById('nav-next')?.click();
-      }
-    });
-  }
-
-  function bindNavVisibility() {
-    document.addEventListener('mousemove', () => {
-      const nav = document.getElementById('poem-nav');
-      nav?.classList.add('visible');
-      clearTimeout(hideTimer);
-      hideTimer = setTimeout(() => {
-        nav?.classList.remove('visible');
-      }, 2000);
-    });
-  }
-
-  async function initNav() {
-    bindKeyboard();
-    bindNavVisibility();
-
-    try {
-      const res = await fetch('/poem-data.json');
-      const allPoems = await res.json();
-
-      const currentPoem = allPoems.find((p) => p.id === currentPoemId && p.world === currentWorld);
-      const emotionScore = currentPoem?.emotionScore ?? currentEmotionScore ?? 0.5;
-
-      pushToHistory({
-        id: currentPoemId,
-        world: currentWorld,
-        emotionScore,
-        timestamp: Date.now(),
-      });
-
-      const history = getHistory();
-      const prev1 = history[1] ?? null;
-      const prev2 = history[2] ?? null;
-
-      const ctx = {
-        currentId: currentPoemId,
-        currentWorld,
-        currentEmotionScore: emotionScore,
-        prev1,
-        prev2,
-      };
-
-      const nextId = getNextPoemId(ctx, allPoems);
-      const nextPoem = allPoems.find((p) => p.id === nextId);
-
-      const prevId = getPrevPoemId(ctx);
-      const prevPoem = prevId ? allPoems.find((p) => p.id === prevId) : null;
-
-      if (nextPoem) {
-        const nextEl = document.getElementById('nav-next');
-        if (nextEl) nextEl.setAttribute('href', `/${nextPoem.world}/${nextPoem.id}`);
-      }
-
-      if (prevPoem) {
-        const prevEl = document.getElementById('nav-prev');
-        if (prevEl) prevEl.setAttribute('href', `/${prevPoem.world}/${prevPoem.id}`);
-      } else {
-        const prevEl = document.getElementById('nav-prev');
-        if (prevEl) prevEl.style.display = 'none';
-      }
-    } catch (err) {
-      console.error('[dynamic-nav] failed to initialize:', err);
-      const prevEl = document.getElementById('nav-prev');
-      const nextEl = document.getElementById('nav-next');
-      if (prevEl) prevEl.style.display = 'none';
-      if (nextEl) nextEl.style.display = 'none';
-    }
-  }
-
-  document.addEventListener('DOMContentLoaded', initNav);
+  enterCollection();
 </script>
 
 <style>
@@ -273,67 +134,59 @@ const siteDescription =
     border: 0;
   }
 
-  .home-main {
-    padding-left: 0;
-    padding-right: 0;
-    padding-bottom: 0;
-    max-width: none;
-    width: 100%;
-    margin: 0;
-    position: relative;
-  }
-
-  .entry-shell {
+  .home-entry {
     min-height: calc(100vh - var(--site-content-offset));
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: var(--space-lg) var(--margin-x);
+    padding: var(--space-xl) var(--margin-x);
     box-sizing: border-box;
   }
 
-  .poem-nav {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    pointer-events: none;
-    z-index: 40;
-  }
-
-  .nav-prev,
-  .nav-next {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 32px;
-    line-height: 1;
-    font-family: Georgia, serif;
-    text-decoration: none;
+  .entry-card {
+    max-width: 42rem;
+    text-align: center;
+    font-family: Georgia, 'Times New Roman', serif;
     color: var(--color-primary, #1a1a1a);
-    opacity: 0;
-    transition: opacity 0.2s ease;
-    pointer-events: all;
-    padding: var(--space-md);
-    user-select: none;
   }
 
-  .nav-prev {
-    left: var(--space-md);
+  .entry-kicker {
+    margin: 0 0 var(--space-md);
+    font-size: 12px;
+    line-height: 1.4;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
   }
 
-  .nav-next {
-    right: var(--space-md);
+  .entry-card h1 {
+    margin: 0;
+    font-size: clamp(34px, 6vw, 78px);
+    line-height: 0.95;
+    font-weight: 500;
+    letter-spacing: -0.04em;
   }
 
-  .poem-nav.visible .nav-prev,
-  .poem-nav.visible .nav-next {
-    opacity: 0.5;
+  .entry-copy {
+    margin: var(--space-lg) auto 0;
+    max-width: 32rem;
+    font-size: clamp(17px, 2vw, 22px);
+    line-height: 1.55;
+    font-style: italic;
+    color: var(--color-meta, #595959);
   }
 
-  .nav-prev:hover,
-  .nav-next:hover {
-    opacity: 1 !important;
+  .entry-fallback,
+  noscript {
+    display: block;
+    margin: var(--space-md) auto 0;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--color-meta, #777777);
+  }
+
+  .entry-fallback a,
+  noscript a {
+    color: currentColor;
+    text-underline-offset: 0.18em;
   }
 </style>
