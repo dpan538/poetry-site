@@ -144,6 +144,13 @@ const worldPaths: Record<IndexWorld, string> = {
   }
 
   @media (max-width: 760px) {
+    .mobile-index-float,
+    .mobile-index-sheet {
+      --mobile-index-green: #617a61;
+      --mobile-index-green-soft: color-mix(in srgb, var(--mobile-index-green) 13%, transparent);
+      --mobile-index-green-line: color-mix(in srgb, var(--mobile-index-green) 42%, transparent);
+    }
+
     :global(body.mobile-site-index-open) {
       overflow: hidden;
     }
@@ -158,9 +165,9 @@ const worldPaths: Record<IndexWorld, string> = {
       gap: 8px;
       min-height: 52px;
       padding: 0 18px;
-      border: 1px solid var(--mobile-hairline, color-mix(in srgb, var(--color-primary, #1a1a1a) 18%, transparent));
+      border: 1px solid var(--mobile-index-green-line);
       border-radius: 999px;
-      background: var(--mobile-control-bg, color-mix(in srgb, var(--color-bg, #f5f2ed) 94%, white));
+      background: color-mix(in srgb, var(--mobile-index-green) 8%, var(--mobile-control-bg, #f5f2ed));
       color: var(--color-primary, #1a1a1a);
       box-shadow: 0 12px 34px rgba(26, 26, 26, 0.1);
       font-family: Georgia, 'Times New Roman', serif;
@@ -207,9 +214,9 @@ const worldPaths: Record<IndexWorld, string> = {
       margin: 0 auto;
       padding: 24px 22px 28px;
       overflow: auto;
-      border: 1px solid var(--mobile-hairline, color-mix(in srgb, var(--color-primary, #1a1a1a) 18%, transparent));
+      border: 1px solid var(--mobile-index-green-line);
       border-radius: var(--mobile-panel-radius, 24px);
-      background: var(--mobile-surface-bg, color-mix(in srgb, var(--color-bg, #f5f2ed) 96%, white));
+      background: color-mix(in srgb, var(--mobile-index-green) 5%, var(--mobile-surface-bg, #f5f2ed));
       box-shadow: var(--mobile-soft-shadow, 0 24px 70px rgba(26, 26, 26, 0.18));
       transform: translateY(16px) scale(0.985);
       transition: transform 0.32s var(--ui-ease-out, ease);
@@ -227,12 +234,12 @@ const worldPaths: Record<IndexWorld, string> = {
       padding-right: 52px;
       margin-top: -24px;
       margin-bottom: 22px;
-      background: var(--mobile-surface-bg, color-mix(in srgb, var(--color-bg, #f5f2ed) 96%, white));
+      background: color-mix(in srgb, var(--mobile-index-green) 5%, var(--mobile-surface-bg, #f5f2ed));
     }
 
     .mobile-index-kicker {
       margin: 0 0 8px;
-      color: var(--color-accent, #c0392b);
+      color: var(--mobile-index-green);
       font-size: 11px;
       letter-spacing: 0.18em;
       text-transform: uppercase;
@@ -288,9 +295,9 @@ const worldPaths: Record<IndexWorld, string> = {
     }
 
     .mobile-index-tab.is-active {
-      border-color: color-mix(in srgb, var(--color-accent, #c0392b) 48%, transparent);
+      border-color: var(--mobile-index-green-line);
       color: var(--color-primary, #1a1a1a);
-      background: color-mix(in srgb, var(--color-accent, #c0392b) 8%, transparent);
+      background: var(--mobile-index-green-soft);
     }
 
     .mobile-index-world {
@@ -309,6 +316,10 @@ const worldPaths: Record<IndexWorld, string> = {
 
     .mobile-index-item {
       border-top: 1px solid var(--mobile-rule, color-mix(in srgb, var(--color-primary, #1a1a1a) 8%, transparent));
+    }
+
+    .mobile-index-item.is-current {
+      border-top-color: var(--mobile-index-green-line);
     }
 
     .mobile-index-link {

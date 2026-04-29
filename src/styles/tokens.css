@@ -88,6 +88,6 @@
     --space-xl: 46px;
 
     --site-nav-height: calc(60px + var(--safe-top));
-    --site-content-offset: calc(var(--site-nav-height) + var(--space-lg));
+    --site-content-offset: calc(var(--site-nav-height) + var(--space-sm));
   }
 }

@@ -96,4 +96,23 @@ const mobilePoemsByWorld = showMobileIndexTools ? await loadPoemsByWorldForIndex
     margin: 0 auto;
     max-width: 52rem;
   }
+
+  @media (max-width: 760px) {
+    .site-body-stack {
+      min-height: auto;
+    }
+
+    .site-main-slot {
+      flex: 0 0 auto;
+    }
+
+    .site-copyright {
+      margin-top: 0;
+      padding-top: var(--space-xs);
+      padding-inline: var(--margin-x);
+      padding-bottom: calc(var(--space-lg) + env(safe-area-inset-bottom));
+      font-size: 10.5px;
+      line-height: 1.55;
+    }
+  }
 </style>

@@ -112,16 +112,16 @@ const worldLabels: Record<Props['world'], string> = {
       width: 100%;
       min-height: calc(100svh - var(--site-content-offset));
       padding:
-        calc(var(--space-xl) + 4px)
+        var(--space-sm)
         max(22px, env(safe-area-inset-right))
-        calc(128px + env(safe-area-inset-bottom))
+        calc(104px + env(safe-area-inset-bottom))
         max(22px, env(safe-area-inset-left));
       background: var(--color-bg, #f5f2ed);
       color: var(--color-primary, #1a1a1a);
     }
 
     .mobile-poem-header {
-      margin-bottom: clamp(36px, 9vw, 58px);
+      margin-bottom: clamp(22px, 6vw, 34px);
     }
 
     .mobile-poem-kicker {

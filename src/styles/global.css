@@ -267,13 +267,13 @@ html[data-world='still-life'] {
   .reading-page {
     max-width: 100%;
     padding-inline: var(--margin-x);
-    padding-bottom: calc(var(--space-xl) + 74px);
+    padding-bottom: calc(var(--space-lg) + 24px);
     animation: none;
   }
 
   .reading-header {
-    padding-bottom: var(--space-lg);
-    margin-bottom: var(--space-lg);
+    padding-bottom: var(--space-md);
+    margin-bottom: var(--space-md);
   }
 
   .reading-header h1 {
@@ -296,8 +296,10 @@ html[data-world='still-life'] {
   }
 
   .site-copyright {
+    margin-top: 0;
+    padding-top: var(--space-xs);
     padding-inline: var(--margin-x);
-    padding-bottom: calc(var(--space-xl) + env(safe-area-inset-bottom));
+    padding-bottom: calc(var(--space-lg) + env(safe-area-inset-bottom));
     font-size: 10.5px;
     line-height: 1.55;
   }
