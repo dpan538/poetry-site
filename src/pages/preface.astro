@@ -1,8 +1,9 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { publication } from '../lib/publication';
 
 const prefaceDescription =
-  'Preface to Three Worlds by Dai Pan — how the ongoing collection took shape across Still Life, Bless You, and Their World. Written and updated 2024–2026.';
+  `Preface to ${publication.collectionTitle} by ${publication.authorName} — how the ongoing collection took shape across Still Life, Bless You, and Their World. Written and updated ${publication.copyrightYears}.`;
 
 const breadcrumbs = [
   { name: 'Three Worlds', url: 'https://daipan.ink/' },
@@ -14,7 +15,7 @@ const breadcrumbs = [
   <main class="reading-page">
     <header class="reading-header">
       <h1>Preface</h1>
-      <p class="reading-meta">Dai Pan — 2024–2026</p>
+      <p class="reading-meta">{publication.authorName} — {publication.copyrightYears}</p>
     </header>
 
     <section class="reading-prose">

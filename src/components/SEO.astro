@@ -89,6 +89,7 @@ const websiteLd = {
 const volumeLd = worldOrder.map((world, index) => {
   const meta = worldMetadata[world];
   return {
+    '@context': 'https://schema.org',
     '@type': 'CreativeWork',
     '@id': `${SITE_ORIGIN}${meta.urlPath}#volume`,
     name: meta.label,

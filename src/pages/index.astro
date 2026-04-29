@@ -5,6 +5,7 @@ import IndexMenu from '../components/IndexMenu.astro';
 import { getCollection } from 'astro:content';
 import { loadPoemsByWorldForIndexMenu } from '../lib/index-menu-data';
 import { analyzePoemText, computeEmotionScore } from '../lib/poem-analyzer';
+import { publication } from '../lib/publication';
 
 const poemsByWorld = await loadPoemsByWorldForIndexMenu();
 
@@ -25,7 +26,7 @@ const currentEmotionScore = Math.round(computeEmotionScore(analysis.metrics) * 1
 
 // Stable site-level description — not derived from a random poem
 const siteDescription =
-  'Three Worlds is an ongoing poetry collection by Dai Pan (潘岱) across three affective volumes: Still Life, Bless You, and Their World. Written and updated 2024–2026, published as a digital edition on daipan.ink.';
+  `${publication.collectionTitle} is an ongoing poetry collection by ${publication.authorDisplayName} across three affective volumes: Still Life, Bless You, and Their World. Written and updated ${publication.copyrightYears}, published as a digital edition on daipan.ink.`;
 ---
 
 <BaseLayout

@@ -8,6 +8,7 @@ import AtlasOverlay from '../../components/AtlasOverlay.astro';
 import { loadPoemsByWorldForIndexMenu } from '../../lib/index-menu-data';
 import { analyzePoemText, computeEmotionScore } from '../../lib/poem-analyzer';
 import { excerptWords } from '../../lib/seo';
+import { poemCitation, publication, worldMetadata } from '../../lib/publication';
 
 type World = 'their-world' | 'bless-you' | 'still-life';
 
@@ -56,17 +57,12 @@ const seoStanzas = rawText
   .map((s) => s.split('\n').map((l) => l.trimEnd()).filter((l) => l.length > 0))
   .filter((s) => s.length > 0);
 
-const worldLabels: Record<string, string> = {
-  'their-world': 'Their World',
-  'bless-you': 'Bless You',
-  'still-life': 'Still Life',
-};
-
 const poemUrl = `https://daipan.ink/${world}/${poem.id}`;
-const citationYear = poem.data.writtenYear ?? 2025;
+const worldLabel = worldMetadata[world].label;
+const citation = poemCitation(poem.data.title, world, poem.data.order, poemUrl, poem.data.writtenYear);
 const breadcrumbs = [
-  { name: 'Three Worlds', url: 'https://daipan.ink/' },
-  { name: worldLabels[world] ?? world, url: `https://daipan.ink/${world}` },
+  { name: publication.collectionTitle, url: `${publication.canonicalUrl}/` },
+  { name: worldLabel, url: `${publication.canonicalUrl}/${world}` },
   { name: poem.data.title, url: poemUrl },
 ];
 ---
@@ -96,10 +92,10 @@ const breadcrumbs = [
       AI crawlers, and screen readers. The JS layout engine renders a visual version
       on top of this inside PoemCanvas.
     -->
-    <article class="poem-seo-text" aria-label={`${poem.data.title} — poem in ${worldLabels[world] ?? world}`}>
+    <article class="poem-seo-text" aria-label={`${poem.data.title} — poem in ${worldLabel}`}>
       <h1>{poem.data.title}</h1>
       <p class="poem-seo-meta">
-        From <em>{worldLabels[world] ?? world}</em>, <em>Three Worlds</em> by Dai Pan (潘岱).
+        From <em>{worldLabel}</em>, <em>{publication.collectionTitle}</em> by {publication.authorDisplayName}.
         Poem {String(poem.data.order).padStart(2, '0')}.
       </p>
       {seoStanzas.map((stanza) => (
@@ -112,9 +108,7 @@ const breadcrumbs = [
         </p>
       ))}
       <p class="poem-seo-citation">
-        Cite as: Dai Pan, "{poem.data.title}," <em>Three Worlds</em>, {worldLabels[world] ?? world},
-        poem {String(poem.data.order).padStart(2, '0')}. daipan.ink, {citationYear}.
-        URL: {poemUrl}
+        Cite as: {citation}
       </p>
     </article>
 
