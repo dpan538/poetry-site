@@ -23,6 +23,12 @@ function deterministicFloat(seed: string): number {
   return (hash >>> 0) / 0xffffffff
 }
 
+function atlasRelationScore(current: ClientPoemRecord, candidate: ClientPoemRecord): number {
+  const direct = current.atlasRelations?.find(r => r.id === candidate.id)?.weight ?? 0
+  const reciprocal = candidate.atlasRelations?.find(r => r.id === current.id)?.weight ?? 0
+  return Math.max(direct, reciprocal * 0.82)
+}
+
 export function getNextPoemId(
   ctx: RecommendationContext,
   allPoems: ClientPoemRecord[],
@@ -61,11 +67,12 @@ export function getNextPoemId(
       }
 
       const contentScore = contentSimilarity(current.contentTypes, p.contentTypes)
+      const atlasScore = atlasRelationScore(current, p)
       const worldScore = p.world !== ctx.currentWorld ? 1 : 0.3
       const worldPenalty = ctx.prev1 && p.world === ctx.prev1.world ? 0.6 : 1
 
       const total =
-        (arcScore * 0.4 + contentScore * 0.35 + worldScore * 0.15 + 0.1) *
+        (atlasScore * 0.35 + arcScore * 0.25 + contentScore * 0.25 + worldScore * 0.1 + 0.05) *
         worldPenalty
 
       return { poem: p, score: total }

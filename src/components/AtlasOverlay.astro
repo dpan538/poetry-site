@@ -35,26 +35,28 @@ const { poemId, world } = Astro.props;
   <div class="atlas-header">
     <span class="atlas-wordmark">ATLAS</span>
     <span class="atlas-subtitle">structural map</span>
-    <button id="atlas-close" class="atlas-close" aria-label="Close ATLAS">
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.2">
-        <line x1="1" y1="1" x2="13" y2="13"/>
-        <line x1="13" y1="1" x2="1" y2="13"/>
-      </svg>
-    </button>
+    <div class="atlas-controls" aria-label="ATLAS zoom controls">
+      <button id="atlas-zoom-out" class="atlas-control" aria-label="Zoom out">−</button>
+      <button id="atlas-zoom-in" class="atlas-control" aria-label="Zoom in">+</button>
+    </div>
+    <button id="atlas-close" class="atlas-close" aria-label="Close ATLAS">×</button>
   </div>
 
   <!-- Legend — not aria-hidden; text labels carry the meaning, color dots are decorative -->
   <div class="atlas-legend">
-    <span class="atlas-legend-item atlas-legend-mode">speaker mode</span>
+    <span class="atlas-legend-item atlas-legend-mode">voice</span>
     <span class="atlas-legend-sep">·</span>
-    <span class="atlas-legend-item atlas-legend-type">poem act</span>
+    <span class="atlas-legend-item atlas-legend-type">act</span>
     <span class="atlas-legend-sep">·</span>
-    <span class="atlas-legend-item atlas-legend-imagery">imagery</span>
-    <span class="atlas-legend-desc">— highlighted = active in this poem</span>
+    <span class="atlas-legend-item atlas-legend-imagery">image</span>
+    <span class="atlas-legend-sep">·</span>
+    <span class="atlas-legend-item atlas-legend-pressure">pressure</span>
+    <span class="atlas-legend-sep">·</span>
+    <span class="atlas-legend-item atlas-legend-form">form</span>
+    <span class="atlas-legend-sep">·</span>
+    <span class="atlas-legend-item atlas-legend-sense">sense</span>
+    <span class="atlas-legend-desc">— drag to pan, scroll to zoom, select a node for detail</span>
   </div>
-
-  <!-- Summary sentence — counts active attributes -->
-  <p id="atlas-summary" class="atlas-summary" aria-live="polite"></p>
 
   <!-- Screen reader text alternative for the canvas — WCAG 1.1.1 / 1.3.1 -->
   <!-- Lists the poem's active attributes so AT users get the same structural information -->
@@ -63,8 +65,8 @@ const { poemId, world } = Astro.props;
   <!-- Canvas — the attribute field (aria-hidden: AT gets info via atlas-sr-attrs above) -->
   <canvas id="atlas-canvas" class="atlas-canvas" aria-hidden="true"></canvas>
 
-  <!-- Annotation panel — slides up from bottom over canvas when attribute is tapped -->
-  <div id="atlas-anno" class="atlas-anno" role="region" aria-label="Attribute annotation" aria-live="polite" aria-atomic="true"></div>
+  <!-- Annotation panel — opens beside the graph when a node is selected -->
+  <aside id="atlas-anno" class="atlas-anno" role="region" aria-label="ATLAS node detail" aria-live="polite" aria-atomic="true"></aside>
 </div>
 
 <style>
@@ -121,52 +123,98 @@ const { poemId, world } = Astro.props;
     display: flex;
     align-items: baseline;
     gap: 12px;
-    padding: 20px var(--margin-x, 24px) 0;
+    padding: 22px var(--margin-x, 24px) 0;
     flex-shrink: 0;
   }
 
   .atlas-wordmark {
-    font-size: 13.5px;
+    font-size: 18px;
     letter-spacing: 0.16em;
     color: var(--color-primary, #1a1a1a);
     font-family: inherit;
   }
 
   .atlas-subtitle {
-    font-size: 13.5px;
+    font-size: 15.5px;
     letter-spacing: 0.06em;
     color: var(--color-meta, #595959);
     font-style: italic;
   }
 
-  .atlas-close {
-    margin-left: auto;
-    background: transparent;
-    border: none;
-    /* WCAG 2.5.5: 44×44px minimum touch target (14px SVG + 30px padding = 44px) */
-    padding: 15px;
-    cursor: pointer;
-    color: var(--color-meta, #595959);
-    transition: color 0.15s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  .atlas-controls {
+    position: fixed;
+    right: var(--margin-x, 24px);
+    bottom: var(--space-lg, 34px);
+    z-index: 24;
     display: flex;
     align-items: center;
-    justify-content: center;
+    gap: var(--space-sm, 13px);
   }
 
-  .atlas-close:hover { color: var(--color-primary, #1a1a1a); transform: rotate(90deg); }
+  .atlas-control {
+    min-width: 52px;
+    min-height: 52px;
+    border: 1px solid color-mix(in srgb, var(--color-primary, #1a1a1a) 28%, transparent);
+    background: color-mix(in srgb, var(--color-bg, #f5f2ed) 88%, white);
+    color: var(--color-primary, #1a1a1a);
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 28px;
+    font-weight: normal;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+    opacity: 0.86;
+    box-shadow: 0 10px 34px rgba(26, 26, 26, 0.08);
+    transition:
+      border-color 0.18s ease,
+      box-shadow 0.18s ease,
+      opacity 0.2s ease,
+      transform 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+  }
 
+  .atlas-control:hover {
+    opacity: 1;
+    border-color: color-mix(in srgb, var(--color-primary, #1a1a1a) 48%, transparent);
+    box-shadow: 0 14px 42px rgba(26, 26, 26, 0.12);
+    transform: translateY(-1px);
+  }
+
+  .atlas-close {
+    margin-left: auto;
+    min-width: 44px;
+    min-height: 44px;
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: var(--color-primary, #1a1a1a);
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 52px;
+    line-height: 1;
+    font-weight: normal;
+    opacity: 0.78;
+    transform-origin: center;
+    transition: opacity 0.18s ease, transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .atlas-close:hover {
+    opacity: 1;
+    transform: rotate(18deg);
+  }
+
+  .atlas-control:focus-visible,
   .atlas-close:focus-visible {
     outline: 2px solid var(--color-accent, #c0392b);
-    outline-offset: 3px;
+    outline-offset: 4px;
     border-radius: 1px;
   }
 
   /* ── Legend ──────────────────────────────────────────────────────────────── */
   .atlas-legend {
     display: flex;
-    gap: 22px;
+    gap: 16px;
     align-items: center;
-    padding: 14px var(--margin-x, 24px) 0;
+    padding: 16px var(--margin-x, 24px) 0;
     flex-shrink: 0;
     flex-wrap: wrap;
   }
@@ -174,11 +222,11 @@ const { poemId, world } = Astro.props;
   .atlas-legend-sep {
     font-size: 12px;
     color: var(--color-meta, #595959);
-    opacity: 0.40;
+    opacity: 0.72;
   }
 
   .atlas-legend-desc {
-    font-size: 14.5px;
+    font-size: 16px;
     letter-spacing: 0.02em;
     /* WCAG 1.4.3: opacity:0.75 was only 3.58:1 ❌ — removed, full #595959 = 6.27:1 ✅ */
     color: var(--color-meta, #595959);
@@ -187,7 +235,7 @@ const { poemId, world } = Astro.props;
   }
 
   .atlas-legend-item {
-    font-size: 15.5px;
+    font-size: 16.5px;
     letter-spacing: 0.04em;
     color: var(--color-meta, #595959);
     display: flex;
@@ -204,52 +252,65 @@ const { poemId, world } = Astro.props;
     flex-shrink: 0;
   }
 
-  .atlas-legend-mode::before   { background: #b8a898; }
-  .atlas-legend-type::before   { background: #8a96a8; }
-  .atlas-legend-imagery::before { background: #8a9e8a; }
-
-  /* ── Summary line ───────────────────────────────────────────────────────── */
-  .atlas-summary {
-    font-size: 16px;
-    letter-spacing: 0.02em;
-    color: var(--color-meta, #595959);
-    font-style: italic;
-    text-align: center;
-    padding: 10px var(--margin-x, 24px) 0;
-    flex-shrink: 0;
-    min-height: 1.6em;
-    margin: 0;
-    line-height: 1.5;
-  }
+  .atlas-legend-mode::before   { background: #6f625b; }
+  .atlas-legend-type::before   { background: #5e6e80; }
+  .atlas-legend-imagery::before { background: #547054; }
+  .atlas-legend-pressure::before { background: #8b4f45; }
+  .atlas-legend-form::before { background: #7a6475; }
+  .atlas-legend-sense::before { background: #806637; }
 
   /* ── Canvas ──────────────────────────────────────────────────────────────── */
   .atlas-canvas {
     flex: 1;
     width: 100%;
     display: block;
-    touch-action: manipulation; /* allows tap; no pan/pinch (drag removed) */
+    cursor: grab;
+    touch-action: none;
     min-height: 0;
   }
 
-  /* ── Annotation panel — absolute overlay at bottom of canvas ── */
-  /* Canvas fills full height at all times; annotation slides up over it.        */
+  /* ── Annotation panel — side sheet on desktop, bottom sheet on narrow screens ── */
   .atlas-anno {
     position: absolute;
-    bottom: 0; left: 0; right: 0;
+    top: calc(var(--site-nav-height, 56px) + var(--space-xl, 55px) + var(--space-lg, 34px));
+    right: var(--margin-x, 24px);
+    width: min(360px, calc(100vw - var(--margin-x, 24px) * 2));
+    max-height: calc(100vh - var(--site-nav-height, 56px) - 150px);
     z-index: 20;
-    background: var(--color-bg, #f5f2ed);
-    border-top: 0.5px solid rgba(26, 26, 26, 0.09);
-    padding: 18px var(--margin-x, 24px) 20px;
+    box-sizing: border-box;
+    background: color-mix(in srgb, var(--color-bg, #f5f2ed) 94%, white);
+    border: 1px solid color-mix(in srgb, var(--color-primary, #1a1a1a) 22%, transparent);
+    border-radius: 14px;
+    box-shadow: 0 18px 54px rgba(26, 26, 26, 0.14);
+    padding: 22px 24px;
+    overflow: auto;
     opacity: 0;
     pointer-events: none;
-    transform: translateY(6px);
+    transform: translateX(12px);
     transition: opacity 0.22s ease, transform 0.22s ease;
   }
 
   .atlas-anno.is-open {
     opacity: 1;
     pointer-events: auto;
-    transform: translateY(0);
+    transform: translateX(0);
+  }
+
+  @media (max-width: 760px) {
+    .atlas-anno {
+      top: auto;
+      left: var(--space-md, 21px);
+      right: var(--space-md, 21px);
+      bottom: var(--space-md, 21px);
+      width: auto;
+      max-height: 42vh;
+      overflow: auto;
+      transform: translateY(12px);
+    }
+
+    .atlas-anno.is-open {
+      transform: translateY(0);
+    }
   }
 
   /* annotation internals (set by JS innerHTML) */
@@ -261,7 +322,7 @@ const { poemId, world } = Astro.props;
   }
 
   :global(.atlas-anno-cat) {
-    font-size: 12.5px;
+    font-size: 11.5px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     flex-shrink: 0;
@@ -270,12 +331,18 @@ const { poemId, world } = Astro.props;
   }
 
   /* WCAG 1.4.3: darkened from #9e8e7e/7a8696/728e72 (all ~2.8-3.3:1 ❌) to pass 4.5:1 ✅ */
-  :global(.atlas-anno-cat.tag-mode)    { color: #776a5e; } /* 4.69:1 ✅ */
+  :global(.atlas-anno-cat.tag-mode)    { color: #6f625b; }
   :global(.atlas-anno-cat.tag-type)    { color: #5e6e80; } /* 4.68:1 ✅ */
   :global(.atlas-anno-cat.tag-imagery) { color: #547054; } /* 4.92:1 ✅ */
+  :global(.atlas-anno-cat.tag-pressure) { color: #8b4f45; }
+  :global(.atlas-anno-cat.tag-form) { color: #7a6475; }
+  :global(.atlas-anno-cat.tag-sense) { color: #806637; }
+  :global(.atlas-anno-cat.tag-their-world) { color: #a92f25; }
+  :global(.atlas-anno-cat.tag-bless-you) { color: #7e5f70; }
+  :global(.atlas-anno-cat.tag-still-life) { color: #6f876f; }
 
   :global(.atlas-anno-name) {
-    font-size: 22px;
+    font-size: 23px;
     font-weight: normal;
     font-family: Georgia, 'Times New Roman', serif;
     letter-spacing: -0.01em;
@@ -285,12 +352,45 @@ const { poemId, world } = Astro.props;
   }
 
   :global(.atlas-anno-def) {
-    margin: 0 0 10px;
+    margin: 0 0 12px;
     font-size: 15.5px;
-    line-height: 1.7;
+    line-height: 1.58;
     color: var(--color-primary, #1a1a1a);
     font-style: italic;
-    opacity: 0.80;
+    opacity: 0.92;
+  }
+
+  :global(.atlas-anno-body) {
+    margin: 0;
+    font-size: 15.5px;
+    line-height: 1.58;
+    color: var(--color-primary, #1a1a1a);
+  }
+
+  :global(.atlas-anno-lede) {
+    margin: 0 0 16px;
+    font-style: italic;
+  }
+
+  :global(.atlas-anno-section) {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid color-mix(in srgb, var(--color-primary, #1a1a1a) 13%, transparent);
+  }
+
+  :global(.atlas-anno-section-title) {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 11px;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+    color: var(--color-meta, #595959);
+    font-style: normal;
+  }
+
+  :global(.atlas-anno-section p) {
+    margin: 0;
+    font-style: italic;
   }
 
   :global(.atlas-anno-meta) {
@@ -306,6 +406,7 @@ const { poemId, world } = Astro.props;
 
   :global(.atlas-anno-active) {
     color: var(--color-primary, #1a1a1a);
+    font-style: normal;
   }
 
   :global(.atlas-anno-inactive) {
@@ -343,38 +444,80 @@ const { poemId, world } = Astro.props;
 
 <script>
   import atlas from '../data/atlas.json';
+  import { poemContentTypes } from '../lib/content-types';
   import gsap from 'gsap';
 
   // ─── Constants ────────────────────────────────────────────────────────────
   const WORLD_COLORS: Record<string, { accent: string; soft: string }> = {
-    'their-world': { accent: '#c0392b', soft: '#e8c8c4' },
-    'bless-you':   { accent: '#9b7b8b', soft: '#ddd0d8' },
-    'still-life':  { accent: '#8a9e8a', soft: '#c8d8c8' },
+    'their-world': { accent: '#a92f25', soft: '#d8aaa5' },
+    'bless-you':   { accent: '#7e5f70', soft: '#cbb6c3' },
+    'still-life':  { accent: '#6f876f', soft: '#b5c9b5' },
   };
 
   const ATTR_COLORS: Record<string, string> = {
-    mode:    '#b8a898',
-    type:    '#8a96a8',
-    imagery: '#8a9e8a',
+    mode: '#5f554f',
+    type: '#4f6174',
+    imagery: '#486848',
+    pressure: '#7a433b',
+    form: '#6f596b',
+    sense: '#70572a',
   };
 
   const ATTR_LABELS: Record<string, string> = {
-    mode: 'speaker mode', type: 'poem act', imagery: 'imagery',
+    mode: 'voice',
+    type: 'act',
+    imagery: 'image',
+    pressure: 'pressure',
+    form: 'form',
+    sense: 'sense',
+  };
+
+  const CATEGORY_KEYS = ['mode', 'type', 'imagery', 'pressure', 'form', 'sense'] as const;
+
+  const DISPLAY_LIMITS: Record<string, number> = {
+    mode: 5,
+    type: 6,
+    imagery: 6,
+    pressure: 5,
+    form: 4,
+    sense: 4,
   };
 
   // Controlled vocabulary — full attribute field.
   const VOCAB: Record<string, string[]> = {
     mode: [
       'solitary_witness', 'child_perception', 'observer', 'fractured_self',
-      'addressed_speaker', 'devotional_speaker', 'plural_voice', 'absent_other_address',
+      'addressed_speaker', 'devotional_speaker', 'plural_voice', 'absent_other',
+      'absent_other_address', 'object_speaker', 'public_voice', 'domestic_voice',
+      'threshold_speaker',
     ],
     type: [
       'memory_fragment', 'scene', 'witness', 'monologue', 'confession',
       'lament', 'invocation', 'prayer', 'chant', 'manifesto', 'warning', 'farewell',
+      'meditation', 'catalogue', 'blessing', 'dream_record', 'parable', 'letter',
+      'threshold_crossing', 'refusal',
     ],
     imagery: [
       'shadow', 'child', 'room', 'house', 'window', 'glass',
       'light', 'eye', 'voice', 'flowers', 'faith', 'sky',
+      'water', 'mirror', 'street', 'forest', 'bed', 'fire', 'table', 'tree',
+      'animal', 'food', 'cloth', 'paper', 'screen', 'door', 'sea', 'body',
+      'weather', 'machine', 'flag', 'music',
+    ],
+    pressure: [
+      'family_pressure', 'institutional_pressure', 'class_pressure', 'surveillance',
+      'private_property', 'modernization', 'public_noise', 'exile', 'memory_pressure',
+      'belief_pressure', 'intimacy_pressure', 'bodily_pressure', 'death_pressure',
+      'labor_pressure', 'commerce', 'crowd_pressure', 'threshold_pressure', 'time_pressure',
+    ],
+    form: [
+      'narrative', 'observation', 'incantatory', 'political', 'spiritual',
+      'fragmented', 'love', 'dialogic', 'numbered_sequence', 'dramatic_fragment',
+      'prose_lyric', 'ritual_repetition',
+    ],
+    sense: [
+      'visual', 'auditory', 'tactile', 'taste', 'smell', 'temperature',
+      'motion', 'silence', 'hunger', 'breath',
     ],
   };
 
@@ -382,12 +525,15 @@ const { poemId, world } = Astro.props;
   // Bounding-box fitToCanvas auto-scales to fill available canvas, so these
   // define the shape of the layout, not the pixel footprint.
   const ZONES: Record<string, { cx: number; cy: number; sx: number; sy: number }> = {
-    mode:    { cx: -345, cy: -28, sx: 172, sy: 176 },
-    type:    { cx:  345, cy: -28, sx: 170, sy: 174 },
-    imagery: { cx:    0, cy: 192, sx: 332, sy: 108 },
+    mode:     { cx: -610, cy: -150, sx: 260, sy: 188 },
+    type:     { cx:  610, cy: -150, sx: 260, sy: 188 },
+    imagery:  { cx:    0, cy:  330, sx: 440, sy: 170 },
+    pressure: { cx: -610, cy:  295, sx: 250, sy: 160 },
+    form:     { cx:    0, cy: -420, sx: 340, sy: 132 },
+    sense:    { cx:  610, cy:  295, sx: 250, sy: 160 },
   };
 
-  const ACTIVE_PULL = 0.30;
+  const ACTIVE_PULL = 0.12;
 
   // ─── Attribute definitions ────────────────────────────────────────────────
   const ATTR_DESCRIPTIONS: Record<string, string> = {
@@ -398,7 +544,12 @@ const { poemId, world } = Astro.props;
     addressed_speaker:     'The poem speaks directly to another person, real or imagined, naming them into presence.',
     devotional_speaker:    'The speaker\'s address carries the quality of prayer or reverence toward something larger.',
     plural_voice:          'The poem speaks in a collective "we," dissolving individual identity into shared experience.',
+    absent_other:          'The poem turns toward someone or something missing, where address becomes a form of absence.',
     absent_other_address:  'The poem speaks to someone who is absent, gone, or unreachable — a one-sided conversation.',
+    object_speaker:        'A thing, material, or non-human presence takes on speech or implied interiority.',
+    public_voice:          'The poem carries a social voice larger than one speaker: crowd, broadcast, slogan, or institution.',
+    domestic_voice:        'Speech begins from the house, room, family, or ordinary interior life.',
+    threshold_speaker:     'The speaker stands at a crossing point: leaving, entering, looking through, or refusing passage.',
     memory_fragment:       'A partial, non-linear recollection — the poem captures a piece of the past as it surfaces, incomplete.',
     scene:                 'A present-tense moment rendered in space — the poem unfolds as a place you can stand inside.',
     witness:               'The poem enacts the act of seeing and recording, as if giving testimony.',
@@ -411,6 +562,14 @@ const { poemId, world } = Astro.props;
     manifesto:             'Declarative and positional — the poem asserts a way of seeing as if staking ground.',
     warning:               'The poem speaks in a cautionary or prophetic register, addressed to the future.',
     farewell:              'Leave-taking — the poem as a form of ending or final departure.',
+    meditation:            'Reflective pressure held over time, where the poem thinks by circling its subject.',
+    catalogue:             'Accumulation through listing — the poem builds force by gathering objects, scenes, or sensations.',
+    blessing:              'A wish or protection extended outward, even when its faith is uncertain.',
+    dream_record:          'A scene held in dream logic: vivid, displaced, or resistant to ordinary causality.',
+    parable:               'A small story or image carrying an ethical, spiritual, or social pressure beyond itself.',
+    letter:                'Address shaped as correspondence, whether or not it expects a reply.',
+    threshold_crossing:    'The poem stages passage from one state, world, room, or self toward another.',
+    refusal:               'The poem resists an imposed logic, command, role, or interpretation.',
     shadow:                'The trace or absence that follows without being named — what a presence leaves behind.',
     child:                 'Youth, vulnerability, the past self as a living presence in the poem.',
     room:                  'Interior space as containment — the poem happens inside enclosure, bounded.',
@@ -423,7 +582,124 @@ const { poemId, world } = Astro.props;
     flowers:               'Beauty, transience, offering — what blooms briefly and cannot be held.',
     faith:                 'Belief, trust, devotion — the poem in relation to what cannot be verified.',
     sky:                   'Expanse, distance, what cannot be held or entered — openness as subject.',
+    water:                 'Flow, cleansing, drowning, or passage — a force that carries feeling elsewhere.',
+    mirror:                'Reflection and doubling — the self seen as altered, split, or returned.',
+    street:                'Public movement and exposure, where private feeling enters social space.',
+    forest:                'A living threshold: danger, childhood fear, or unmanaged memory.',
+    bed:                   'Rest, illness, vulnerability, or the place where perception becomes unstable.',
+    fire:                  'Warmth, destruction, ritual, or a small center of survival.',
+    table:                 'The social surface of eating, family, exchange, and observation.',
+    tree:                  'Rooted witness, seasonal time, or a figure that holds memory in place.',
+    animal:                'Non-human life as witness, companion, appetite, or omen.',
+    food:                  'Taste, hunger, care, commerce, and the body\'s memory of the world.',
+    cloth:                 'Covering, costume, protection, wrapping, or the surface of social presentation.',
+    paper:                 'Record, message, advertisement, archive, or fragile proof.',
+    screen:                'Mediated vision: image, broadcast, noise, or technological distance.',
+    door:                  'Entry, refusal, boundary, or the possibility of leaving.',
+    sea:                   'Large departure, dissolution, origin, or the horizon of return.',
+    body:                  'Embodied pressure: pain, pulse, mouth, hand, breath, and physical memory.',
+    weather:               'Atmosphere as force: rain, snow, wind, heat, or pressure on the scene.',
+    machine:               'Mechanism, automation, public infrastructure, or the body under industrial logic.',
+    flag:                  'Public identity, ceremony, nation, or staged belonging.',
+    music:                 'Sound organized as memory, ritual, crowd, or emotional pressure.',
+    family_pressure:       'The family appears as demand, inheritance, protection, or wound.',
+    institutional_pressure:'School, state, church, property, medicine, or authority shaping what can be said.',
+    class_pressure:        'Social rank, money, status, or inherited place pressing on the poem.',
+    surveillance:          'The experience of watching and being watched, formally or informally.',
+    private_property:      'Boundaries of ownership: what may be entered, photographed, held, or claimed.',
+    modernization:         'New systems, objects, habits, or built environments changing perception.',
+    public_noise:          'Broadcast, siren, slogan, crowd, or civic sound crowding the interior voice.',
+    exile:                 'Distance from origin, home, language, or a former self.',
+    memory_pressure:       'The past actively pressing into the present rather than remaining behind it.',
+    belief_pressure:       'Faith, doubt, blessing, ritual, or devotion placed under strain.',
+    intimacy_pressure:     'Attachment, address, care, desire, or tenderness under difficulty.',
+    bodily_pressure:       'The poem is organized by pain, hunger, breath, illness, touch, or pulse.',
+    death_pressure:        'Mortality, disappearance, burial, farewell, or the nearness of ending.',
+    labor_pressure:        'Work, use, exhaustion, production, or being valued by function.',
+    commerce:              'Buying, selling, display, advertisement, or desire shaped by market surfaces.',
+    crowd_pressure:        'The mass presence of others: audience, public, strangers, or collective mood.',
+    threshold_pressure:    'A border must be crossed, guarded, refused, or recognized.',
+    time_pressure:         'The poem is driven by aging, waiting, season, return, or irreversible passage.',
+    narrative:             'The poem advances by event and sequence, even when the story remains partial.',
+    observation:           'Attention is the primary action: the poem watches, records, and arranges what it sees.',
+    incantatory:           'Repetition and cadence create a ritual charge.',
+    political:             'Public structure, power, class, ideology, or collective life enters the poem.',
+    spiritual:             'The poem keeps relation with belief, blessing, ritual, afterlife, or unseen force.',
+    fragmented:            'The poem is built from broken sequence, collage, interruption, or discontinuity.',
+    love:                  'Intimacy, tenderness, longing, or the beloved as organizing field.',
+    dialogic:              'The poem is shaped by implied exchange between voices.',
+    numbered_sequence:     'Numbering or sectional form makes the poem proceed as a series of panels.',
+    dramatic_fragment:     'The poem borrows stage, script, broadcast, or performance logic.',
+    prose_lyric:           'A lyric mode that leans toward sentence, scene, and sustained thought.',
+    ritual_repetition:     'Repeated structure works like ceremony rather than simple refrain.',
+    visual:                'Sight dominates the poem\'s way of knowing.',
+    auditory:              'Sound, voice, music, siren, silence, or broadcast carries the poem.',
+    tactile:               'Touch, texture, pressure, surface, or bodily contact is central.',
+    taste:                 'Taste or eating becomes a route into memory and feeling.',
+    smell:                 'Smell marks atmosphere, memory, place, or bodily nearness.',
+    temperature:           'Heat, cold, fever, warmth, or seasonal temperature governs the scene.',
+    motion:                'Movement, travel, falling, leaving, or drift drives the poem.',
+    silence:               'What is unsaid, muted, withheld, or quiet becomes active structure.',
+    hunger:                'Need, appetite, lack, or consumption gives the poem pressure.',
+    breath:                'Breathing, air, wind, or voice carries bodily presence.',
   };
+
+  function addValues(target: Set<string>, values: string[]) {
+    values.forEach((value) => target.add(value));
+  }
+
+  function inferAtlasValues(poem: any): Record<string, Set<string>> {
+    const contentTypes = poemContentTypes[poem?.id as keyof typeof poemContentTypes] ?? [];
+    const values: Record<string, Set<string>> = {
+      mode: new Set<string>(poem?.mode || []),
+      type: new Set<string>(poem?.type || []),
+      imagery: new Set<string>(poem?.imagery || []),
+      pressure: new Set<string>(poem?.pressure || []),
+      form: new Set<string>(poem?.form || []),
+      sense: new Set<string>(poem?.sense || []),
+    };
+
+    contentTypes.forEach((type) => values.form.add(type));
+
+    if (contentTypes.includes('narrative')) {
+      addValues(values.type, ['memory_fragment', 'scene']);
+      addValues(values.pressure, ['memory_pressure', 'time_pressure']);
+      addValues(values.mode, ['threshold_speaker']);
+      values.sense.add('motion');
+    }
+    if (contentTypes.includes('observation')) {
+      values.type.add('witness');
+      values.mode.add('observer');
+      values.sense.add('visual');
+    }
+    if (contentTypes.includes('incantatory')) {
+      addValues(values.type, ['chant', 'invocation']);
+      addValues(values.form, ['ritual_repetition']);
+      values.sense.add('auditory');
+    }
+    if (contentTypes.includes('political')) {
+      addValues(values.type, ['manifesto', 'warning']);
+      addValues(values.pressure, ['institutional_pressure', 'public_noise']);
+      values.mode.add('public_voice');
+    }
+    if (contentTypes.includes('spiritual')) {
+      addValues(values.type, ['prayer', 'invocation']);
+      values.pressure.add('belief_pressure');
+      values.mode.add('devotional_speaker');
+    }
+    if (contentTypes.includes('fragmented')) {
+      values.mode.add('fractured_self');
+      values.form.add('fragmented');
+      values.type.add('meditation');
+    }
+    if (contentTypes.includes('love')) {
+      addValues(values.mode, ['addressed_speaker', 'absent_other']);
+      values.pressure.add('intimacy_pressure');
+      values.type.add('letter');
+    }
+
+    return values;
+  }
 
   // ─── Types ────────────────────────────────────────────────────────────────
   interface Node {
@@ -439,7 +715,7 @@ const { poemId, world } = Astro.props;
     delay: number; currentAlpha: number;
   }
 
-  interface Edge { from: Node; to: Node; color: string; }
+  interface Edge { from: Node; to: Node; color: string; role?: 'poem' | 'cross'; }
 
   // ─── AtlasGraph ───────────────────────────────────────────────────────────
   class AtlasGraph {
@@ -449,12 +725,14 @@ const { poemId, world } = Astro.props;
     nodes: Node[]; edges: Edge[];
     selectedNode: Node | null; hoveredNode: Node | null;
     tx: number; ty: number; scale: number;
+    fitTx: number; fitTy: number; fitScale: number;
     cx: number; cy: number; dpr: number;
     isDragging: boolean;
     dragStart: { x: number; y: number; tx: number; ty: number } | null;
     pinchStart: number | null; pinchScale: number;
     pointerDownPos: { x: number; y: number } | null; pointerDownTime: number;
     rafId: number; isStub: boolean;
+    pulseStart: number;
     primaryColor: string; metaColor: string;
 
     constructor(canvas: HTMLCanvasElement, poemId: string, worldKey: string) {
@@ -465,18 +743,20 @@ const { poemId, world } = Astro.props;
       this.nodes = []; this.edges = [];
       this.selectedNode = null; this.hoveredNode = null;
       this.tx = 0; this.ty = 0; this.scale = 1;
+      this.fitTx = 0; this.fitTy = 0; this.fitScale = 1;
       this.cx = 0; this.cy = 0; this.dpr = window.devicePixelRatio || 1;
       this.isDragging = false; this.dragStart = null;
       this.pinchStart = null; this.pinchScale = 1;
       this.pointerDownPos = null; this.pointerDownTime = 0;
       this.rafId = 0; this.isStub = !this.poem?.mode;
+      this.pulseStart = 0;
       this.primaryColor = '#1a1a1a';
       this.metaColor = '#4f4f4f';
 
       this.resize();
       this.readThemeColors();
       this.buildGraph();
-      this.primeLayout(320); // settle positions synchronously — no visible motion
+      this.primeLayout(820); // settle positions synchronously — no visible motion
       this.fitToCanvas();
       this.setupEvents();
       this.startLoop();
@@ -515,28 +795,37 @@ const { poemId, world } = Astro.props;
       return { x: rawX, y: rawY };
     }
 
+    displayValues(attrType: string, activeSet: Set<string>): string[] {
+      const vocab = VOCAB[attrType] || [];
+      const active = vocab.filter((value) => activeSet.has(value));
+      const limit = DISPLAY_LIMITS[attrType] ?? vocab.length;
+      const context = vocab
+        .filter((value) => !activeSet.has(value))
+        .sort((a, b) => this.hashStr(`${this.poemId}:${attrType}:${a}`) - this.hashStr(`${this.poemId}:${attrType}:${b}`))
+        .slice(0, Math.max(0, limit - active.length));
+      return [...active, ...context];
+    }
+
     // ── Graph construction ─────────────────────────────────────────────────────
     buildGraph() {
       this.nodes = []; this.edges = [];
       const poem = this.poem;
-      const activeSets: Record<string, Set<string>> = {
-        mode:    new Set<string>(poem?.mode    || []),
-        type:    new Set<string>(poem?.type    || []),
-        imagery: new Set<string>(poem?.imagery || []),
-      };
+      const activeSets = inferAtlasValues(poem);
 
       // Anchor at origin
       const anchor: Node = {
-        kind: 'anchor', x: 0, y: 0, r: 24, vx: 0, vy: 0, homeX: 0, homeY: 0,
+        kind: 'anchor', x: 0, y: 0, r: 18, vx: 0, vy: 0, homeX: 0, homeY: 0,
         id: poem?.id, title: poem?.title ?? this.poemId,
         world: poem?.world ?? this.worldKey,
         delay: 0, currentAlpha: 1,
       };
       this.nodes.push(anchor);
 
-      // Attr node for every vocabulary item
-      ['mode', 'type', 'imagery'].forEach(attrType => {
-        VOCAB[attrType].forEach((value, i) => {
+      const activeAttrNodes: Node[] = [];
+
+      // Attr nodes are concrete feature nodes; category names stay in cards/legend.
+      CATEGORY_KEYS.forEach(attrType => {
+        this.displayValues(attrType, activeSets[attrType]).forEach((value, i) => {
           const active = activeSets[attrType].has(value);
           const home = this.computeHome(attrType, value, active);
           const jx = (this.hashStr(value + '_jx') - 0.5) * 8;
@@ -549,16 +838,76 @@ const { poemId, world } = Astro.props;
             delay: 0.04 + i * 0.042, currentAlpha: 0,
           };
           this.nodes.push(n);
-          if (active) this.edges.push({ from: anchor, to: n, color: ATTR_COLORS[attrType] });
+          if (active) {
+            activeAttrNodes.push(n);
+          }
         });
       });
+
+      this.selectPoemEdgeNodes(activeAttrNodes).forEach((node) => {
+        this.edges.push({ from: anchor, to: node, color: ATTR_COLORS[node.attrType!], role: 'poem' });
+      });
+
+      // A few cross-field links make the map read like parallel triggers:
+      // relation appears between active fields, while the poem remains context.
+      const linkPairs: Array<[string, string]> = [
+        ['mode', 'type'],
+        ['type', 'pressure'],
+        ['pressure', 'imagery'],
+        ['imagery', 'sense'],
+        ['form', 'type'],
+      ];
+      const crossDegree = new Map<Node, number>();
+      linkPairs.forEach(([a, b]) => {
+        const from = activeAttrNodes.find((n) => n.attrType === a);
+        const to = activeAttrNodes.find((n) => n.attrType === b);
+        if (!from || !to) return;
+        const fromDegree = crossDegree.get(from) ?? 0;
+        const toDegree = crossDegree.get(to) ?? 0;
+        if (fromDegree >= 2 || toDegree >= 2) return;
+        crossDegree.set(from, fromDegree + 1);
+        crossDegree.set(to, toDegree + 1);
+        this.edges.push({ from, to, color: this.metaColor, role: 'cross' });
+      });
+    }
+
+    selectPoemEdgeNodes(nodes: Node[]): Node[] {
+      const representatives = CATEGORY_KEYS
+        .map((key) => {
+          const candidates = nodes.filter((node) => node.attrType === key);
+          if (!candidates.length) return null;
+          return candidates
+            .slice()
+            .sort((a, b) => {
+              const da = Math.hypot(a.x, a.y);
+              const db = Math.hypot(b.x, b.y);
+              return db - da;
+            })[0];
+        })
+        .filter(Boolean) as Node[];
+
+      const selected: Node[] = [];
+      const minAngle = 0.34;
+      representatives
+        .slice()
+        .sort((a, b) => Math.hypot(b.x, b.y) - Math.hypot(a.x, a.y))
+        .forEach((node) => {
+          const angle = Math.atan2(node.y, node.x);
+          const crowded = selected.some((other) => {
+            const delta = Math.abs(Math.atan2(Math.sin(angle - Math.atan2(other.y, other.x)), Math.cos(angle - Math.atan2(other.y, other.x))));
+            return delta < minAngle;
+          });
+          if (!crowded || selected.length < 3) selected.push(node);
+        });
+
+      return selected.slice(0, 5);
     }
 
     // ── Force simulation (used only by primeLayout — not called during render) ─
     simulateStep() {
       // Softer zone pull lets repulsion spread nodes freely across the larger zones.
       // Higher REPEL_K and larger minD reduce label overlap, especially in dense clusters.
-      const ZONE_K = 0.017, ANCHOR_K = 0.008, REPEL_K = 1.72, DAMPING = 0.76;
+      const ZONE_K = 0.026, ANCHOR_K = 0.001, REPEL_K = 2.7, DAMPING = 0.72;
       const attrNodes = this.nodes.filter(n => n.kind === 'attr');
       attrNodes.forEach(n => {
         n.vx += (n.homeX - n.x) * ZONE_K;
@@ -567,15 +916,17 @@ const { poemId, world } = Astro.props;
           n.vx += (0 - n.x) * ANCHOR_K;
           n.vy += (0 - n.y) * ANCHOR_K;
         }
-        const allVis = [this.nodes[0], ...attrNodes];
+        const allVis = this.nodes;
         allVis.forEach(other => {
           if (other === n) return;
           const dx = n.x - other.x, dy = n.y - other.y;
           const dist = Math.sqrt(dx * dx + dy * dy) || 0.1;
           // More conservative minimum gap between dot surfaces for label breathing room.
-          const baseGap = n.r + other.r + 92;
+          const labelA = n.kind === 'attr' ? this.labelFootprint(n) : n.r + 82;
+          const labelB = other.kind === 'attr' ? this.labelFootprint(other) : other.r + 82;
+          const baseGap = Math.max(n.r + other.r + 158, (labelA + labelB) * 0.62);
           // Same-category nodes tend to sit near each other; push them a bit farther apart.
-          const typeBoost = n.kind === 'attr' && other.kind === 'attr' && n.attrType === other.attrType ? 14 : 0;
+          const typeBoost = n.kind === 'attr' && other.kind === 'attr' && n.attrType === other.attrType ? 46 : 0;
           const minD = baseGap + typeBoost;
           if (dist < minD) {
             const f = REPEL_K * (minD - dist) / dist;
@@ -585,6 +936,13 @@ const { poemId, world } = Astro.props;
         n.vx *= DAMPING; n.vy *= DAMPING;
         n.x += n.vx; n.y += n.vy;
       });
+    }
+
+    labelFootprint(n: Node): number {
+      if (n.kind !== 'attr') return n.r + 82;
+      const labelLen = this.formatLabel(n.value || '').length;
+      const textSize = n.active ? 29 : 22;
+      return n.r + 56 + Math.min(300, labelLen * textSize * 0.48);
     }
 
     // Settle layout synchronously before first draw — more steps for larger zones
@@ -600,11 +958,9 @@ const { poemId, world } = Astro.props;
       const ys = this.nodes.map(n => n.y);
       const minX = Math.min(...xs), maxX = Math.max(...xs);
       const minY = Math.min(...ys), maxY = Math.max(...ys);
-      const labelPadX = 112;
-      const topSafe = 54;
-      const annoEl = document.getElementById('atlas-anno');
-      const annoH = annoEl ? Math.max(annoEl.getBoundingClientRect().height, 0) : 0;
-      const bottomSafe = Math.max(170, annoH + 34);
+      const labelPadX = 72;
+      const topSafe = 34;
+      const bottomSafe = 72;
 
       const contentW = (maxX - minX) + labelPadX * 2;
       const contentH = (maxY - minY) + topSafe + bottomSafe;
@@ -612,7 +968,7 @@ const { poemId, world } = Astro.props;
       const usableH = Math.max(this.cy * 2, 1);
       const scaleW = usableW / contentW;
       const scaleH = usableH / contentH;
-      this.scale = Math.min(scaleW, scaleH, 1.35);
+      this.scale = Math.min(scaleW, scaleH, 1.82);
 
       // Place content inside asymmetric top/bottom paddings (centered in remaining space).
       const freeW = Math.max(0, usableW - (labelPadX * 2 + (maxX - minX)) * this.scale);
@@ -622,6 +978,9 @@ const { poemId, world } = Astro.props;
 
       this.tx = padLeft - this.cx - minX * this.scale;
       this.ty = padTop - this.cy - minY * this.scale;
+      this.fitScale = this.scale;
+      this.fitTx = this.tx;
+      this.fitTy = this.ty;
     }
 
     resize() {
@@ -663,6 +1022,20 @@ const { poemId, world } = Astro.props;
 
     easeOut(t: number) { return 1 - Math.pow(1 - t, 3); }
 
+    animateFor(ms = 460) {
+      const started = performance.now();
+      const tick = (now: number) => {
+        this.draw();
+        if (now - started < ms) {
+          this.rafId = requestAnimationFrame(tick);
+        } else {
+          this.rafId = 0;
+          this.draw();
+        }
+      };
+      if (!this.rafId) this.rafId = requestAnimationFrame(tick);
+    }
+
     // ── Drawing ───────────────────────────────────────────────────────────────
     draw() {
       const ctx = this.ctx, dpr = this.dpr;
@@ -677,60 +1050,31 @@ const { poemId, world } = Astro.props;
       ctx.restore();
     }
 
-    // Subtle zone halos — fill + dashed ring + label
-    drawZoneHalos() {
-      const ctx = this.ctx;
-      const zones = [
-        { key: 'mode',    label: 'speaker mode', rx: ZONES.mode.sx + 50,    ry: ZONES.mode.sy + 28,    labelY: ZONES.mode.cy - ZONES.mode.sy - 18 },
-        { key: 'type',    label: 'poem act',      rx: ZONES.type.sx + 50,    ry: ZONES.type.sy + 28,    labelY: ZONES.type.cy - ZONES.type.sy - 18 },
-        { key: 'imagery', label: 'imagery',       rx: ZONES.imagery.sx + 40, ry: ZONES.imagery.sy + 46, labelY: ZONES.imagery.cy + ZONES.imagery.sy + 20 },
-      ];
-
-      zones.forEach(({ key, rx, ry }) => {
-        const z = ZONES[key];
-        ctx.save();
-        ctx.globalAlpha = 0.10;
-        ctx.beginPath(); ctx.ellipse(z.cx, z.cy, rx, ry, 0, 0, Math.PI * 2);
-        ctx.fillStyle = ATTR_COLORS[key]; ctx.fill();
-        ctx.restore();
-      });
-
-      zones.forEach(({ key, rx, ry }) => {
-        const z = ZONES[key];
-        ctx.save();
-        ctx.globalAlpha = 0.20;
-        ctx.beginPath(); ctx.ellipse(z.cx, z.cy, rx + 2, ry + 2, 0, 0, Math.PI * 2);
-        ctx.strokeStyle = ATTR_COLORS[key]; ctx.lineWidth = 0.8;
-        ctx.setLineDash([4, 5]); ctx.stroke(); ctx.setLineDash([]);
-        ctx.restore();
-      });
-
-      ctx.save();
-      ctx.font = 'italic 12px Georgia, serif';
-      ctx.textBaseline = 'middle'; ctx.textAlign = 'center';
-      zones.forEach(({ key, label, labelY }) => {
-        ctx.globalAlpha = 0.74;
-        ctx.fillStyle = ATTR_COLORS[key];
-        ctx.fillText(label, ZONES[key].cx, labelY);
-      });
-      ctx.restore();
-    }
-
     // Edges: anchor → active attr only
     drawEdges() {
       const ctx = this.ctx;
       this.edges.forEach(edge => {
         const alpha = edge.to.currentAlpha ?? 0;
         if (alpha < 0.02) return;
-        const isSel = this.selectedNode === edge.to;
+        const isSel = this.selectedNode === edge.to || this.selectedNode === edge.from;
+        const roleOpacity: Record<string, number> = {
+          poem: 0.38,
+          cross: 0.68,
+        };
+        const roleWidth: Record<string, number> = {
+          poem: 1.05,
+          cross: 1.65,
+        };
         ctx.save();
-        ctx.globalAlpha = alpha * (isSel ? 0.72 : 0.40);
+        ctx.globalAlpha = alpha * (isSel ? 0.88 : roleOpacity[edge.role || 'poem']);
         ctx.strokeStyle = edge.color;
-        ctx.lineWidth = isSel ? 1.5 : 1.0;
+        ctx.lineWidth = isSel ? 1.9 : roleWidth[edge.role || 'poem'];
+        if (edge.role === 'poem') ctx.setLineDash([4, 8]);
         ctx.beginPath();
         ctx.moveTo(edge.from.x, edge.from.y);
         ctx.lineTo(edge.to.x, edge.to.y);
         ctx.stroke();
+        ctx.setLineDash([]);
         ctx.restore();
       });
     }
@@ -755,42 +1099,50 @@ const { poemId, world } = Astro.props;
     drawAnchorNode(n: Node) {
       const ctx = this.ctx;
       const wc = WORLD_COLORS[n.world || this.worldKey] || WORLD_COLORS['their-world'];
+      const isSel = this.selectedNode === n;
+      const pulse = isSel ? this.selectionPulse() : 0;
+      const r = n.r * (isSel ? 1.16 + pulse * 0.08 : 1);
       // Faint outer halo
-      ctx.beginPath(); ctx.arc(0, 0, n.r + 12, 0, Math.PI * 2);
-      ctx.strokeStyle = wc.accent; ctx.lineWidth = 0.8;
-      ctx.globalAlpha *= 0.14; ctx.stroke(); ctx.globalAlpha /= 0.14;
+      ctx.beginPath(); ctx.arc(0, 0, r + 12, 0, Math.PI * 2);
+      ctx.strokeStyle = wc.accent; ctx.lineWidth = 1.15;
+      ctx.globalAlpha *= isSel ? 0.46 : 0.28; ctx.stroke(); ctx.globalAlpha /= isSel ? 0.46 : 0.28;
       // Soft fill
-      ctx.beginPath(); ctx.arc(0, 0, n.r, 0, Math.PI * 2);
+      ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2);
       ctx.fillStyle = wc.soft;
-      ctx.globalAlpha *= 0.24; ctx.fill(); ctx.globalAlpha /= 0.24;
+      ctx.globalAlpha *= isSel ? 0.5 : 0.36; ctx.fill(); ctx.globalAlpha /= isSel ? 0.5 : 0.36;
       // Border
-      ctx.beginPath(); ctx.arc(0, 0, n.r, 0, Math.PI * 2);
-      ctx.strokeStyle = wc.accent; ctx.lineWidth = 1.8; ctx.stroke();
+      ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2);
+      ctx.strokeStyle = wc.accent; ctx.lineWidth = isSel ? 2.6 : 2.1; ctx.stroke();
+      if (pulse > 0) {
+        ctx.beginPath(); ctx.arc(0, 0, r + 16 + pulse * 12, 0, Math.PI * 2);
+        ctx.strokeStyle = wc.accent; ctx.lineWidth = 1.0;
+        ctx.globalAlpha *= 0.2 * pulse; ctx.stroke(); ctx.globalAlpha /= 0.2 * pulse;
+      }
       // Title below — larger, comfortable to read
-      ctx.font = '17px Georgia, serif'; ctx.fillStyle = this.primaryColor;
+      ctx.font = '36px Georgia, serif'; ctx.fillStyle = this.primaryColor;
       ctx.textAlign = 'center'; ctx.textBaseline = 'top';
-      this.wrapText(n.title || '', 0, n.r + 11, 140, 20);
+      this.wrapText(n.title || '', 0, r + 16, 310, 40);
     }
 
     drawAttrNode(n: Node) {
       const ctx = this.ctx;
       const color = ATTR_COLORS[n.attrType!] || '#888';
-      const isHov = this.hoveredNode === n;
       const isSel = this.selectedNode === n;
       const active = n.active ?? false;
 
       // Active nodes: full presence.
       // Inactive: clearly subordinate but still legible — not faint, just smaller and muted.
-      const baseOpacity = active ? 1 : 0.74;
+      const baseOpacity = active ? 1 : 0.88;
       ctx.globalAlpha *= baseOpacity;
 
+      const pulse = isSel ? this.selectionPulse() : 0;
       const baseR = active ? 10 : 5;
-      const r = baseR * (isHov || isSel ? 1.5 : 1);
+      const r = baseR * (isSel ? 1.24 + pulse * 0.1 : 1);
 
       // Soft aura for active nodes
       if (active && !isSel) {
         ctx.beginPath(); ctx.arc(n.x, n.y, r + 12, 0, Math.PI * 2);
-        ctx.fillStyle = color; ctx.globalAlpha *= 0.18; ctx.fill(); ctx.globalAlpha /= 0.18;
+        ctx.fillStyle = color; ctx.globalAlpha *= 0.26; ctx.fill(); ctx.globalAlpha /= 0.26;
       }
 
       // Dot
@@ -800,8 +1152,13 @@ const { poemId, world } = Astro.props;
       // Selection ring
       if (isSel) {
         ctx.beginPath(); ctx.arc(n.x, n.y, r + 6, 0, Math.PI * 2);
-        ctx.strokeStyle = color; ctx.lineWidth = 1.0;
-        ctx.globalAlpha *= 0.55; ctx.stroke(); ctx.globalAlpha /= 0.55;
+        ctx.strokeStyle = color; ctx.lineWidth = 1.25;
+        ctx.globalAlpha *= 0.72; ctx.stroke(); ctx.globalAlpha /= 0.72;
+        if (pulse > 0) {
+          ctx.beginPath(); ctx.arc(n.x, n.y, r + 12 + pulse * 10, 0, Math.PI * 2);
+          ctx.strokeStyle = color; ctx.lineWidth = 0.9;
+          ctx.globalAlpha *= 0.18 * pulse; ctx.stroke(); ctx.globalAlpha /= 0.18 * pulse;
+        }
       }
 
       // Label — radially outward from anchor, larger and more readable
@@ -816,8 +1173,8 @@ const { poemId, world } = Astro.props;
       else if (deg >= 70 && deg <= 110)   { ly = n.y + gap + 2; tb = 'top'; ta = 'center'; }
       else                                { ly = n.y - gap - 2; tb = 'bottom'; ta = 'center'; }
 
-      // Active: 18.5px upright; inactive: 16.5px italic
-      const fs = active ? 18.5 : 16.5;
+      // Active labels are close to the main reading scale; inactive labels stay legible.
+      const fs = active ? 29 : 22;
       ctx.font = `${active ? '' : 'italic '}${fs}px Georgia, serif`;
       // WCAG 1.4.3: dot drawn at baseOpacity (0.58 for inactive) but text needs higher opacity.
       // #5a5452 at 58% → 2.62:1 ❌. At 88% → 4.98:1 ✅. Save/restore alpha around text only.
@@ -835,6 +1192,12 @@ const { poemId, world } = Astro.props;
     }
 
     // ── Text helpers ──────────────────────────────────────────────────────────
+    selectionPulse(): number {
+      if (!this.pulseStart) return 0;
+      const t = Math.min(1, (performance.now() - this.pulseStart) / 460);
+      return Math.sin(t * Math.PI) * (1 - t * 0.28);
+    }
+
     wrapText(text: string, x: number, y: number, maxW: number, lineH: number) {
       const ctx = this.ctx, words = text.split(' ');
       let line = '', cy = y;
@@ -849,26 +1212,17 @@ const { poemId, world } = Astro.props;
 
     formatLabel(val: string) { return val.replace(/_/g, ' '); }
 
-    // ── Summary + annotation text ─────────────────────────────────────────────
-    buildSummaryText(): string {
-      const poem = this.poem;
-      if (!poem?.mode) return '';
-      const nMode = (poem.mode || []).length;
-      const nType = (poem.type || []).length;
-      const nImg  = (poem.imagery || []).length;
-      const parts: string[] = [];
-      if (nMode > 0) parts.push(`${nMode} speaker ${nMode === 1 ? 'mode' : 'modes'}`);
-      if (nType > 0) parts.push(`${nType} ${nType === 1 ? 'act' : 'acts'}`);
-      if (nImg  > 0) parts.push(`${nImg} imagery ${nImg === 1 ? 'field' : 'fields'}`);
-      if (!parts.length) return '';
-      const listed = parts.length === 1 ? parts[0]
-        : parts.slice(0, -1).join(', ') + ', and ' + parts[parts.length - 1];
-      return `This poem activates ${listed}.`;
+    sentenceList(values: string[]): string {
+      if (values.length <= 1) return values[0] || '';
+      if (values.length === 2) return `${values[0]} and ${values[1]}`;
+      return `${values.slice(0, -1).join(', ')}, and ${values[values.length - 1]}`;
     }
 
-    setSummary(text: string) {
-      const el = document.getElementById('atlas-summary');
-      if (el) el.textContent = text;
+    featurePhrase(active: Record<string, Set<string>>, keys: string[], maxPerKey = 4): string {
+      return keys
+        .flatMap((key) => [...active[key]].slice(0, maxPerKey).map((value) => this.formatLabel(value)))
+        .filter(Boolean)
+        .join(', ');
     }
 
     // Show attribute annotation panel (no poem lists — pure definition)
@@ -885,14 +1239,41 @@ const { poemId, world } = Astro.props;
         ${description ? `<p class="atlas-anno-def">${description}</p>` : ''}
       `;
       annoEl.classList.add('is-open');
-      this.fitToCanvas();
+      if (!this.rafId) this.draw();
+    }
+
+    showPoemAnnotation(n: Node) {
+      const poem = this.poem;
+      const active = inferAtlasValues(poem);
+      const voice = this.featurePhrase(active, ['mode']);
+      const actForm = this.featurePhrase(active, ['type', 'form'], 3);
+      const imageSense = this.featurePhrase(active, ['imagery', 'sense'], 4);
+      const pressure = this.featurePhrase(active, ['pressure']);
+      const connectedFields = CATEGORY_KEYS.filter((key) => active[key].size > 0).map((key) => ATTR_LABELS[key]);
+      const overview = connectedFields.length
+        ? `This poem sits at the center of ${this.sentenceList(connectedFields)}.`
+        : 'This poem is the center of the current ATLAS view.';
+      const annoEl = document.getElementById('atlas-anno')!;
+      annoEl.innerHTML = `
+        <div class="atlas-anno-header">
+          <span class="atlas-anno-cat tag-${poem?.world || this.worldKey}">poem</span>
+          <h3 class="atlas-anno-name">${n.title || this.poemId}</h3>
+        </div>
+        <div class="atlas-anno-body">
+          <p class="atlas-anno-lede">${overview} Dashed links show the poem's direct feature anchors; solid links show structural relations among those features.</p>
+          ${voice ? `<div class="atlas-anno-section"><span class="atlas-anno-section-title">Voice Position</span><p>The speaking position leans toward <span class="atlas-anno-active">${voice}</span>.</p></div>` : ''}
+          ${actForm ? `<div class="atlas-anno-section"><span class="atlas-anno-section-title">Poetic Action</span><p>Its movement is shaped by <span class="atlas-anno-active">${actForm}</span>.</p></div>` : ''}
+          ${imageSense ? `<div class="atlas-anno-section"><span class="atlas-anno-section-title">Image And Sense</span><p>The sensory field gathers around <span class="atlas-anno-active">${imageSense}</span>.</p></div>` : ''}
+          ${pressure ? `<div class="atlas-anno-section"><span class="atlas-anno-section-title">Pressure</span><p>The poem is held under <span class="atlas-anno-active">${pressure}</span>.</p></div>` : ''}
+        </div>
+      `;
+      annoEl.classList.add('is-open');
       if (!this.rafId) this.draw();
     }
 
     hideAnnotation() {
       const el = document.getElementById('atlas-anno');
       if (el) el.classList.remove('is-open');
-      this.fitToCanvas();
     }
 
     // ── Hit testing (anchor + attr only) ──────────────────────────────────────
@@ -908,8 +1289,7 @@ const { poemId, world } = Astro.props;
         // Active attr: large radius (65px) covers dot + label fully.
         // Inactive attr: 50px — generous but yields to nearer active nodes.
         // Anchor: fixed radius around the circle border.
-        const hitR = n.kind === 'anchor' ? n.r + 14
-          : (n.active ? 65 : 50);
+        const hitR = n.kind === 'anchor' ? n.r + 92 : (n.active ? 72 : 56);
         if (dist < hitR && dist < bestDist) { best = n; bestDist = dist; }
       }
       return best;
@@ -922,26 +1302,74 @@ const { poemId, world } = Astro.props;
       if (!this.rafId) this.draw();
     }
 
-    handleTap(px: number, py: number) {
-      const hit = this.hitTest(px, py);
-      if (!hit || hit.kind === 'anchor') { this.clearSelection(); return; }
-      if (hit === this.selectedNode) { this.clearSelection(); return; }
-      this.selectedNode = hit;
-      if (hit.kind === 'attr') this.showAttrAnnotation(hit);
+    zoomAt(px: number, py: number, factor: number) {
+      const nextScale = Math.max(this.fitScale, Math.min(2.45, this.scale * factor));
+      if (factor < 1 && nextScale <= this.fitScale * 1.01) {
+        this.resetView();
+        return;
+      }
+      const worldX = (px - this.cx - this.tx) / this.scale;
+      const worldY = (py - this.cy - this.ty) / this.scale;
+      this.scale = nextScale;
+      this.tx = px - this.cx - worldX * this.scale;
+      this.ty = py - this.cy - worldY * this.scale;
+      if (!this.rafId) this.draw();
     }
 
-    // ── Events — hover + tap only (drag/pan/zoom removed) ────────────────────
+    resetView() {
+      this.scale = this.fitScale;
+      this.tx = this.fitTx;
+      this.ty = this.fitTy;
+      if (!this.rafId) this.draw();
+    }
+
+    handleTap(px: number, py: number) {
+      const hit = this.hitTest(px, py);
+      if (!hit) { this.clearSelection(); return; }
+      if (hit === this.selectedNode) { this.clearSelection(); return; }
+      this.selectedNode = hit;
+      this.pulseStart = performance.now();
+      if (hit.kind === 'attr') this.showAttrAnnotation(hit);
+      if (hit.kind === 'anchor') this.showPoemAnnotation(hit);
+      this.animateFor(520);
+    }
+
+    // ── Events — pan, wheel zoom, double-click reset, tap select ─────────────
     setupEvents() {
       const canvas = this.canvas;
 
-      // Hover: update cursor and hovered node for visual feedback
+      canvas.addEventListener('wheel', (e: WheelEvent) => {
+        e.preventDefault();
+        const rect = canvas.getBoundingClientRect();
+        const factor = Math.exp(-e.deltaY * 0.0012);
+        this.zoomAt(e.clientX - rect.left, e.clientY - rect.top, factor);
+      }, { passive: false });
+
+      canvas.addEventListener('dblclick', () => this.resetView());
+
+      // Hover or drag: update cursor, selected hover, and pan when pointer is held.
       canvas.addEventListener('pointermove', (e: PointerEvent) => {
+        if (this.pointerDownPos) {
+          const dx = e.clientX - this.pointerDownPos.x;
+          const dy = e.clientY - this.pointerDownPos.y;
+          if (this.isDragging || Math.sqrt(dx * dx + dy * dy) > 8) {
+            this.isDragging = true;
+            if (this.dragStart) {
+              this.tx = this.dragStart.tx + dx;
+              this.ty = this.dragStart.ty + dy;
+              canvas.style.cursor = 'grabbing';
+              if (!this.rafId) this.draw();
+            }
+            return;
+          }
+        }
+
         const rect = canvas.getBoundingClientRect();
         const hit = this.hitTest(e.clientX - rect.left, e.clientY - rect.top);
         const attrHit = hit?.kind === 'attr' ? hit : null;
         if (attrHit !== this.hoveredNode) {
           this.hoveredNode = attrHit;
-          canvas.style.cursor = attrHit ? 'pointer' : 'default';
+          canvas.style.cursor = attrHit ? 'pointer' : 'grab';
           if (!this.rafId) this.draw();
         }
       });
@@ -950,6 +1378,8 @@ const { poemId, world } = Astro.props;
       canvas.addEventListener('pointerdown', (e: PointerEvent) => {
         canvas.setPointerCapture(e.pointerId);
         this.pointerDownPos = { x: e.clientX, y: e.clientY };
+        this.dragStart = { x: e.clientX, y: e.clientY, tx: this.tx, ty: this.ty };
+        this.isDragging = false;
         this.pointerDownTime = Date.now();
       });
 
@@ -959,11 +1389,14 @@ const { poemId, world } = Astro.props;
         const elapsed = Date.now() - this.pointerDownTime;
         const dx = e.clientX - this.pointerDownPos.x;
         const dy = e.clientY - this.pointerDownPos.y;
-        if (elapsed < 350 && Math.sqrt(dx * dx + dy * dy) < 12) {
+        if (!this.isDragging && elapsed < 350 && Math.sqrt(dx * dx + dy * dy) < 12) {
           const rect = canvas.getBoundingClientRect();
           this.handleTap(e.clientX - rect.left, e.clientY - rect.top);
         }
         this.pointerDownPos = null;
+        this.dragStart = null;
+        this.isDragging = false;
+        canvas.style.cursor = this.hoveredNode ? 'pointer' : 'grab';
       });
 
       window.addEventListener('resize', () => { this.resize(); this.fitToCanvas(); if (!this.rafId) this.draw(); });
@@ -977,6 +1410,8 @@ const { poemId, world } = Astro.props;
   const overlay  = document.getElementById('atlas-overlay')!;
   const trigger  = document.getElementById('atlas-trigger')!;
   const closeBtn = document.getElementById('atlas-close')!;
+  const zoomOutBtn = document.getElementById('atlas-zoom-out')!;
+  const zoomInBtn = document.getElementById('atlas-zoom-in')!;
   const canvas   = document.getElementById('atlas-canvas') as HTMLCanvasElement;
   const poemId   = (overlay as HTMLElement).dataset.poemId!;
   const worldKey = (overlay as HTMLElement).dataset.world!;
@@ -985,14 +1420,14 @@ const { poemId, world } = Astro.props;
   // Build accessible text summary of active attributes for screen readers
   function buildSrAttrsText(g: AtlasGraph): string {
     const poem = g.poem;
-    if (!poem?.mode) return 'No structural data available for this poem.';
+    if (!poem) return 'No structural data available for this poem.';
     const lines: string[] = [];
-    const labels: Record<string, string> = { mode: 'Speaker mode', type: 'Poem act', imagery: 'Imagery' };
-    (['mode', 'type', 'imagery'] as const).forEach(k => {
-      const active: string[] = poem[k] || [];
+    const activeValues = inferAtlasValues(poem);
+    CATEGORY_KEYS.forEach(k => {
+      const active = [...activeValues[k]];
       if (active.length) {
         const names = active.map((v: string) => v.replace(/_/g, ' ')).join(', ');
-        lines.push(`${labels[k]}: ${names}.`);
+        lines.push(`${ATTR_LABELS[k]}: ${names}.`);
       }
     });
     return lines.length ? 'Active structural qualities — ' + lines.join(' ') : '';
@@ -1005,10 +1440,13 @@ const { poemId, world } = Astro.props;
     // Reset annotation panel
     const annoEl = document.getElementById('atlas-anno');
     if (annoEl) { annoEl.classList.remove('is-open'); annoEl.innerHTML = ''; }
-    gsap.fromTo(overlay, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.32, ease: 'power2.out' });
+    gsap.fromTo(
+      overlay,
+      { opacity: 0, scale: 0.985 },
+      { opacity: 1, scale: 1, duration: 0.32, ease: 'expo.out' },
+    );
     if (graph) graph.destroy();
     graph = new AtlasGraph(canvas, poemId, worldKey);
-    document.getElementById('atlas-summary')!.textContent = graph.buildSummaryText();
     // Populate screen reader text alternative for the canvas (WCAG 1.1.1)
     const srEl = document.getElementById('atlas-sr-attrs');
     if (srEl) srEl.textContent = buildSrAttrsText(graph);
@@ -1018,7 +1456,7 @@ const { poemId, world } = Astro.props;
 
   function closeAtlas() {
     gsap.to(overlay, {
-      opacity: 0, y: 6, duration: 0.22, ease: 'power2.in',
+      opacity: 0, scale: 0.995, duration: 0.22, ease: 'power1.in',
       onComplete: () => {
         overlay.classList.remove('is-open');
         overlay.setAttribute('aria-hidden', 'true');
@@ -1031,9 +1469,15 @@ const { poemId, world } = Astro.props;
 
   trigger.addEventListener('click', openAtlas);
   closeBtn.addEventListener('click', closeAtlas);
+  zoomOutBtn.addEventListener('click', () => graph?.zoomAt(canvas.clientWidth / 2, canvas.clientHeight / 2, 0.86));
+  zoomInBtn.addEventListener('click', () => graph?.zoomAt(canvas.clientWidth / 2, canvas.clientHeight / 2, 1.16));
 
   document.addEventListener('keydown', (e: KeyboardEvent) => {
     if (e.key === 'Escape' && overlay.classList.contains('is-open')) closeAtlas();
+    if (!overlay.classList.contains('is-open')) return;
+    if (e.key === '+' || e.key === '=') graph?.zoomAt(canvas.clientWidth / 2, canvas.clientHeight / 2, 1.12);
+    if (e.key === '-' || e.key === '_') graph?.zoomAt(canvas.clientWidth / 2, canvas.clientHeight / 2, 0.9);
+    if (e.key === '0') graph?.resetView();
   });
 
   overlay.addEventListener('keydown', (e: KeyboardEvent) => {

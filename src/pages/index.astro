@@ -112,6 +112,12 @@ const siteDescription =
     return intersection / union;
   }
 
+  function atlasRelationScore(current, candidate) {
+    const direct = current.atlasRelations?.find((r) => r.id === candidate.id)?.weight ?? 0;
+    const reciprocal = candidate.atlasRelations?.find((r) => r.id === current.id)?.weight ?? 0;
+    return Math.max(direct, reciprocal * 0.82);
+  }
+
   function getNextPoemId(ctx, allPoems) {
     const current = allPoems.find((p) => p.id === ctx.currentId);
     if (!current) return allPoems[0]?.id ?? ctx.currentId;
@@ -144,10 +150,13 @@ const siteDescription =
         }
 
         const contentScore = contentSimilarity(current.contentTypes || [], p.contentTypes || []);
+        const atlasScore = atlasRelationScore(current, p);
         const worldScore = p.world !== ctx.currentWorld ? 1 : 0.3;
         const worldPenalty = ctx.prev1 && p.world === ctx.prev1.world ? 0.6 : 1;
 
-        const total = (arcScore * 0.4 + contentScore * 0.35 + worldScore * 0.15 + 0.1) * worldPenalty;
+        const total =
+          (atlasScore * 0.35 + arcScore * 0.25 + contentScore * 0.25 + worldScore * 0.1 + 0.05) *
+          worldPenalty;
 
         return { poem: p, score: total };
       });

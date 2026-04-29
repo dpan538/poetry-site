@@ -5,6 +5,12 @@ export interface ClientPoemRecord {
   firstLine: string
   emotionScore: number
   contentTypes: string[]
+  atlasRelations?: Array<{
+    id: string
+    weight: number
+    relation?: string
+    reason?: string[]
+  }>
 }
 
 export const allPoems: ClientPoemRecord[] = []
