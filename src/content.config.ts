@@ -8,7 +8,7 @@ const poemSchema = z.object({
   firstLine: z.string().optional(),
   /**
    * Optional: year the poem was written (for citation and metadata purposes).
-   * When omitted, the collection year range "2024–2025" is used.
+   * When omitted, the collection year range "2024–2026" is used.
    */
   writtenYear: z.number().optional(),
 });

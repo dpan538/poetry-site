@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import Nav from '../components/Nav.astro';
 import SEO from '../components/SEO.astro';
+import { publication } from '../lib/publication';
 
 interface Props {
   world?: 'their-world' | 'bless-you' | 'still-life';
@@ -16,6 +17,7 @@ interface Props {
     order: number;
     firstLine?: string;
     rawText?: string;
+    writtenYear?: number;
   };
   /** Breadcrumb trail for JSON-LD BreadcrumbList and Google site structure signals. */
   breadcrumbs?: { name: string; url: string }[];
@@ -46,7 +48,7 @@ const canonicalURL = new URL(pathname, site).href;
       </div>
       <footer class="site-copyright" role="contentinfo" aria-label="Site copyright">
         <p>
-          © 2024–2025 Dai Pan (潘岱). All rights reserved. Poems may not be reproduced without written permission.
+          © {publication.copyrightYears} {publication.authorDisplayName}. {publication.license}. Poems may not be reproduced without written permission.
         </p>
       </footer>
     </div>

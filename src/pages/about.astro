@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { publication } from '../lib/publication';
 
 const aboutDescription =
   'Dai Pan (潘岱, also written Pan Dai) is a visual artist, photographer, printmaker and writer based in Brisbane, Australia. BFA, School of Visual Arts, New York.';
@@ -42,7 +43,7 @@ const breadcrumbs = [
           prohibited without written permission.
         </p>
         <p>
-          © 2024–2025 Dai Pan (潘岱). All rights reserved.
+          © {publication.copyrightYears} {publication.authorDisplayName}. {publication.license}.
         </p>
       </div>
     </section>

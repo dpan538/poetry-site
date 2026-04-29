@@ -63,6 +63,7 @@ const worldLabels: Record<string, string> = {
 };
 
 const poemUrl = `https://daipan.ink/${world}/${poem.id}`;
+const citationYear = poem.data.writtenYear ?? 2025;
 const breadcrumbs = [
   { name: 'Three Worlds', url: 'https://daipan.ink/' },
   { name: worldLabels[world] ?? world, url: `https://daipan.ink/${world}` },
@@ -81,6 +82,7 @@ const breadcrumbs = [
     order: poem.data.order,
     firstLine: poem.data.firstLine,
     rawText,
+    writtenYear: poem.data.writtenYear,
   }}
 >
   <main class="poem-shell">
@@ -111,7 +113,7 @@ const breadcrumbs = [
       ))}
       <p class="poem-seo-citation">
         Cite as: Dai Pan, "{poem.data.title}," <em>Three Worlds</em>, {worldLabels[world] ?? world},
-        poem {String(poem.data.order).padStart(2, '0')}. daipan.ink, 2025.
+        poem {String(poem.data.order).padStart(2, '0')}. daipan.ink, {citationYear}.
         URL: {poemUrl}
       </p>
     </article>

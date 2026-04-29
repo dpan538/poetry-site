@@ -1,8 +1,19 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import { publication, worldMetadata, worldOrder } from '../lib/publication';
 
 const collectionDescription =
-  'Three Worlds — a poetry collection by Dai Pan (潘岱). Publication record: volumes, poem count, edition, citation format, and copyright.';
+  'Three Worlds — an ongoing poetry collection by Dai Pan (潘岱). Publication record: affective volumes, poem count, edition history, citation format, and copyright.';
+
+const poemCounts = Object.fromEntries(
+  await Promise.all(
+    worldOrder.map(async (world) => {
+      const poems = await getCollection(world);
+      return [world, poems.length] as const;
+    }),
+  ),
+) as Record<(typeof worldOrder)[number], number>;
 
 const breadcrumbs = [
   { name: 'Three Worlds', url: 'https://daipan.ink/' },
@@ -15,7 +26,7 @@ const breadcrumbs = [
 
     <!-- ── Colophon / Publication Record ───────────────────────────────────── -->
     <header class="collection-masthead">
-      <h1 class="collection-title">Three Worlds</h1>
+      <h1 class="collection-title">{publication.collectionTitle}</h1>
       <p class="collection-subtitle">Still Life · Bless You · Their World</p>
     </header>
 
@@ -23,35 +34,35 @@ const breadcrumbs = [
       <dl class="colophon-grid">
         <div class="colophon-row">
           <dt>Collection</dt>
-          <dd>Three Worlds (三个世界)</dd>
+          <dd>{publication.collectionTitle} ({publication.collectionChineseTitle})</dd>
         </div>
         <div class="colophon-row">
           <dt>Author</dt>
-          <dd>Dai Pan <span class="colophon-zh">潘岱</span></dd>
+          <dd>{publication.authorName} <span class="colophon-zh">{publication.authorChineseName}</span></dd>
         </div>
         <div class="colophon-row">
           <dt>Written</dt>
-          <dd>2024 — Spring 2025</dd>
+          <dd>{publication.writtenRangeLabel}</dd>
         </div>
         <div class="colophon-row">
           <dt>Digital edition</dt>
-          <dd>2025 (first edition)</dd>
+          <dd>{publication.digitalEditionLabel}</dd>
         </div>
         <div class="colophon-row">
           <dt>Version</dt>
-          <dd>1.0</dd>
+          <dd>{publication.versionLabel}</dd>
         </div>
         <div class="colophon-row">
           <dt>Language</dt>
-          <dd>English</dd>
+          <dd>{publication.language}</dd>
         </div>
         <div class="colophon-row">
           <dt>License</dt>
-          <dd>All rights reserved</dd>
+          <dd>{publication.license}</dd>
         </div>
         <div class="colophon-row">
           <dt>Contact</dt>
-          <dd><a href="https://daipan.art" target="_blank" rel="noopener noreferrer">daipan.art</a></dd>
+          <dd><a href={publication.visualArtUrl} target="_blank" rel="noopener noreferrer">daipan.art</a></dd>
         </div>
       </dl>
     </section>
@@ -64,8 +75,8 @@ const breadcrumbs = [
           <a href="/their-world" class="volume-link">
             <span class="volume-roman">I</span>
             <span class="volume-info">
-              <span class="volume-name">Their World</span>
-              <span class="volume-meta">21 poems · New York</span>
+                <span class="volume-name">{worldMetadata['their-world'].label}</span>
+                <span class="volume-meta">{poemCounts['their-world']} poems · {worldMetadata['their-world'].register}</span>
             </span>
           </a>
         </li>
@@ -73,8 +84,8 @@ const breadcrumbs = [
           <a href="/bless-you" class="volume-link">
             <span class="volume-roman">II</span>
             <span class="volume-info">
-              <span class="volume-name">Bless You</span>
-              <span class="volume-meta">27 poems · Shanghai</span>
+              <span class="volume-name">{worldMetadata['bless-you'].label}</span>
+              <span class="volume-meta">{poemCounts['bless-you']} poems · {worldMetadata['bless-you'].register}</span>
             </span>
           </a>
         </li>
@@ -82,8 +93,8 @@ const breadcrumbs = [
           <a href="/still-life" class="volume-link">
             <span class="volume-roman">III</span>
             <span class="volume-info">
-              <span class="volume-name">Still Life</span>
-              <span class="volume-meta">27 poems · Brisbane</span>
+              <span class="volume-name">{worldMetadata['still-life'].label}</span>
+              <span class="volume-meta">{poemCounts['still-life']} poems · {worldMetadata['still-life'].register}</span>
             </span>
           </a>
         </li>
@@ -95,12 +106,11 @@ const breadcrumbs = [
       <h2 class="colophon-section-label">Cite this collection</h2>
       <div class="citation-block">
         <p class="citation-format">
-          Dai Pan. <em>Three Worlds</em>. daipan.ink, 2025.
-          <span class="citation-url">https://daipan.ink/collection</span>
+          Dai Pan. <em>Three Worlds</em>. daipan.ink, 2025–.
+          <span class="citation-url">{publication.collectionUrl}</span>
         </p>
         <p class="citation-note">
-          For individual poems: Dai Pan, "<em>Title</em>," <em>Three Worlds</em>, Volume, poem 00.
-          daipan.ink, 2025. URL.
+          For individual poems: {publication.individualCitationTemplate}
         </p>
       </div>
     </section>
@@ -109,10 +119,10 @@ const breadcrumbs = [
     <section class="reading-prose collection-note" aria-label="Editorial note">
       <h2 class="colophon-section-label">Note</h2>
       <p>
-        Written between 2024 and the spring of 2025, this collection emerged from a period of quiet
-        withdrawal — a final year in New York spent largely alone, where communication grew sparse
-        and something harder to name grew in its place: introspection, narrative reconfiguration,
-        and an emotional intensity that had nowhere else to go.
+        Begun in 2024 and continuing through 2026, this collection emerged from a period of quiet
+        withdrawal and has since become an ongoing digital record. Communication grew sparse, and
+        something harder to name grew in its place: introspection, narrative reconfiguration, and
+        an emotional intensity that had nowhere else to go.
       </p>
       <p>
         Dai Pan was born in Jiangsu, formed in Shanghai and New York. He has since lived across
@@ -122,10 +132,11 @@ const breadcrumbs = [
       </p>
       <p>
         The three volumes — <em>Still Life</em>, <em>Bless You</em>, and <em>Their World</em> —
-        correspond to three registers of experience: the internal world colored by intuition and
-        affect; the address toward others, collapsing love and belief and grief into a single
-        'you'; and the symbolic exterior, the mechanical world that disfigures and defines us.
-        These worlds are porous and overlapping, the way memory actually moves.
+        are not geographic divisions. They correspond to three affective registers: the internal
+        world colored by intuition and perception; the address toward others, collapsing love and
+        belief and grief into a single 'you'; and the symbolic exterior, the mechanical world that
+        disfigures and defines us. These worlds are porous and overlapping, the way memory actually
+        moves.
       </p>
       <p>
         Writing, for this author, becomes a way of circling the unreachable present. These poems
@@ -138,7 +149,8 @@ const breadcrumbs = [
           All poems collected in <em>Three Worlds</em> are the original work of Dai Pan (潘岱)
           and are protected under copyright. No part of this collection may be reproduced,
           distributed, or transmitted in any form without the prior written permission of the
-          author. For permissions and inquiries, visit daipan.art.
+          author. This digital collection is maintained as an ongoing edition. For permissions and
+          inquiries, visit daipan.art.
         </p>
       </div>
     </section>

@@ -1,5 +1,7 @@
+import { SITE_ORIGIN } from './publication';
+
 /** Site origin for canonical URLs and SEO (matches `site` in astro.config). */
-export const SITE_ORIGIN = 'https://daipan.ink';
+export { SITE_ORIGIN };
 
 /** First `maxWords` words, plus "..." when truncated (for poem meta descriptions). */
 export function excerptWords(text: string, maxWords: number): string {

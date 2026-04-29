@@ -30,7 +30,11 @@ export const poemContentTypes: Record<string, ContentType[]> = {
   room: ['monologue', 'fragmented'],
   'the-white-tree': ['narrative', 'spiritual'],
   farewell: ['narrative', 'spiritual'],
+  'end-for-the-end': ['political', 'incantatory', 'fragmented'],
+  'the-wrapper': ['love', 'narrative', 'fragmented'],
+  synesthesia: ['love', 'observation', 'spiritual', 'fragmented'],
 
+  'a-new-york-home': ['love', 'narrative', 'observation'],
   river: ['love', 'fragmented'],
   ears: ['love', 'observation'],
   kite: ['love', 'monologue'],

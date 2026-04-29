@@ -1,4 +1,6 @@
 ---
+import { publication, SITE_ORIGIN, worldMetadata, worldOrder, type WorldId } from '../lib/publication';
+
 interface Props {
   title: string;
   description: string;
@@ -11,6 +13,7 @@ interface Props {
     order: number;
     firstLine?: string;
     rawText?: string;
+    writtenYear?: number;
   };
   /** When provided, emits a BreadcrumbList JSON-LD for site hierarchy signals */
   breadcrumbs?: { name: string; url: string }[];
@@ -18,8 +21,8 @@ interface Props {
 
 const { title, description, canonicalURL, ogImage, poem, breadcrumbs } = Astro.props;
 
-const fullTitle = `${title} — Dai Pan`;
-const ogSiteName = 'Dai Pan — daipan.ink';
+const fullTitle = `${title} — ${publication.authorName}`;
+const ogSiteName = `${publication.authorName} — daipan.ink`;
 
 // Keywords include canonical name forms and explicit subject signals.
 // "daipan.ink" is the personal poetry website of Dai Pan (潘岱) — NOT an ink product brand.
@@ -31,15 +34,15 @@ const keywords =
 const personLd = {
   '@context': 'https://schema.org',
   '@type': 'Person',
-  '@id': 'https://daipan.ink/#author',
-  name: 'Dai Pan',
+  '@id': `${SITE_ORIGIN}/#author`,
+  name: publication.authorName,
   // alternateName lists all recognized forms: Chinese characters, pinyin, reversed-order romanization
-  alternateName: ['潘岱', 'Pan Dai', 'Pān Dài', 'Dai Pan (潘岱)'],
-  url: 'https://daipan.ink',
+  alternateName: publication.authorAlternateNames,
+  url: SITE_ORIGIN,
   sameAs: [
-    'https://daipan.art',
-    'https://instagram.com/jumpingchick666',
-    'https://www.instagram.com/jumpingchick666/',
+    publication.visualArtUrl,
+    `https://instagram.com/${publication.authorInstagram}`,
+    publication.authorInstagramUrl,
   ],
   jobTitle: 'Visual Artist and Writer',
   description:
@@ -66,19 +69,49 @@ const personLd = {
 const websiteLd = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
-  '@id': 'https://daipan.ink/#website',
-  name: 'Three Worlds — Dai Pan',
+  '@id': `${SITE_ORIGIN}/#website`,
+  name: `${publication.collectionTitle} — ${publication.authorName}`,
   alternateName: 'daipan.ink — poetry by Dai Pan',
-  url: 'https://daipan.ink',
+  url: SITE_ORIGIN,
   description:
-    'daipan.ink is the personal poetry website of Dai Pan (潘岱, Pan Dai), a visual artist and poet based in Brisbane. Three Worlds is his debut poetry collection, comprising Still Life, Bless You, and Their World. Written 2024–2025. This site is a poetry collection, not an ink or printing product.',
+    'daipan.ink is the personal poetry website of Dai Pan (潘岱, Pan Dai), a visual artist and poet based in Brisbane. Three Worlds is an ongoing poetry collection comprising Still Life, Bless You, and Their World, organized by affective registers rather than geography. Written and updated 2024–2026. This site is a poetry collection, not an ink or printing product.',
   about: { '@type': 'Thing', name: 'Poetry', description: 'Contemporary poetry in English by Dai Pan (潘岱)' },
-  author: { '@id': 'https://daipan.ink/#author' },
-  inLanguage: 'en',
+  author: { '@id': `${SITE_ORIGIN}/#author` },
+  inLanguage: publication.languageCode,
+  dateModified: publication.dateModified,
   audience: { '@type': 'Audience', audienceType: 'poetry readers, literary readers' },
-  copyrightHolder: { '@id': 'https://daipan.ink/#author' },
-  copyrightYear: '2024',
-  license: 'All rights reserved',
+  copyrightHolder: { '@id': `${SITE_ORIGIN}/#author` },
+  copyrightYear: String(publication.writtenStartYear),
+  copyrightNotice: publication.rights,
+  license: publication.license,
+};
+
+const volumeLd = worldOrder.map((world, index) => {
+  const meta = worldMetadata[world];
+  return {
+    '@type': 'CreativeWork',
+    '@id': `${SITE_ORIGIN}${meta.urlPath}#volume`,
+    name: meta.label,
+    position: index + 1,
+    url: `${SITE_ORIGIN}${meta.urlPath}`,
+    genre: meta.register,
+    description: meta.description,
+    isPartOf: { '@id': `${SITE_ORIGIN}/#collection` },
+  };
+});
+
+const collectionSeriesLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CreativeWorkSeries',
+  '@id': `${SITE_ORIGIN}/#three-worlds-series`,
+  name: publication.collectionTitle,
+  url: publication.collectionUrl,
+  author: { '@id': `${SITE_ORIGIN}/#author` },
+  inLanguage: publication.languageCode,
+  datePublished: String(publication.firstDigitalEditionYear),
+  dateModified: publication.dateModified,
+  temporalCoverage: `${publication.writtenStartYear}/${publication.latestWrittenYear}`,
+  hasPart: volumeLd.map((volume) => ({ '@id': volume['@id'] })),
 };
 
 // --- Book schema for the collection itself ---
@@ -86,34 +119,37 @@ const websiteLd = {
 const bookLd = {
   '@context': 'https://schema.org',
   '@type': 'Book',
-  '@id': 'https://daipan.ink/#collection',
-  name: 'Three Worlds',
+  '@id': `${SITE_ORIGIN}/#collection`,
+  name: publication.collectionTitle,
   alternativeHeadline: 'Still Life · Bless You · Their World',
-  url: 'https://daipan.ink/collection',
-  author: { '@id': 'https://daipan.ink/#author' },
-  inLanguage: 'en',
-  datePublished: '2025',
-  publisher: { '@id': 'https://daipan.ink/#author' },
-  copyrightHolder: { '@id': 'https://daipan.ink/#author' },
-  copyrightYear: '2024',
-  license: 'All rights reserved',
+  url: publication.collectionUrl,
+  author: { '@id': `${SITE_ORIGIN}/#author` },
+  inLanguage: publication.languageCode,
+  datePublished: String(publication.firstDigitalEditionYear),
+  dateModified: publication.dateModified,
+  temporalCoverage: `${publication.writtenStartYear}/${publication.latestWrittenYear}`,
+  version: publication.version,
+  publisher: { '@id': `${SITE_ORIGIN}/#author` },
+  copyrightHolder: { '@id': `${SITE_ORIGIN}/#author` },
+  copyrightYear: String(publication.writtenStartYear),
+  copyrightNotice: publication.rights,
+  license: publication.license,
   genre: 'Poetry',
   numberOfPages: undefined,
   bookFormat: 'EBook',
+  isPartOf: { '@id': `${SITE_ORIGIN}/#three-worlds-series` },
+  hasPart: volumeLd.map((volume) => ({ '@id': volume['@id'] })),
   description:
-    'Three Worlds is the debut poetry collection by Dai Pan (潘岱), organized into three volumes — Still Life, Bless You, and Their World — written between 2024 and spring 2025.',
+    'Three Worlds is the ongoing debut poetry collection by Dai Pan (潘岱), organized into three affective volumes — Still Life, Bless You, and Their World — written and updated between 2024 and 2026.',
 };
 
 // --- Poem schema (only on individual poem pages) ---
 let poemLd: object | null = null;
 if (poem) {
-  const worldLabels: Record<string, string> = {
-    'their-world': 'Their World',
-    'bless-you': 'Bless You',
-    'still-life': 'Still Life',
-  };
-  const worldLabel = worldLabels[poem.world] ?? poem.world;
-  const poemUrl = `https://daipan.ink/${poem.world}/${poem.id}`;
+  const poemWorld = poem.world as WorldId;
+  const worldMeta = worldMetadata[poemWorld];
+  const worldLabel = worldMeta?.label ?? poem.world;
+  const poemUrl = `${SITE_ORIGIN}/${poem.world}/${poem.id}`;
 
   // First ~150 chars of text as abstract
   const abstract = poem.rawText
@@ -126,14 +162,19 @@ if (poem) {
     '@id': poemUrl,
     name: title,
     url: poemUrl,
-    author: { '@id': 'https://daipan.ink/#author' },
-    isPartOf: { '@id': 'https://daipan.ink/#collection' },
-    genre: worldLabel,
+    author: { '@id': `${SITE_ORIGIN}/#author` },
+    isPartOf: [
+      { '@id': `${SITE_ORIGIN}/#collection` },
+      ...(worldMeta ? [{ '@id': `${SITE_ORIGIN}${worldMeta.urlPath}#volume` }] : []),
+    ],
+    genre: worldMeta ? `${worldLabel}; ${worldMeta.register}` : worldLabel,
     abstract: abstract,
-    inLanguage: 'en',
-    copyrightHolder: { '@id': 'https://daipan.ink/#author' },
-    copyrightYear: '2025',
-    license: 'All rights reserved — Dai Pan (潘岱)',
+    inLanguage: publication.languageCode,
+    copyrightHolder: { '@id': `${SITE_ORIGIN}/#author` },
+    dateCreated: poem.writtenYear ? String(poem.writtenYear) : undefined,
+    copyrightYear: String(poem.writtenYear ?? publication.firstDigitalEditionYear),
+    copyrightNotice: publication.rights,
+    license: `${publication.license} — ${publication.authorDisplayName}`,
     position: poem.order,
   };
 }
@@ -157,7 +198,9 @@ if (breadcrumbs && breadcrumbs.length > 0) {
 const jsonLdBlocks = [
   personLd,
   websiteLd,
+  collectionSeriesLd,
   bookLd,
+  ...volumeLd,
   ...(poemLd ? [poemLd] : []),
   ...(breadcrumbLd ? [breadcrumbLd] : []),
 ];
@@ -165,15 +208,16 @@ const jsonLdBlocks = [
 
 <title>{fullTitle}</title>
 <meta name="description" content={description} />
-<meta name="author" content="Dai Pan (潘岱)" />
-<meta name="copyright" content="© 2024–2025 Dai Pan (潘岱 / Pan Dai). All rights reserved." />
+<meta name="author" content={publication.authorDisplayName} />
+<meta name="copyright" content={`© ${publication.copyrightYears} ${publication.authorName} (${publication.authorChineseName} / Pan Dai). ${publication.license}.`} />
 <meta
   name="rights"
-  content="All poems and texts © 2024–2025 Dai Pan (潘岱). Unauthorized reproduction, redistribution, or AI training use prohibited without written permission."
+  content={publication.rights}
 />
-<meta name="dcterms.creator" content="Dai Pan (潘岱)" />
-<meta name="dcterms.rights" content="Copyright © 2024–2025 Dai Pan. All rights reserved." />
-<meta name="dcterms.language" content="en" />
+<meta name="dcterms.creator" content={publication.authorDisplayName} />
+<meta name="dcterms.rights" content={`Copyright © ${publication.copyrightYears} ${publication.authorName}. ${publication.license}.`} />
+<meta name="dcterms.language" content={publication.languageCode} />
+<meta name="dcterms.modified" content={publication.dateModified} />
 <meta name="keywords" content={keywords} />
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
 <link rel="canonical" href={canonicalURL} />

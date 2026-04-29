@@ -318,6 +318,74 @@
       ]
     },
     {
+      "id": "end-for-the-end",
+      "title": "End for the end",
+      "world": "their-world",
+      "order": 22,
+      "url": "/their-world/end-for-the-end",
+      "firstLine": "Watching the flags in the faring wind, making a sign,",
+      "mode": ["plural_voice", "observer"],
+      "type": ["warning", "chant", "lament"],
+      "imagery": ["sky", "voice", "light", "glass"],
+      "related_poems": [
+        { "id": "manifesto", "weight": 0.82, "reason": ["mode", "type"] },
+        { "id": "hope", "weight": 0.78, "reason": ["type", "imagery"] },
+        { "id": "siren", "weight": 0.74, "reason": ["type", "mode"] },
+        { "id": "young-blood", "weight": 0.70, "reason": ["type", "mode"] }
+      ]
+    },
+    {
+      "id": "the-wrapper",
+      "title": "The Wrapper",
+      "world": "their-world",
+      "order": 23,
+      "url": "/their-world/the-wrapper",
+      "firstLine": "Sealed for how long, your room, a sugar smell fermenting",
+      "mode": ["addressed_speaker", "fractured_self"],
+      "type": ["confession", "memory_fragment"],
+      "imagery": ["room", "voice", "light"],
+      "related_poems": [
+        { "id": "room", "weight": 0.81, "reason": ["mode", "imagery"] },
+        { "id": "umbrella", "weight": 0.76, "reason": ["mode", "type"] },
+        { "id": "river", "weight": 0.70, "reason": ["type", "mode"] },
+        { "id": "a-new-york-home", "weight": 0.68, "reason": ["type", "imagery"] }
+      ]
+    },
+    {
+      "id": "synesthesia",
+      "title": "Synesthesia",
+      "world": "their-world",
+      "order": 24,
+      "url": "/their-world/synesthesia",
+      "firstLine": "Pink tongues and green tastings,",
+      "mode": ["addressed_speaker", "devotional_speaker"],
+      "type": ["invocation", "prayer", "memory_fragment"],
+      "imagery": ["voice", "faith", "light", "flowers"],
+      "related_poems": [
+        { "id": "hope", "weight": 0.80, "reason": ["type", "imagery"] },
+        { "id": "traces-of-healing", "weight": 0.76, "reason": ["mode", "type"] },
+        { "id": "gentleness", "weight": 0.72, "reason": ["mode", "imagery"] },
+        { "id": "the-wrapper", "weight": 0.68, "reason": ["type", "mode"] }
+      ]
+    },
+    {
+      "id": "a-new-york-home",
+      "title": "A New York Home",
+      "world": "bless-you",
+      "order": 28,
+      "url": "/bless-you/a-new-york-home",
+      "firstLine": "My home in New York has no walls, no doors.",
+      "mode": ["solitary_witness", "observer"],
+      "type": ["scene", "memory_fragment"],
+      "imagery": ["house", "flowers", "room", "sky"],
+      "related_poems": [
+        { "id": "the-barn", "weight": 0.78, "reason": ["imagery", "type"] },
+        { "id": "sleeping-in", "weight": 0.76, "reason": ["mode", "type"] },
+        { "id": "cottage", "weight": 0.72, "reason": ["imagery", "type"] },
+        { "id": "the-wrapper", "weight": 0.68, "reason": ["type", "imagery"] }
+      ]
+    },
+    {
       "id": "breakfast",
       "title": "Breakfast",
       "world": "their-world",
