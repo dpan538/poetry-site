@@ -131,6 +131,20 @@ const breadcrumbs = [
     currentEmotionScore,
   }}
 >
+  if ('scrollRestoration' in history) {
+    history.scrollRestoration = 'manual';
+  }
+
+  function resetPoemScroll() {
+    window.scrollTo(0, 0);
+  }
+
+  resetPoemScroll();
+  window.addEventListener('pageshow', resetPoemScroll);
+  document.addEventListener('DOMContentLoaded', () => {
+    requestAnimationFrame(resetPoemScroll);
+  });
+
   const HISTORY_KEY = 'three-worlds-history';
   const MAX_HISTORY = 20;
 

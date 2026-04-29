@@ -552,6 +552,38 @@ const { poemId, world } = Astro.props;
   };
 
   const FIELD_BOUNDS = { minX: -760, maxX: 760, minY: -545, maxY: 545 };
+  const ACTIVE_BOUNDS = { minX: -460, maxX: 460, minY: -355, maxY: 355 };
+  const EDGE_MARGIN = 90;
+  const CONTEXT_BOUNDS = {
+    minX: FIELD_BOUNDS.minX + EDGE_MARGIN,
+    maxX: FIELD_BOUNDS.maxX - EDGE_MARGIN,
+    minY: FIELD_BOUNDS.minY + EDGE_MARGIN,
+    maxY: FIELD_BOUNDS.maxY - EDGE_MARGIN,
+  };
+
+  const ATLAS_TYPE = {
+    anchorLabel: 32,
+    activeLabel: 23,
+    inactiveLabel: 15,
+    anchorRadius: 16,
+    activeRadius: 8,
+    inactiveRadius: 3.8,
+    activeAura: 12,
+  } as const;
+
+  const FORCE = {
+    homeActive: 0.088,
+    homeInactive: 0.03,
+    repelActive: 1.05,
+    repelInactive: 2.2,
+    repelInactiveFromActive: 2.55,
+    repelActiveFromInactive: 0.055,
+    anchorPull: 0.00025,
+    damping: 0.7,
+    minActiveGap: 118,
+    minInactiveGap: 92,
+    sameCategoryBoost: 42,
+  } as const;
 
   // ─── Attribute definitions ────────────────────────────────────────────────
   const ATTR_DESCRIPTIONS: Record<string, string> = {
@@ -835,7 +867,7 @@ const { poemId, world } = Astro.props;
 
       // Anchor at origin
       const anchor: Node = {
-        kind: 'anchor', x: 0, y: 0, r: 18, vx: 0, vy: 0, homeX: 0, homeY: 0,
+        kind: 'anchor', x: 0, y: 0, r: ATLAS_TYPE.anchorRadius, vx: 0, vy: 0, homeX: 0, homeY: 0,
         id: poem?.id, title: poem?.title ?? this.poemId,
         world: poem?.world ?? this.worldKey,
         delay: 0, currentAlpha: 1,
@@ -855,7 +887,7 @@ const { poemId, world } = Astro.props;
             kind: 'attr', attrType, value,
             x: home.x + jx, y: home.y + jy,
             vx: 0, vy: 0, homeX: home.x, homeY: home.y,
-            r: active ? 10 : 5, active,
+            r: active ? ATLAS_TYPE.activeRadius : ATLAS_TYPE.inactiveRadius, active,
             delay: 0.04 + i * 0.042, currentAlpha: 0,
           };
           this.nodes.push(n);
@@ -926,46 +958,57 @@ const { poemId, world } = Astro.props;
 
     // ── Force simulation (used only by primeLayout — not called during render) ─
     simulateStep() {
-      // Softer zone pull lets repulsion spread nodes freely across the larger zones.
-      // Higher REPEL_K and larger minD reduce label overlap, especially in dense clusters.
-      const ZONE_K = 0.026, ANCHOR_K = 0.001, REPEL_K = 2.7, DAMPING = 0.72;
       const attrNodes = this.nodes.filter(n => n.kind === 'attr');
       attrNodes.forEach(n => {
-        n.vx += (n.homeX - n.x) * ZONE_K;
-        n.vy += (n.homeY - n.y) * ZONE_K;
+        const active = Boolean(n.active);
+        const homeK = active ? FORCE.homeActive : FORCE.homeInactive;
+        n.vx += (n.homeX - n.x) * homeK;
+        n.vy += (n.homeY - n.y) * homeK;
         if (n.active) {
-          n.vx += (0 - n.x) * ANCHOR_K;
-          n.vy += (0 - n.y) * ANCHOR_K;
+          n.vx += (0 - n.x) * FORCE.anchorPull;
+          n.vy += (0 - n.y) * FORCE.anchorPull;
         }
         const allVis = this.nodes;
         allVis.forEach(other => {
           if (other === n) return;
           const dx = n.x - other.x, dy = n.y - other.y;
           const dist = Math.sqrt(dx * dx + dy * dy) || 0.1;
-          // More conservative minimum gap between dot surfaces for label breathing room.
           const labelA = n.kind === 'attr' ? this.labelFootprint(n) : n.r + 82;
           const labelB = other.kind === 'attr' ? this.labelFootprint(other) : other.r + 82;
-          const baseGap = Math.max(n.r + other.r + 158, (labelA + labelB) * 0.62);
-          // Same-category nodes tend to sit near each other; push them a bit farther apart.
-          const typeBoost = n.kind === 'attr' && other.kind === 'attr' && n.attrType === other.attrType ? 46 : 0;
+          const otherActive = other.kind === 'attr' && Boolean(other.active);
+          const minSurfaceGap = active || otherActive ? FORCE.minActiveGap : FORCE.minInactiveGap;
+          const labelGap = active || otherActive ? 0.52 : 0.46;
+          const baseGap = Math.max(n.r + other.r + minSurfaceGap, (labelA + labelB) * labelGap);
+          const typeBoost = n.kind === 'attr' && other.kind === 'attr' && n.attrType === other.attrType
+            ? FORCE.sameCategoryBoost
+            : 0;
           const minD = baseGap + typeBoost;
           if (dist < minD) {
-            const f = REPEL_K * (minD - dist) / dist;
+            let repelK = active ? FORCE.repelActive : FORCE.repelInactive;
+            if (active && other.kind === 'attr' && !other.active) {
+              // Background context should move around the poem's active structure,
+              // not push selected feature anchors into the corners.
+              repelK = FORCE.repelActiveFromInactive;
+            } else if (!active && otherActive) {
+              repelK = FORCE.repelInactiveFromActive;
+            }
+            const f = repelK * (minD - dist) / dist;
             n.vx += dx * f; n.vy += dy * f;
           }
         });
-        n.vx *= DAMPING; n.vy *= DAMPING;
+        n.vx *= FORCE.damping; n.vy *= FORCE.damping;
         n.x += n.vx; n.y += n.vy;
-        n.x = Math.max(FIELD_BOUNDS.minX, Math.min(FIELD_BOUNDS.maxX, n.x));
-        n.y = Math.max(FIELD_BOUNDS.minY, Math.min(FIELD_BOUNDS.maxY, n.y));
+        const bounds = active ? ACTIVE_BOUNDS : CONTEXT_BOUNDS;
+        n.x = Math.max(bounds.minX, Math.min(bounds.maxX, n.x));
+        n.y = Math.max(bounds.minY, Math.min(bounds.maxY, n.y));
       });
     }
 
     labelFootprint(n: Node): number {
       if (n.kind !== 'attr') return n.r + 82;
       const labelLen = this.formatLabel(n.value || '').length;
-      const textSize = n.active ? 29 : 22;
-      return n.r + 56 + Math.min(300, labelLen * textSize * 0.48);
+      const textSize = n.active ? ATLAS_TYPE.activeLabel : ATLAS_TYPE.inactiveLabel;
+      return n.r + 42 + Math.min(235, labelLen * textSize * 0.43);
     }
 
     // Settle layout synchronously before first draw — more steps for larger zones
@@ -973,15 +1016,58 @@ const { poemId, world } = Astro.props;
       for (let i = 0; i < steps; i++) this.simulateStep();
     }
 
+    nodeVisualBounds(n: Node): { minX: number; maxX: number; minY: number; maxY: number } {
+      if (n.kind === 'anchor') {
+        const labelW = Math.min(300, (n.title || '').length * ATLAS_TYPE.anchorLabel * 0.52);
+        return {
+          minX: n.x - Math.max(n.r + 24, labelW / 2),
+          maxX: n.x + Math.max(n.r + 24, labelW / 2),
+          minY: n.y - n.r - 18,
+          maxY: n.y + n.r + ATLAS_TYPE.anchorLabel * 2.1,
+        };
+      }
+
+      const fs = n.active ? ATLAS_TYPE.activeLabel : ATLAS_TYPE.inactiveLabel;
+      const label = this.formatLabel(n.value || '');
+      const labelW = Math.min(n.active ? 245 : 180, label.length * fs * 0.5);
+      const labelH = fs * 1.25;
+      const angle = Math.atan2(n.y, n.x);
+      const deg = angle * 180 / Math.PI;
+      const gap = n.r + 16;
+      let minX = n.x - n.r - 8;
+      let maxX = n.x + n.r + 8;
+      let minY = n.y - n.r - 8;
+      let maxY = n.y + n.r + 8;
+
+      if (deg > -70 && deg < 70) {
+        maxX = Math.max(maxX, n.x + gap + labelW);
+        minY = Math.min(minY, n.y - labelH / 2);
+        maxY = Math.max(maxY, n.y + labelH / 2);
+      } else if (deg > 110 || deg < -110) {
+        minX = Math.min(minX, n.x - gap - labelW);
+        minY = Math.min(minY, n.y - labelH / 2);
+        maxY = Math.max(maxY, n.y + labelH / 2);
+      } else if (deg >= 70 && deg <= 110) {
+        minX = Math.min(minX, n.x - labelW / 2);
+        maxX = Math.max(maxX, n.x + labelW / 2);
+        maxY = Math.max(maxY, n.y + gap + labelH);
+      } else {
+        minX = Math.min(minX, n.x - labelW / 2);
+        maxX = Math.max(maxX, n.x + labelW / 2);
+        minY = Math.min(minY, n.y - gap - labelH);
+      }
+
+      return { minX, maxX, minY, maxY };
+    }
+
     // ── Fit canvas ────────────────────────────────────────────────────────────
     fitToCanvas() {
       // Auto-fit to actual settled node positions.
       // We reserve a larger bottom safe area so the annotation panel never covers nodes.
-      const xs = this.nodes.map(n => n.x);
-      const ys = this.nodes.map(n => n.y);
-      const minX = Math.min(...xs), maxX = Math.max(...xs);
-      const minY = Math.min(...ys), maxY = Math.max(...ys);
-      const labelPadX = 72;
+      const boxes = this.nodes.map(n => this.nodeVisualBounds(n));
+      const minX = Math.min(...boxes.map(b => b.minX)), maxX = Math.max(...boxes.map(b => b.maxX));
+      const minY = Math.min(...boxes.map(b => b.minY)), maxY = Math.max(...boxes.map(b => b.maxY));
+      const labelPadX = 44;
       const topSafe = 34;
       const bottomSafe = 72;
 
@@ -1142,9 +1228,9 @@ const { poemId, world } = Astro.props;
         ctx.globalAlpha *= 0.2 * pulse; ctx.stroke(); ctx.globalAlpha /= 0.2 * pulse;
       }
       // Title below — larger, comfortable to read
-      ctx.font = '36px Georgia, serif'; ctx.fillStyle = this.primaryColor;
+      ctx.font = `${ATLAS_TYPE.anchorLabel}px Georgia, serif`; ctx.fillStyle = this.primaryColor;
       ctx.textAlign = 'center'; ctx.textBaseline = 'top';
-      this.wrapText(n.title || '', 0, r + 16, 310, 40);
+      this.wrapText(n.title || '', 0, r + 15, 300, ATLAS_TYPE.anchorLabel * 1.12);
     }
 
     drawAttrNode(n: Node) {
@@ -1159,12 +1245,12 @@ const { poemId, world } = Astro.props;
       ctx.globalAlpha *= baseOpacity;
 
       const pulse = isSel ? this.selectionPulse() : 0;
-      const baseR = active ? 10 : 5;
+      const baseR = active ? ATLAS_TYPE.activeRadius : ATLAS_TYPE.inactiveRadius;
       const r = baseR * (isSel ? 1.24 + pulse * 0.1 : 1);
 
       // Soft aura for active nodes
       if (active && !isSel) {
-        ctx.beginPath(); ctx.arc(n.x, n.y, r + 12, 0, Math.PI * 2);
+        ctx.beginPath(); ctx.arc(n.x, n.y, r + ATLAS_TYPE.activeAura, 0, Math.PI * 2);
         ctx.fillStyle = color; ctx.globalAlpha *= 0.26; ctx.fill(); ctx.globalAlpha /= 0.26;
       }
 
@@ -1197,7 +1283,7 @@ const { poemId, world } = Astro.props;
       else                                { ly = n.y - gap - 2; tb = 'bottom'; ta = 'center'; }
 
       // Active labels are close to the main reading scale; inactive labels stay legible.
-      const fs = active ? 29 : 22;
+      const fs = active ? ATLAS_TYPE.activeLabel : ATLAS_TYPE.inactiveLabel;
       ctx.font = `${active ? '' : 'italic '}${fs}px Georgia, serif`;
       // WCAG 1.4.3: dot drawn at baseOpacity (0.58 for inactive) but text needs higher opacity.
       // #5a5452 at 58% → 2.62:1 ❌. At 88% → 4.98:1 ✅. Save/restore alpha around text only.
@@ -1309,10 +1395,9 @@ const { poemId, world } = Astro.props;
       for (const n of this.nodes) {
         const dx = n.x - wx, dy = n.y - wy;
         const dist = Math.sqrt(dx * dx + dy * dy);
-        // Active attr: large radius (65px) covers dot + label fully.
-        // Inactive attr: 50px — generous but yields to nearer active nodes.
-        // Anchor: fixed radius around the circle border.
-        const hitR = n.kind === 'anchor' ? n.r + 92 : (n.active ? 72 : 56);
+        const hitR = n.kind === 'anchor'
+          ? n.r + ATLAS_TYPE.anchorLabel * 2.1
+          : (n.active ? ATLAS_TYPE.activeLabel * 2.5 : ATLAS_TYPE.inactiveLabel * 2.6);
         if (dist < hitR && dist < bestDist) { best = n; bestDist = dist; }
       }
       return best;
@@ -1389,10 +1474,9 @@ const { poemId, world } = Astro.props;
 
         const rect = canvas.getBoundingClientRect();
         const hit = this.hitTest(e.clientX - rect.left, e.clientY - rect.top);
-        const attrHit = hit?.kind === 'attr' ? hit : null;
-        if (attrHit !== this.hoveredNode) {
-          this.hoveredNode = attrHit;
-          canvas.style.cursor = attrHit ? 'pointer' : 'grab';
+        if (hit !== this.hoveredNode) {
+          this.hoveredNode = hit;
+          canvas.style.cursor = hit ? 'pointer' : 'grab';
           if (!this.rafId) this.draw();
         }
       });
