@@ -771,6 +771,11 @@ stanzas.forEach((stanza, si) => {
 
     const indexBtn = document.getElementById('index-trigger');
     if (indexBtn) {
+      const waveColors = ['#c0392b', '#9b7b8b', '#6f876f', '#806637', '#5e6e80', '#8b4f45'];
+      const setRandomWaveColor = () => {
+        const color = waveColors[Math.floor(Math.random() * waveColors.length)];
+        indexBtn.style.setProperty('--ui-wavy-color', color);
+      };
       const KEY = 'tw-index-side';
       const EXP = 'tw-index-side-exp';
       const pickSide = (): 'left' | 'right' => {
@@ -801,6 +806,8 @@ stanzas.forEach((stanza, si) => {
       indexBtn.addEventListener('click', () => {
         (window as Window & { openIndex?: () => void }).openIndex?.();
       });
+      indexBtn.addEventListener('pointerenter', setRandomWaveColor);
+      indexBtn.addEventListener('focus', setRandomWaveColor);
     }
 
     console.group(`[Poem] ${poemId}`);
@@ -983,6 +990,8 @@ stanzas.forEach((stanza, si) => {
     display: flex;
     align-items: center;
     line-height: 1.2;
+    text-decoration: none;
+    text-decoration-color: var(--ui-wavy-color, currentColor);
     transition: color 0.2s var(--ui-ease-out, ease);
   }
 
@@ -996,25 +1005,11 @@ stanzas.forEach((stanza, si) => {
     right: max(var(--margin-x), 12px);
   }
 
-  .index-trigger::after {
-    content: '';
-    position: absolute;
-    bottom: -3px;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: currentColor;
-    opacity: 1;
-    transform: scaleX(0);
-    transform-origin: left center;
-    transition: transform 0.24s var(--ui-ease-out, ease);
-  }
-
   .index-trigger:hover {
     color: var(--color-primary, #1a1a1a);
-  }
-
-  .index-trigger:hover::after {
-    transform: scaleX(1);
+    text-decoration: underline;
+    text-decoration-style: wavy;
+    text-decoration-color: var(--ui-wavy-color, currentColor);
+    text-underline-offset: 4px;
   }
 </style>

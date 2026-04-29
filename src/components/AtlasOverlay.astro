@@ -93,28 +93,17 @@ const { poemId, world } = Astro.props;
     color: var(--color-meta, #595959);
     opacity: 1;
     line-height: 1.2;
+    text-decoration: none;
+    text-decoration-color: var(--ui-wavy-color, currentColor);
     transition: color 0.2s var(--ui-ease-out, ease);
-  }
-
-  .atlas-trigger::after {
-    content: '';
-    position: absolute;
-    left: 8px;
-    right: 8px;
-    bottom: 8px;
-    height: 1px;
-    background: currentColor;
-    transform: scaleX(0);
-    transform-origin: left center;
-    transition: transform 0.24s var(--ui-ease-out, ease);
   }
 
   .atlas-trigger:hover {
     color: var(--color-primary, #1a1a1a);
-  }
-
-  .atlas-trigger:hover::after {
-    transform: scaleX(1);
+    text-decoration: underline;
+    text-decoration-style: wavy;
+    text-decoration-color: var(--ui-wavy-color, currentColor);
+    text-underline-offset: 4px;
   }
 
   .atlas-trigger:focus-visible {
@@ -551,7 +540,18 @@ const { poemId, world } = Astro.props;
     sense:    { cx:  610, cy:  295, sx: 250, sy: 160 },
   };
 
-  const ACTIVE_PULL = 0.12;
+  // Active features should explain the current poem before they explain the whole taxonomy.
+  // Keep them on a readable inner ring; inactive context nodes stay in the wider field.
+  const ACTIVE_ZONES: Record<string, { cx: number; cy: number; sx: number; sy: number }> = {
+    mode:     { cx: -260, cy:  -78, sx: 88, sy: 82 },
+    type:     { cx:  260, cy:  -78, sx: 88, sy: 82 },
+    imagery:  { cx:    0, cy:  238, sx: 126, sy: 78 },
+    pressure: { cx: -260, cy:  178, sx: 88, sy: 82 },
+    form:     { cx:    0, cy: -246, sx: 128, sy: 72 },
+    sense:    { cx:  260, cy:  178, sx: 88, sy: 82 },
+  };
+
+  const FIELD_BOUNDS = { minX: -760, maxX: 760, minY: -545, maxY: 545 };
 
   // ─── Attribute definitions ────────────────────────────────────────────────
   const ATTR_DESCRIPTIONS: Record<string, string> = {
@@ -797,19 +797,22 @@ const { poemId, world } = Astro.props;
 
     // ── Zone home position ────────────────────────────────────────────────────
     computeHome(attrType: string, value: string, active: boolean): { x: number; y: number } {
-      const z = ZONES[attrType] || { cx: 0, cy: 0, sx: 80, sy: 80 };
+      const z = active
+        ? (ACTIVE_ZONES[attrType] || { cx: 0, cy: 0, sx: 80, sy: 80 })
+        : (ZONES[attrType] || { cx: 0, cy: 0, sx: 80, sy: 80 });
       const vocab = VOCAB[attrType] || [];
       const n = Math.max(vocab.length, 1);
       const idx = Math.max(0, vocab.indexOf(value));
       // Golden-angle distribution gives a much more even, deterministic spread than hash XY.
       const GOLDEN_ANGLE = 2.399963229728653;
-      const angleSeed = this.hashStr(`${attrType}_angle_seed`) * Math.PI * 2;
+      const angleSeed = this.hashStr(`${attrType}_${active ? 'active' : 'field'}_angle_seed`) * Math.PI * 2;
       const angle = angleSeed + idx * GOLDEN_ANGLE;
-      const ring = Math.sqrt((idx + 0.5) / n);
+      const ring = active
+        ? 0.38 + this.hashStr(`${attrType}:${value}:active-ring`) * 0.44
+        : Math.sqrt((idx + 0.5) / n);
       const rJitter = 0.92 + this.hashStr(value + '_r') * 0.16;
       const rawX = z.cx + Math.cos(angle) * z.sx * ring * rJitter;
       const rawY = z.cy + Math.sin(angle) * z.sy * ring * rJitter;
-      if (active) return { x: rawX * (1 - ACTIVE_PULL), y: rawY * (1 - ACTIVE_PULL) };
       return { x: rawX, y: rawY };
     }
 
@@ -953,6 +956,8 @@ const { poemId, world } = Astro.props;
         });
         n.vx *= DAMPING; n.vy *= DAMPING;
         n.x += n.vx; n.y += n.vy;
+        n.x = Math.max(FIELD_BOUNDS.minX, Math.min(FIELD_BOUNDS.maxX, n.x));
+        n.y = Math.max(FIELD_BOUNDS.minY, Math.min(FIELD_BOUNDS.maxY, n.y));
       });
     }
 
@@ -1485,7 +1490,15 @@ const { poemId, world } = Astro.props;
     });
   }
 
+  const waveColors = ['#c0392b', '#9b7b8b', '#6f876f', '#806637', '#5e6e80', '#8b4f45'];
+  function setRandomWaveColor(el: HTMLElement) {
+    const color = waveColors[Math.floor(Math.random() * waveColors.length)];
+    el.style.setProperty('--ui-wavy-color', color);
+  }
+
   trigger.addEventListener('click', openAtlas);
+  trigger.addEventListener('pointerenter', () => setRandomWaveColor(trigger));
+  trigger.addEventListener('focus', () => setRandomWaveColor(trigger));
   closeBtn.addEventListener('click', closeAtlas);
   zoomOutBtn.addEventListener('click', () => graph?.zoomAt(canvas.clientWidth / 2, canvas.clientHeight / 2, 0.86));
   zoomInBtn.addEventListener('click', () => graph?.zoomAt(canvas.clientWidth / 2, canvas.clientHeight / 2, 1.16));

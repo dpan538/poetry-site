@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Three Worlds — Dai Pan</title>
+  <desc id="desc">Default sharing image for daipan.ink, the poetry website of Dai Pan (潘岱).</desc>
+  <rect width="1200" height="630" fill="#f5f2ed"/>
+  <path d="M96 142 C190 80 284 208 378 145 S566 82 660 146 848 210 942 146 1102 96 1140 142" fill="none" stroke="#c0392b" stroke-width="3" opacity="0.72"/>
+  <path d="M96 488 C190 426 284 554 378 491 S566 428 660 492 848 556 942 492 1102 442 1140 488" fill="none" stroke="#6f876f" stroke-width="3" opacity="0.62"/>
+  <text x="96" y="238" fill="#1a1a1a" font-family="Georgia, 'Times New Roman', serif" font-size="92" letter-spacing="-3">Three Worlds</text>
+  <text x="100" y="314" fill="#595959" font-family="Georgia, 'Times New Roman', serif" font-size="34" font-style="italic">Still Life · Bless You · Their World</text>
+  <text x="100" y="408" fill="#1a1a1a" font-family="Georgia, 'Times New Roman', serif" font-size="44">Dai Pan <tspan fill="#595959" font-size="36">潘岱</tspan></text>
+  <text x="100" y="462" fill="#595959" font-family="Georgia, 'Times New Roman', serif" font-size="25" letter-spacing="1.2">daipan.ink · poetry collection · ongoing digital edition</text>
+</svg>

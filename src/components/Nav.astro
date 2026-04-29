@@ -72,6 +72,7 @@ const aboutActive = norm === '/about' || norm.startsWith('/about/');
     text-decoration: none;
     color: var(--color-primary, #1a1a1a);
     opacity: 1;
+    text-decoration-color: var(--ui-wavy-color, currentColor);
     transition: opacity 0.2s linear, color 0.2s linear, text-decoration 0.2s linear;
     /* Minimum touch target: pad out to at least 44px tall (WCAG 2.5.5) */
     padding-block: 15px;
@@ -86,6 +87,20 @@ const aboutActive = norm === '/about' || norm.startsWith('/about/');
   .nav-link:hover {
     text-decoration: underline;
     text-decoration-style: wavy;
+    text-decoration-color: var(--ui-wavy-color, currentColor);
     text-underline-offset: 4px;
   }
 </style>
+
+<script>
+  const waveColors = ['#c0392b', '#9b7b8b', '#6f876f', '#806637', '#5e6e80', '#8b4f45'];
+  function setRandomWaveColor(el) {
+    const color = waveColors[Math.floor(Math.random() * waveColors.length)];
+    el.style.setProperty('--ui-wavy-color', color);
+  }
+
+  document.querySelectorAll('.nav-link').forEach((el) => {
+    el.addEventListener('pointerenter', () => setRandomWaveColor(el));
+    el.addEventListener('focus', () => setRandomWaveColor(el));
+  });
+</script>

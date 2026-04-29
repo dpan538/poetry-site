@@ -38,7 +38,10 @@ const breadcrumbs = [
         </div>
         <div class="colophon-row">
           <dt>Author</dt>
-          <dd>{publication.authorName} <span class="colophon-zh">{publication.authorChineseName}</span></dd>
+          <dd>
+            {publication.authorName} <span class="colophon-zh">{publication.authorChineseName}</span>
+            <span class="colophon-aliases">also indexed as Pan Dai / PANDAI / daipan</span>
+          </dd>
         </div>
         <div class="colophon-row">
           <dt>Written</dt>
@@ -63,6 +66,13 @@ const breadcrumbs = [
         <div class="colophon-row">
           <dt>Contact</dt>
           <dd><a href={publication.visualArtUrl} target="_blank" rel="noopener noreferrer">daipan.art</a></dd>
+        </div>
+        <div class="colophon-row">
+          <dt>Site relation</dt>
+          <dd>
+            daipan.ink is the poetry and digital edition site; daipan.art is the visual art site by
+            the same author, Dai Pan (潘岱).
+          </dd>
         </div>
       </dl>
     </section>
@@ -239,6 +249,14 @@ const breadcrumbs = [
     margin-left: var(--space-sm);
     color: var(--color-meta, #595959);
     font-size: 13px;
+  }
+
+  .colophon-aliases {
+    display: block;
+    margin-top: 0.15rem;
+    color: var(--color-meta, #595959);
+    font-size: 13px;
+    line-height: 1.45;
   }
 
   /* ── Section label ──────────────────────────────────────────────────────── */

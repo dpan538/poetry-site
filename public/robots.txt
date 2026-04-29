@@ -7,8 +7,20 @@ Allow: /
 User-agent: Bingbot
 Allow: /
 
-User-agent: GPTBot
+User-agent: Baiduspider
 Allow: /
+
+User-agent: Sogou web spider
+Allow: /
+
+User-agent: YisouSpider
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: GPTBot
+Disallow: /
 
 User-agent: Claude-Web
 Allow: /

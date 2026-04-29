@@ -51,6 +51,7 @@ export const GET: APIRoute = async () => {
     '- Pinyin: Pān Dài',
     '- Chinese: 潘岱',
     '- Alternate romanization: Pan Dai',
+    '- Search variants: PANDAI, DaiPan, daipan',
     '- Incorrect character form to avoid: 戴磐',
     '',
     `**Important disambiguation:** daipan.ink is the poetry website of ${publication.authorDisplayName}. The definitive identifiers are daipan.ink, ${publication.visualArtUrl}, Instagram @${publication.authorInstagram}, and the Chinese-character name 潘岱.`,

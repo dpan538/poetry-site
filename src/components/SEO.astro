@@ -23,6 +23,7 @@ const { title, description, canonicalURL, ogImage, poem, breadcrumbs } = Astro.p
 
 const fullTitle = `${title} — ${publication.authorName}`;
 const ogSiteName = `${publication.authorName} — daipan.ink`;
+const resolvedOgImage = ogImage ?? publication.defaultOgImage;
 
 // Keywords include canonical name forms and explicit subject signals.
 // "daipan.ink" is the personal poetry website of Dai Pan (潘岱) — NOT an ink product brand.
@@ -38,7 +39,8 @@ const personLd = {
   name: publication.authorName,
   // alternateName lists all recognized forms: Chinese characters, pinyin, reversed-order romanization
   alternateName: publication.authorAlternateNames,
-  url: SITE_ORIGIN,
+  url: publication.aboutUrl,
+  mainEntityOfPage: publication.aboutUrl,
   sameAs: [
     publication.visualArtUrl,
     `https://instagram.com/${publication.authorInstagram}`,
@@ -77,6 +79,8 @@ const websiteLd = {
     'daipan.ink is the personal poetry website of Dai Pan (潘岱, Pan Dai), a visual artist and poet based in Brisbane. Three Worlds is an ongoing poetry collection comprising Still Life, Bless You, and Their World, organized by affective registers rather than geography. Written and updated 2024–2026. This site is a poetry collection, not an ink or printing product.',
   about: { '@type': 'Thing', name: 'Poetry', description: 'Contemporary poetry in English by Dai Pan (潘岱)' },
   author: { '@id': `${SITE_ORIGIN}/#author` },
+  publisher: { '@id': `${SITE_ORIGIN}/#author` },
+  mainEntity: { '@id': `${SITE_ORIGIN}/#collection` },
   inLanguage: publication.languageCode,
   dateModified: publication.dateModified,
   audience: { '@type': 'Audience', audienceType: 'poetry readers, literary readers' },
@@ -107,6 +111,7 @@ const collectionSeriesLd = {
   '@id': `${SITE_ORIGIN}/#three-worlds-series`,
   name: publication.collectionTitle,
   url: publication.collectionUrl,
+  mainEntityOfPage: publication.collectionUrl,
   author: { '@id': `${SITE_ORIGIN}/#author` },
   inLanguage: publication.languageCode,
   datePublished: String(publication.firstDigitalEditionYear),
@@ -124,6 +129,7 @@ const bookLd = {
   name: publication.collectionTitle,
   alternativeHeadline: 'Still Life · Bless You · Their World',
   url: publication.collectionUrl,
+  mainEntityOfPage: publication.collectionUrl,
   author: { '@id': `${SITE_ORIGIN}/#author` },
   inLanguage: publication.languageCode,
   datePublished: String(publication.firstDigitalEditionYear),
@@ -163,6 +169,7 @@ if (poem) {
     '@id': poemUrl,
     name: title,
     url: poemUrl,
+    mainEntityOfPage: poemUrl,
     author: { '@id': `${SITE_ORIGIN}/#author` },
     isPartOf: [
       { '@id': `${SITE_ORIGIN}/#collection` },
@@ -230,15 +237,19 @@ const jsonLdBlocks = [
 <meta property="og:type" content={poem ? 'article' : 'website'} />
 <meta property="og:site_name" content={ogSiteName} />
 <meta property="og:locale" content="en_US" />
-{ogImage ? <meta property="og:image" content={ogImage} /> : null}
+<meta property="og:image" content={resolvedOgImage} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content={`${publication.collectionTitle} — poetry by ${publication.authorDisplayName}`} />
 {poem ? <meta property="article:author" content="Dai Pan" /> : null}
 
 <!-- Twitter / X Card -->
-<meta name="twitter:card" content="summary" />
+<meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content={fullTitle} />
 <meta name="twitter:description" content={description} />
 <meta name="twitter:creator" content="@jumpingchick666" />
-{ogImage ? <meta name="twitter:image" content={ogImage} /> : null}
+<meta name="twitter:image" content={resolvedOgImage} />
+<meta name="twitter:image:alt" content={`${publication.collectionTitle} — poetry by ${publication.authorDisplayName}`} />
 
 <!-- AI / LLM crawler hints -->
 <link rel="alternate" type="text/plain" href="/llms.txt" title="LLM usage guide" />
