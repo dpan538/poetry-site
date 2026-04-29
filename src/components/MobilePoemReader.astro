@@ -1,0 +1,188 @@
+---
+interface Props {
+  title: string;
+  rawText: string;
+  world: 'their-world' | 'bless-you' | 'still-life';
+  order: number;
+}
+
+const { title, rawText, world, order } = Astro.props;
+
+const stanzas = (rawText ?? '')
+  .split(/\n\s*\n/)
+  .map((stanza) => stanza.split('\n').map((line) => line.trimEnd()).filter(Boolean))
+  .filter((stanza) => stanza.length > 0);
+
+const softBreakWords = new Set([
+  'and',
+  'but',
+  'or',
+  'as',
+  'into',
+  'from',
+  'through',
+  'with',
+  'without',
+  'before',
+  'behind',
+  'between',
+  'in',
+  'on',
+  'to',
+  'of',
+  'for',
+  'at',
+  'because',
+  'until',
+  'while',
+]);
+
+function splitLongMobileLine(line: string) {
+  const trimmed = line.trim();
+  if (trimmed.length <= 34) return [line];
+
+  const punctuationMatch = trimmed.match(/^(.{18,58}?[,;:—-])\s+(.+)$/);
+  if (punctuationMatch) return [punctuationMatch[1], punctuationMatch[2]];
+
+  const words = trimmed.split(/\s+/);
+  if (words.length <= 7) return [line];
+
+  const midpoint = Math.floor(words.length / 2);
+  const candidates = words
+    .map((word, index) => ({ word: word.toLowerCase().replace(/[^a-z]/g, ''), index }))
+    .filter(({ word, index }) => index > 2 && index < words.length - 2 && softBreakWords.has(word))
+    .sort((a, b) => Math.abs(a.index - midpoint) - Math.abs(b.index - midpoint));
+
+  const breakIndex = candidates[0]?.index ?? midpoint;
+  return [
+    words.slice(0, breakIndex).join(' '),
+    words.slice(breakIndex).join(' '),
+  ];
+}
+
+const mobileStanzas = stanzas.map((lines) => lines.map(splitLongMobileLine));
+
+const worldLabels: Record<Props['world'], string> = {
+  'their-world': 'Their World',
+  'bless-you': 'Bless You',
+  'still-life': 'Still Life',
+};
+---
+
+<article class="mobile-poem-reader" aria-label={`${title} — mobile reading view`}>
+  <header class="mobile-poem-header">
+    <p class="mobile-poem-kicker">
+      <span>{worldLabels[world]}</span>
+      <span aria-hidden="true">/</span>
+      <span>{String(order).padStart(2, '0')}</span>
+    </p>
+    <h1>{title}</h1>
+  </header>
+
+  <div class="mobile-poem-body">
+    {mobileStanzas.map((stanza) => (
+      <p class="mobile-poem-stanza mobile-poem-stanza--lineated">
+        {stanza.map((segments, lineIndex) => (
+          <>
+            <span class="mobile-poem-line">
+              {segments.map((segment, segmentIndex) => (
+                <span class:list={['mobile-poem-segment', { 'is-continuation': segmentIndex > 0 }]}>
+                  {segmentIndex > 0 ? <span class="mobile-poem-caesura" aria-label="caesura">// </span> : null}
+                  {segment}
+                </span>
+              ))}
+            </span>
+            {lineIndex < stanza.length - 1 ? <br /> : null}
+          </>
+        ))}
+      </p>
+    ))}
+  </div>
+</article>
+
+<style>
+  .mobile-poem-reader {
+    display: none;
+  }
+
+  @media (max-width: 760px) {
+    .mobile-poem-reader {
+      display: block;
+      box-sizing: border-box;
+      width: 100%;
+      min-height: calc(100svh - var(--site-content-offset));
+      padding:
+        calc(var(--space-xl) + 4px)
+        max(22px, env(safe-area-inset-right))
+        calc(128px + env(safe-area-inset-bottom))
+        max(22px, env(safe-area-inset-left));
+      background: var(--color-bg, #f5f2ed);
+      color: var(--color-primary, #1a1a1a);
+    }
+
+    .mobile-poem-header {
+      margin-bottom: clamp(36px, 9vw, 58px);
+    }
+
+    .mobile-poem-kicker {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      align-items: center;
+      margin: 0 0 16px;
+      font-size: 12px;
+      line-height: 1.4;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--color-meta, #595959);
+    }
+
+    .mobile-poem-header h1 {
+      margin: 0;
+      max-width: 12ch;
+      font-size: clamp(40px, 11.5vw, 58px);
+      line-height: 0.98;
+      font-weight: normal;
+      letter-spacing: -0.038em;
+    }
+
+    .mobile-poem-body {
+      max-width: 34rem;
+      margin: 0;
+    }
+
+    .mobile-poem-stanza {
+      margin: 0 0 1.85em;
+      font-size: clamp(18px, 4.55vw, 21px);
+      line-height: 1.74;
+      letter-spacing: -0.004em;
+      overflow-wrap: break-word;
+    }
+
+    .mobile-poem-stanza:last-child {
+      margin-bottom: 0;
+    }
+
+    .mobile-poem-line {
+      display: block;
+      max-width: 100%;
+      padding-left: 0;
+      text-indent: 0;
+    }
+
+    .mobile-poem-segment {
+      display: block;
+    }
+
+    .mobile-poem-segment.is-continuation {
+      padding-left: 1.15em;
+      text-indent: 0;
+    }
+
+    .mobile-poem-caesura {
+      color: var(--color-accent, #c0392b);
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+    }
+  }
+</style>

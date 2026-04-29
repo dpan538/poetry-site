@@ -59,7 +59,7 @@ const breadcrumbs = [
           <dt>Language</dt>
           <dd>{publication.language}</dd>
         </div>
-        <div class="colophon-row">
+        <div class="colophon-row mobile-secondary-row">
           <dt>License</dt>
           <dd>{publication.license}</dd>
         </div>
@@ -67,7 +67,7 @@ const breadcrumbs = [
           <dt>Contact</dt>
           <dd><a href={publication.visualArtUrl} target="_blank" rel="noopener noreferrer">daipan.art</a></dd>
         </div>
-        <div class="colophon-row">
+        <div class="colophon-row mobile-secondary-row">
           <dt>Site relation</dt>
           <dd>
             daipan.ink is the poetry and digital edition site; daipan.art is the visual art site by
@@ -82,31 +82,31 @@ const breadcrumbs = [
       <h2 class="colophon-section-label">Volumes</h2>
       <ol class="volume-list">
         <li class="volume-item">
-          <a href="/their-world" class="volume-link">
+          <div class="volume-link" aria-label="Their World volume">
             <span class="volume-roman">I</span>
             <span class="volume-info">
                 <span class="volume-name">{worldMetadata['their-world'].label}</span>
                 <span class="volume-meta">{poemCounts['their-world']} poems · {worldMetadata['their-world'].register}</span>
             </span>
-          </a>
+          </div>
         </li>
         <li class="volume-item">
-          <a href="/bless-you" class="volume-link">
+          <div class="volume-link" aria-label="Bless You volume">
             <span class="volume-roman">II</span>
             <span class="volume-info">
               <span class="volume-name">{worldMetadata['bless-you'].label}</span>
               <span class="volume-meta">{poemCounts['bless-you']} poems · {worldMetadata['bless-you'].register}</span>
             </span>
-          </a>
+          </div>
         </li>
         <li class="volume-item">
-          <a href="/still-life" class="volume-link">
+          <div class="volume-link" aria-label="Still Life volume">
             <span class="volume-roman">III</span>
             <span class="volume-info">
               <span class="volume-name">{worldMetadata['still-life'].label}</span>
               <span class="volume-meta">{poemCounts['still-life']} poems · {worldMetadata['still-life'].register}</span>
             </span>
-          </a>
+          </div>
         </li>
       </ol>
     </section>
@@ -125,8 +125,19 @@ const breadcrumbs = [
       </div>
     </section>
 
+    <section class="collection-mobile-note" aria-label="Mobile editorial note">
+      <h2 class="colophon-section-label">Editorial frame</h2>
+      <p>
+        The three worlds are affective registers rather than geographic divisions:
+        interior perception, address, and symbolic exterior.
+      </p>
+      <p>
+        This is an ongoing digital edition, written and updated between 2024 and 2026.
+      </p>
+    </section>
+
     <!-- ── Editorial note ──────────────────────────────────────────────────── -->
-    <section class="reading-prose collection-note" aria-label="Editorial note">
+    <section class="reading-prose collection-note mobile-secondary-section" aria-label="Editorial note">
       <h2 class="colophon-section-label">Note</h2>
       <p>
         Begun in 2024 and continuing through 2026, this collection emerged from a period of quiet
@@ -167,6 +178,12 @@ const breadcrumbs = [
 
   </main>
 </BaseLayout>
+
+<script>
+  if (window.matchMedia('(max-width: 760px)').matches) {
+    window.location.replace('/about');
+  }
+</script>
 
 <style>
   .collection-page {
@@ -292,11 +309,6 @@ const breadcrumbs = [
     text-decoration: none;
     color: inherit;
     padding: var(--space-md) 0;
-    transition: padding-left 0.18s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .volume-link:hover {
-    padding-left: 5px;
   }
 
   .volume-roman {
@@ -304,11 +316,6 @@ const breadcrumbs = [
     color: var(--color-meta, #595959);
     min-width: 1.5rem;
     font-variant-numeric: tabular-nums;
-    transition: color 0.15s ease;
-  }
-
-  .volume-link:hover .volume-roman {
-    color: var(--color-accent, #c0392b);
   }
 
   .volume-info {
@@ -327,13 +334,6 @@ const breadcrumbs = [
     font-size: 13px;
     color: var(--color-meta, #595959);
     letter-spacing: 0.04em;
-  }
-
-  .volume-link:focus-visible {
-    outline: 2px solid var(--color-accent, #c0392b);
-    outline-offset: 3px;
-    border-radius: 1px;
-    padding-left: 4px;
   }
 
   /* ── Citation ───────────────────────────────────────────────────────────── */
@@ -374,5 +374,132 @@ const breadcrumbs = [
   /* ── Editorial note ─────────────────────────────────────────────────────── */
   .collection-note {
     /* inherits .reading-prose from global.css */
+  }
+
+  .collection-mobile-note {
+    display: none;
+  }
+
+  @media (max-width: 760px) {
+    .collection-page {
+      max-width: 100%;
+    }
+
+    .collection-masthead {
+      margin-bottom: var(--space-md);
+      padding-bottom: var(--space-md);
+    }
+
+    .collection-title {
+      font-size: clamp(44px, 15vw, 66px);
+      line-height: 0.94;
+      letter-spacing: -0.045em;
+    }
+
+    .collection-subtitle {
+      font-size: 16px;
+      line-height: 1.45;
+    }
+
+    .colophon {
+      margin-bottom: var(--space-md);
+      padding-bottom: var(--space-md);
+    }
+
+    .collection-note {
+      display: none !important;
+    }
+
+    .mobile-secondary-row,
+    .colophon-aliases {
+      display: none !important;
+    }
+
+    .colophon-grid {
+      display: block;
+    }
+
+    .colophon-row {
+      display: block;
+      padding: 10px 0;
+      border-bottom: 0.5px solid rgba(26, 26, 26, 0.08);
+    }
+
+    .colophon-grid dt,
+    .colophon-grid dd {
+      display: block;
+      padding: 0;
+      border-bottom: 0;
+    }
+
+    .colophon-grid dt {
+      margin-bottom: 3px;
+      font-size: 11.5px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .colophon-grid dd {
+      font-size: 17px;
+      line-height: 1.42;
+    }
+
+    .colophon-zh,
+    .colophon-aliases,
+    .volume-meta,
+    .citation-note,
+    .citation-url {
+      font-size: 12.5px;
+    }
+
+    .colophon-volumes,
+    .colophon-citation {
+      margin-bottom: var(--space-md);
+      padding-bottom: var(--space-md);
+    }
+
+    .volume-link {
+      align-items: flex-start;
+      gap: 14px;
+      padding: 11px 0;
+      transition: none;
+    }
+
+    .volume-name {
+      font-size: 20px;
+      line-height: 1.16;
+    }
+
+    .citation-block {
+      padding: 13px 15px;
+    }
+
+    .citation-format {
+      margin-bottom: 7px;
+      font-size: 16px;
+      line-height: 1.48;
+    }
+
+    .citation-note {
+      line-height: 1.42;
+    }
+
+    .collection-mobile-note {
+      display: block;
+      margin-bottom: var(--space-md);
+      padding-bottom: var(--space-md);
+      border-bottom: 0.5px solid rgba(26, 26, 26, 0.08);
+    }
+
+    .collection-mobile-note p {
+      margin: 0 0 10px;
+      color: var(--color-primary, #1a1a1a);
+      font-size: 16.5px;
+      line-height: 1.55;
+    }
+
+    .collection-mobile-note p:last-child {
+      margin-bottom: 0;
+    }
   }
 </style>

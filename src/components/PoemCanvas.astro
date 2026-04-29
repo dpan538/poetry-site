@@ -73,6 +73,7 @@ stanzas.forEach((stanza, si) => {
   document.addEventListener('DOMContentLoaded', () => {
     const page = document.getElementById('poem-page');
     if (!page) return;
+    if (window.matchMedia('(max-width: 760px)').matches) return;
 
     const poemId = page.dataset.poemId ?? '';
     const world = page.dataset.world ?? 'their-world';
@@ -1011,5 +1012,11 @@ stanzas.forEach((stanza, si) => {
     text-decoration-style: wavy;
     text-decoration-color: var(--ui-wavy-color, currentColor);
     text-underline-offset: 4px;
+  }
+
+  @media (max-width: 760px) {
+    .poem-page {
+      display: none;
+    }
   }
 </style>

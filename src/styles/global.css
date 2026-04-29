@@ -241,3 +241,82 @@ html[data-world='still-life'] {
   outline: 2px solid var(--color-accent, #c0392b);
   outline-offset: 4px;
 }
+
+@media (max-width: 760px) {
+  html,
+  body {
+    min-height: 100svh;
+    overflow-x: hidden;
+  }
+
+  body {
+    padding-top: var(--site-content-offset);
+    --mobile-surface-bg: color-mix(in srgb, var(--color-bg, #f5f2ed) 96%, white);
+    --mobile-control-bg: color-mix(in srgb, var(--color-bg, #f5f2ed) 94%, white);
+    --mobile-hairline: color-mix(in srgb, var(--color-primary, #1a1a1a) 16%, transparent);
+    --mobile-rule: color-mix(in srgb, var(--color-primary, #1a1a1a) 9%, transparent);
+    --mobile-soft-shadow: 0 18px 54px rgba(26, 26, 26, 0.13);
+    --mobile-panel-radius: 24px;
+  }
+
+  body > main {
+    width: 100%;
+    padding-inline: var(--margin-x);
+  }
+
+  .reading-page {
+    max-width: 100%;
+    padding-inline: var(--margin-x);
+    padding-bottom: calc(var(--space-xl) + 74px);
+    animation: none;
+  }
+
+  .reading-header {
+    padding-bottom: var(--space-lg);
+    margin-bottom: var(--space-lg);
+  }
+
+  .reading-header h1 {
+    font-size: clamp(42px, 13vw, 58px);
+    line-height: 0.98;
+    letter-spacing: -0.04em;
+  }
+
+  .reading-prose p {
+    font-size: 18px;
+    line-height: 1.72;
+  }
+
+  .reading-prose .reading-copyright-block p {
+    font-size: 13px;
+  }
+
+  .nav-link--collection {
+    display: none !important;
+  }
+
+  .site-copyright {
+    padding-inline: var(--margin-x);
+    padding-bottom: calc(var(--space-xl) + env(safe-area-inset-bottom));
+    font-size: 10.5px;
+    line-height: 1.55;
+  }
+
+  /* Critical mobile split: hide desktop-only interactive layers before component JS runs. */
+  .poem-page,
+  .atlas-trigger,
+  .atlas-overlay,
+  .index-overlay,
+  .poem-nav {
+    display: none !important;
+  }
+}
+
+@media (min-width: 761px) {
+  .mobile-poem-reader,
+  .mobile-poem-dock,
+  .mobile-sheet,
+  .mobile-home {
+    display: none !important;
+  }
+}

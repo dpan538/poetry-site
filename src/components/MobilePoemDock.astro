@@ -1,0 +1,594 @@
+---
+import atlas from '../data/atlas.json';
+import { poemContentTypes } from '../lib/content-types';
+import type { IndexMenuPoemRow, IndexWorld } from '../lib/index-menu-data';
+import { worldMetadata } from '../lib/publication';
+
+interface Props {
+  currentWorld: IndexWorld;
+  currentPoemId: string;
+  title: string;
+  poemsByWorld: Record<IndexWorld, IndexMenuPoemRow[]>;
+}
+
+const { currentWorld, currentPoemId, title, poemsByWorld } = Astro.props;
+
+const worlds = ['their-world', 'bless-you', 'still-life'] as const;
+const worldPaths: Record<IndexWorld, string> = {
+  'their-world': '/their-world',
+  'bless-you': '/bless-you',
+  'still-life': '/still-life',
+};
+
+const attrLabels: Record<string, string> = {
+  mode: 'voice',
+  type: 'act',
+  imagery: 'image',
+  pressure: 'pressure',
+  form: 'form',
+  sense: 'sense',
+};
+
+const attrOrder = ['mode', 'type', 'imagery', 'pressure', 'form', 'sense'] as const;
+const poemRecord = (atlas.poems as any[]).find((poem) => poem.id === currentPoemId);
+
+function addValues(target: Set<string>, values: string[]) {
+  values.forEach((value) => target.add(value));
+}
+
+function formatLabel(value: string) {
+  return value.replace(/_/g, ' ');
+}
+
+function inferMobileAtlasValues(poem: any) {
+  const values: Record<(typeof attrOrder)[number], Set<string>> = {
+    mode: new Set(poem?.mode || []),
+    type: new Set(poem?.type || []),
+    imagery: new Set(poem?.imagery || []),
+    pressure: new Set(poem?.pressure || []),
+    form: new Set(poem?.form || []),
+    sense: new Set(poem?.sense || []),
+  };
+
+  const contentTypes = poemContentTypes[currentPoemId as keyof typeof poemContentTypes] ?? [];
+  contentTypes.forEach((type) => values.form.add(type));
+
+  if (contentTypes.includes('narrative')) {
+    addValues(values.type, ['memory_fragment', 'scene']);
+    addValues(values.pressure, ['memory_pressure', 'time_pressure']);
+    values.mode.add('threshold_speaker');
+    values.sense.add('motion');
+  }
+  if (contentTypes.includes('observation')) {
+    values.type.add('witness');
+    values.mode.add('observer');
+    values.sense.add('visual');
+  }
+  if (contentTypes.includes('incantatory')) {
+    addValues(values.type, ['chant', 'invocation']);
+    values.form.add('ritual_repetition');
+    values.sense.add('auditory');
+  }
+  if (contentTypes.includes('political')) {
+    addValues(values.type, ['manifesto', 'warning']);
+    addValues(values.pressure, ['institutional_pressure', 'public_noise']);
+    values.mode.add('public_voice');
+  }
+  if (contentTypes.includes('spiritual')) {
+    addValues(values.type, ['prayer', 'invocation']);
+    values.pressure.add('belief_pressure');
+    values.mode.add('devotional_speaker');
+  }
+  if (contentTypes.includes('fragmented')) {
+    values.mode.add('fractured_self');
+    values.form.add('fragmented');
+    values.type.add('meditation');
+  }
+  if (contentTypes.includes('love')) {
+    addValues(values.mode, ['addressed_speaker', 'absent_other']);
+    values.pressure.add('intimacy_pressure');
+    values.type.add('letter');
+  }
+
+  return Object.fromEntries(
+    attrOrder.map((key) => [key, [...values[key]].map(formatLabel)]),
+  ) as Record<(typeof attrOrder)[number], string[]>;
+}
+
+const mobileAtlasValues = inferMobileAtlasValues(poemRecord);
+const activeGroupCount = attrOrder.filter((key) => mobileAtlasValues[key].length > 0).length;
+---
+
+<div class="mobile-poem-dock" aria-label="Mobile poem tools">
+  <a class="mobile-dock-button mobile-nav-link" href="#" data-poem-nav="prev" aria-label="Previous poem">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M14.8 5.2 8 12l6.8 6.8" />
+    </svg>
+  </a>
+  <button class="mobile-dock-button" type="button" data-mobile-open="index" aria-label="Open poem index">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M6 7h12M6 12h12M6 17h12" />
+    </svg>
+  </button>
+  <button class="mobile-dock-button" type="button" data-mobile-open="atlas" aria-label="Open poem relationship map">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="12" r="2.5" />
+      <circle cx="6.5" cy="7" r="1.8" />
+      <circle cx="17.5" cy="7.5" r="1.8" />
+      <circle cx="7.5" cy="17" r="1.8" />
+      <circle cx="18" cy="16.5" r="1.8" />
+      <path d="M8 8.1 10.2 10.2M15 9.1 13.8 10.3M9.1 15.5 10.2 13.8M15 14.9 13.8 13.8" />
+    </svg>
+  </button>
+  <a class="mobile-dock-button mobile-nav-link" href="#" data-poem-nav="next" aria-label="Next poem">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M9.2 5.2 16 12l-6.8 6.8" />
+    </svg>
+  </a>
+</div>
+
+<section
+  class="mobile-sheet"
+  id="mobile-index-sheet"
+  data-mobile-sheet="index"
+  role="dialog"
+  aria-modal="true"
+  aria-hidden="true"
+  aria-label="Mobile poem index"
+>
+  <div class="mobile-sheet-panel">
+    <header class="mobile-sheet-header">
+      <p class="mobile-sheet-kicker">Index</p>
+      <h2>Poem directory</h2>
+      <button class="mobile-sheet-close" type="button" data-mobile-close aria-label="Close poem index">x</button>
+    </header>
+
+    <div class="mobile-world-tabs" role="tablist" aria-label="Select world">
+      {worlds.map((world) => (
+        <button
+          type="button"
+          class:list={['mobile-world-tab', { 'is-active': world === currentWorld }]}
+          data-mobile-world={world}
+          role="tab"
+          aria-selected={world === currentWorld ? 'true' : 'false'}
+        >
+          {worldMetadata[world].label}
+        </button>
+      ))}
+    </div>
+
+    {worlds.map((world) => (
+      <div
+        class:list={['mobile-index-panel', { 'is-active': world === currentWorld }]}
+        data-mobile-world-panel={world}
+        role="tabpanel"
+        aria-hidden={world === currentWorld ? 'false' : 'true'}
+      >
+        <ol class="mobile-index-list">
+          {poemsByWorld[world].map((poem) => {
+            const isCurrent = poem.id === currentPoemId && world === currentWorld;
+            return (
+              <li class:list={['mobile-index-item', { 'is-current': isCurrent }]}>
+                <a href={`${worldPaths[world]}/${poem.id}`} class="mobile-index-link">
+                  <span class="mobile-index-order">{String(poem.order).padStart(2, '0')}</span>
+                  <span class="mobile-index-copy">
+                    <span class="mobile-index-title">{poem.title}</span>
+                    {poem.firstLine && <span class="mobile-index-line">{poem.firstLine}</span>}
+                  </span>
+                </a>
+              </li>
+            );
+          })}
+        </ol>
+      </div>
+    ))}
+  </div>
+</section>
+
+<section
+  class="mobile-sheet"
+  id="mobile-atlas-sheet"
+  data-mobile-sheet="atlas"
+  role="dialog"
+  aria-modal="true"
+  aria-hidden="true"
+  aria-label="Mobile ATLAS summary"
+>
+  <div class="mobile-sheet-panel mobile-atlas-panel">
+    <header class="mobile-sheet-header">
+      <p class="mobile-sheet-kicker">ATLAS</p>
+      <h2>{title}</h2>
+      <button class="mobile-sheet-close" type="button" data-mobile-close aria-label="Close relationship map">x</button>
+    </header>
+
+    <p class="mobile-atlas-lede">
+      A compact relationship reading for this poem: voice, action, image, pressure, form, and sense.
+    </p>
+
+    <div class="mobile-atlas-groups" aria-label={`${activeGroupCount} active structural groups`}>
+      {attrOrder.map((key) => {
+        const values = mobileAtlasValues[key];
+        if (!values.length) return null;
+        return (
+          <section class={`mobile-atlas-group mobile-atlas-${key}`}>
+            <h3>{attrLabels[key]}</h3>
+            <p>{values.join(', ')}</p>
+          </section>
+        );
+      })}
+    </div>
+  </div>
+</section>
+
+<script>
+  function initMobilePoemDock() {
+    const sheets = Array.from(document.querySelectorAll('[data-mobile-sheet]'));
+    const openButtons = Array.from(document.querySelectorAll('[data-mobile-open]'));
+    const closeButtons = Array.from(document.querySelectorAll('[data-mobile-close]'));
+    const worldTabs = Array.from(document.querySelectorAll('[data-mobile-world]'));
+    let lastFocused = null;
+
+    const focusableSelector = [
+      'a[href]',
+      'button:not([disabled])',
+      '[tabindex]:not([tabindex="-1"])',
+    ].join(',');
+
+    function closeSheets() {
+      sheets.forEach((sheet) => {
+        sheet.classList.remove('is-open');
+        sheet.setAttribute('aria-hidden', 'true');
+      });
+      document.body.classList.remove('mobile-sheet-open');
+      if (lastFocused) requestAnimationFrame(() => lastFocused.focus?.());
+    }
+
+    function openSheet(name) {
+      const sheet = document.querySelector(`[data-mobile-sheet="${name}"]`);
+      if (!sheet) return;
+      lastFocused = document.activeElement;
+      closeSheets();
+      sheet.classList.add('is-open');
+      sheet.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('mobile-sheet-open');
+      requestAnimationFrame(() => sheet.querySelector(focusableSelector)?.focus?.());
+    }
+
+    openButtons.forEach((button) => {
+      button.addEventListener('click', () => openSheet(button.getAttribute('data-mobile-open')));
+    });
+
+    closeButtons.forEach((button) => {
+      button.addEventListener('click', closeSheets);
+    });
+
+    sheets.forEach((sheet) => {
+      sheet.addEventListener('click', (event) => {
+        if (event.target === sheet) closeSheets();
+      });
+
+      sheet.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') closeSheets();
+        if (event.key !== 'Tab') return;
+        const focusables = Array.from(sheet.querySelectorAll(focusableSelector));
+        if (!focusables.length) return;
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      });
+    });
+
+    worldTabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        const world = tab.getAttribute('data-mobile-world');
+        worldTabs.forEach((item) => {
+          const active = item.getAttribute('data-mobile-world') === world;
+          item.classList.toggle('is-active', active);
+          item.setAttribute('aria-selected', active ? 'true' : 'false');
+        });
+        document.querySelectorAll('[data-mobile-world-panel]').forEach((panel) => {
+          const active = panel.getAttribute('data-mobile-world-panel') === world;
+          panel.classList.toggle('is-active', active);
+          panel.setAttribute('aria-hidden', active ? 'false' : 'true');
+        });
+      });
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initMobilePoemDock);
+  } else {
+    initMobilePoemDock();
+  }
+</script>
+
+<style>
+  .mobile-poem-dock,
+  .mobile-sheet {
+    display: none;
+  }
+
+  @media (max-width: 760px) {
+    :global(body.mobile-sheet-open) {
+      overflow: hidden;
+    }
+
+    .mobile-poem-dock {
+      position: fixed;
+      left: 50%;
+      bottom: calc(18px + env(safe-area-inset-bottom));
+      z-index: 180;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px;
+      border: 1px solid var(--mobile-hairline, color-mix(in srgb, var(--color-primary, #1a1a1a) 18%, transparent));
+      border-radius: 999px;
+      background: var(--mobile-control-bg, color-mix(in srgb, var(--color-bg, #f5f2ed) 94%, white));
+      box-shadow: 0 12px 34px rgba(26, 26, 26, 0.1);
+      transform: translateX(-50%);
+      backdrop-filter: blur(18px);
+    }
+
+    .mobile-dock-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 42px;
+      height: 42px;
+      padding: 0;
+      border: 0;
+      border-radius: 50%;
+      background: transparent;
+      color: var(--color-primary, #1a1a1a);
+      cursor: pointer;
+      text-decoration: none;
+      transition:
+        background-color 0.18s var(--ui-ease-out, ease),
+        color 0.18s var(--ui-ease-out, ease),
+        transform 0.22s var(--ui-ease-spring, ease);
+    }
+
+    .mobile-dock-button:hover,
+    .mobile-dock-button:focus-visible {
+      background: color-mix(in srgb, var(--color-accent, #c0392b) 12%, transparent);
+      color: var(--color-accent, #c0392b);
+      transform: translateY(-1px);
+    }
+
+    .mobile-dock-button svg {
+      width: 21px;
+      height: 21px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.65;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .mobile-nav-link[aria-disabled='true'] {
+      opacity: 0.35;
+      pointer-events: none;
+    }
+
+    .mobile-sheet {
+      position: fixed;
+      inset: 0;
+      z-index: 950;
+      display: block;
+      padding: calc(var(--site-nav-height) + 14px) 12px calc(12px + env(safe-area-inset-bottom));
+      box-sizing: border-box;
+      background: rgba(26, 26, 26, 0);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.22s ease, background 0.22s ease;
+    }
+
+    .mobile-sheet.is-open {
+      opacity: 1;
+      pointer-events: auto;
+      background: rgba(26, 26, 26, 0.12);
+    }
+
+    .mobile-sheet-panel {
+      box-sizing: border-box;
+      width: 100%;
+      max-height: calc(100svh - var(--site-nav-height) - 28px);
+      margin: 0 auto;
+      padding: 24px 22px 28px;
+      overflow: auto;
+      border: 1px solid var(--mobile-hairline, color-mix(in srgb, var(--color-primary, #1a1a1a) 18%, transparent));
+      border-radius: var(--mobile-panel-radius, 24px);
+      background: var(--mobile-surface-bg, color-mix(in srgb, var(--color-bg, #f5f2ed) 96%, white));
+      box-shadow: var(--mobile-soft-shadow, 0 24px 70px rgba(26, 26, 26, 0.18));
+      transform: translateY(16px) scale(0.985);
+      transition: transform 0.32s var(--ui-ease-out, ease);
+    }
+
+    .mobile-sheet.is-open .mobile-sheet-panel {
+      transform: translateY(0) scale(1);
+    }
+
+    .mobile-sheet-header {
+      position: sticky;
+      top: -24px;
+      z-index: 3;
+      padding-right: 52px;
+      padding-top: 24px;
+      margin-top: -24px;
+      margin-bottom: 22px;
+      background: var(--mobile-surface-bg, color-mix(in srgb, var(--color-bg, #f5f2ed) 96%, white));
+    }
+
+    .mobile-sheet-kicker {
+      margin: 0 0 8px;
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--color-accent, #c0392b);
+    }
+
+    .mobile-sheet-header h2 {
+      margin: 0;
+      font-size: clamp(32px, 10vw, 48px);
+      line-height: 0.96;
+      font-weight: normal;
+      letter-spacing: -0.035em;
+    }
+
+    .mobile-sheet-close {
+      position: absolute;
+      top: 16px;
+      right: -8px;
+      z-index: 4;
+      width: 46px;
+      height: 46px;
+      border: 0;
+      border-radius: 50%;
+      background: transparent;
+      color: var(--color-primary, #1a1a1a);
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 28px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .mobile-world-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .mobile-world-tabs::-webkit-scrollbar {
+      display: none;
+    }
+
+    .mobile-world-tab {
+      flex: 0 0 auto;
+      min-height: 42px;
+      padding: 0 14px;
+      border: 1px solid var(--mobile-hairline, color-mix(in srgb, var(--color-primary, #1a1a1a) 14%, transparent));
+      border-radius: 999px;
+      background: transparent;
+      color: var(--color-meta, #595959);
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .mobile-world-tab.is-active {
+      border-color: color-mix(in srgb, var(--color-accent, #c0392b) 48%, transparent);
+      color: var(--color-primary, #1a1a1a);
+      background: color-mix(in srgb, var(--color-accent, #c0392b) 8%, transparent);
+    }
+
+    .mobile-index-panel {
+      display: none;
+    }
+
+    .mobile-index-panel.is-active {
+      display: block;
+    }
+
+    .mobile-index-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .mobile-index-item {
+      border-top: 1px solid var(--mobile-rule, color-mix(in srgb, var(--color-primary, #1a1a1a) 8%, transparent));
+    }
+
+    .mobile-index-link {
+      display: flex;
+      gap: 14px;
+      padding: 16px 0;
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .mobile-index-order {
+      width: 2.4rem;
+      flex: 0 0 auto;
+      padding-top: 0.12em;
+      color: var(--color-meta, #595959);
+      font-size: 12px;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.08em;
+    }
+
+    .mobile-index-copy {
+      min-width: 0;
+      display: grid;
+      gap: 5px;
+    }
+
+    .mobile-index-title {
+      font-size: 20px;
+      line-height: 1.2;
+      letter-spacing: -0.012em;
+    }
+
+    .mobile-index-line {
+      color: var(--color-meta, #595959);
+      font-size: 14px;
+      line-height: 1.45;
+      font-style: italic;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+
+    .mobile-index-item.is-current .mobile-index-title {
+      color: var(--color-accent, #c0392b);
+      text-decoration: underline;
+      text-underline-offset: 4px;
+    }
+
+    .mobile-atlas-lede {
+      margin: 0 0 22px;
+      color: var(--color-meta, #595959);
+      font-size: 16px;
+      line-height: 1.55;
+      font-style: italic;
+    }
+
+    .mobile-atlas-groups {
+      display: grid;
+      gap: 12px;
+    }
+
+    .mobile-atlas-group {
+      padding: 16px;
+      border: 1px solid var(--mobile-rule, color-mix(in srgb, var(--color-primary, #1a1a1a) 10%, transparent));
+      border-radius: 18px;
+      background: color-mix(in srgb, var(--mobile-surface-bg, #f5f2ed) 92%, white);
+    }
+
+    .mobile-atlas-group h3 {
+      margin: 0 0 8px;
+      color: var(--color-accent, #c0392b);
+      font-size: 11px;
+      font-weight: normal;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .mobile-atlas-group p {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.45;
+      letter-spacing: -0.01em;
+    }
+  }
+</style>

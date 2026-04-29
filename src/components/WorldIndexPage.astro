@@ -193,4 +193,66 @@ const volumeNumber: Record<string, string> = {
     border-radius: 1px;
     padding-left: 4px;
   }
+
+  @media (max-width: 760px) {
+    .world-index {
+      max-width: 100%;
+      padding-inline: var(--margin-x);
+      padding-bottom: calc(var(--space-xl) + 34px);
+    }
+
+    .world-header {
+      padding-bottom: var(--space-lg);
+      margin-bottom: var(--space-md);
+    }
+
+    .world-volume-label {
+      margin-bottom: var(--space-sm);
+      font-size: 12px;
+    }
+
+    .world-header h1 {
+      margin-bottom: var(--space-md);
+      font-size: clamp(44px, 15vw, 68px);
+      line-height: 0.94;
+      letter-spacing: -0.045em;
+    }
+
+    .world-desc {
+      max-width: none;
+      font-size: 17px;
+      line-height: 1.62;
+    }
+
+    .poem-index-link {
+      gap: 15px;
+      padding: 18px 0;
+      transition: none;
+    }
+
+    .poem-index-link:hover {
+      padding-left: 0;
+    }
+
+    .poem-index-num {
+      min-width: 2.4rem;
+      font-size: 12px;
+    }
+
+    .poem-index-title {
+      font-size: 22px;
+      line-height: 1.18;
+      letter-spacing: -0.012em;
+    }
+
+    .poem-index-first-line {
+      max-width: none;
+      white-space: normal;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+  }
 </style>

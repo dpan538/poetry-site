@@ -112,6 +112,13 @@ const { poemId, world } = Astro.props;
     border-radius: 1px;
   }
 
+  @media (max-width: 760px) {
+    .atlas-trigger,
+    .atlas-overlay {
+      display: none;
+    }
+  }
+
   /* ── Overlay ─────────────────────────────────────────────────────────────── */
   .atlas-overlay {
     position: fixed;

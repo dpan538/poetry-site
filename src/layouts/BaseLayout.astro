@@ -2,6 +2,8 @@
 import '../styles/global.css';
 import Nav from '../components/Nav.astro';
 import SEO from '../components/SEO.astro';
+import MobileIndexTools from '../components/MobileIndexTools.astro';
+import { loadPoemsByWorldForIndexMenu } from '../lib/index-menu-data';
 import { publication } from '../lib/publication';
 
 interface Props {
@@ -27,13 +29,15 @@ const { world, title, description, ogImage, poem, breadcrumbs } = Astro.props;
 const pathname = Astro.url.pathname;
 const site = Astro.site ?? new URL('https://daipan.ink');
 const canonicalURL = new URL(pathname, site).href;
+const showMobileIndexTools = pathname !== '/' && !poem;
+const mobilePoemsByWorld = showMobileIndexTools ? await loadPoemsByWorldForIndexMenu() : undefined;
 ---
 
 <!doctype html>
 <html lang="en" {...world ? { 'data-world': world } : {}}>
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="manifest" href="/site.webmanifest" />
     <meta name="theme-color" content="#1a1a1a" />
@@ -51,6 +55,9 @@ const canonicalURL = new URL(pathname, site).href;
           © {publication.copyrightYears} {publication.authorDisplayName}. {publication.license}. Poems may not be reproduced without written permission.
         </p>
       </footer>
+      {showMobileIndexTools && mobilePoemsByWorld && (
+        <MobileIndexTools currentWorld={world ?? 'their-world'} poemsByWorld={mobilePoemsByWorld} />
+      )}
     </div>
   </body>
 </html>

@@ -1,0 +1,355 @@
+---
+import type { IndexMenuPoemRow, IndexWorld } from '../lib/index-menu-data';
+import { worldMetadata } from '../lib/publication';
+
+interface Props {
+  currentWorld: IndexWorld;
+  poemsByWorld: Record<IndexWorld, IndexMenuPoemRow[]>;
+}
+
+const { currentWorld, poemsByWorld } = Astro.props;
+
+const worlds = ['their-world', 'bless-you', 'still-life'] as const;
+const worldPaths: Record<IndexWorld, string> = {
+  'their-world': '/their-world',
+  'bless-you': '/bless-you',
+  'still-life': '/still-life',
+};
+---
+
+<button class="mobile-index-float" type="button" data-mobile-site-index-open aria-label="Open poem index">
+  <svg viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M6 7h12M6 12h12M6 17h12" />
+  </svg>
+  <span>Index</span>
+</button>
+
+<section
+  class="mobile-index-sheet"
+  data-mobile-site-index
+  role="dialog"
+  aria-modal="true"
+  aria-hidden="true"
+  aria-label="Poem index"
+>
+  <div class="mobile-index-panel">
+    <header class="mobile-index-header">
+      <p class="mobile-index-kicker">Index</p>
+      <h2>Poem directory</h2>
+      <button class="mobile-index-close" type="button" data-mobile-site-index-close aria-label="Close poem index">x</button>
+    </header>
+
+    <div class="mobile-index-tabs" role="tablist" aria-label="Select world">
+      {worlds.map((world) => (
+        <button
+          type="button"
+          class:list={['mobile-index-tab', { 'is-active': world === currentWorld }]}
+          data-mobile-site-world={world}
+          role="tab"
+          aria-selected={world === currentWorld ? 'true' : 'false'}
+        >
+          {worldMetadata[world].label}
+        </button>
+      ))}
+    </div>
+
+    {worlds.map((world) => (
+      <div
+        class:list={['mobile-index-world', { 'is-active': world === currentWorld }]}
+        data-mobile-site-world-panel={world}
+        role="tabpanel"
+        aria-hidden={world === currentWorld ? 'false' : 'true'}
+      >
+        <ol class="mobile-index-list">
+          {poemsByWorld[world].map((poem) => (
+            <li class="mobile-index-item">
+              <a href={`${worldPaths[world]}/${poem.id}`} class="mobile-index-link">
+                <span class="mobile-index-order">{String(poem.order).padStart(2, '0')}</span>
+                <span class="mobile-index-copy">
+                  <span class="mobile-index-title">{poem.title}</span>
+                  {poem.firstLine && <span class="mobile-index-line">{poem.firstLine}</span>}
+                </span>
+              </a>
+            </li>
+          ))}
+        </ol>
+      </div>
+    ))}
+  </div>
+</section>
+
+<script>
+  function initMobileIndexTools() {
+    const sheet = document.querySelector('[data-mobile-site-index]');
+    const openButton = document.querySelector('[data-mobile-site-index-open]');
+    const closeButton = document.querySelector('[data-mobile-site-index-close]');
+    const tabs = Array.from(document.querySelectorAll('[data-mobile-site-world]'));
+    if (!sheet || !openButton || !closeButton) return;
+
+    const focusableSelector = 'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
+    let lastFocused = null;
+
+    function closeSheet() {
+      sheet.classList.remove('is-open');
+      sheet.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('mobile-site-index-open');
+      if (lastFocused) requestAnimationFrame(() => lastFocused.focus?.());
+    }
+
+    function openSheet() {
+      lastFocused = document.activeElement;
+      sheet.classList.add('is-open');
+      sheet.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('mobile-site-index-open');
+      requestAnimationFrame(() => sheet.querySelector(focusableSelector)?.focus?.());
+    }
+
+    openButton.addEventListener('click', openSheet);
+    closeButton.addEventListener('click', closeSheet);
+    sheet.addEventListener('click', (event) => {
+      if (event.target === sheet) closeSheet();
+    });
+    sheet.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') closeSheet();
+    });
+
+    tabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        const world = tab.getAttribute('data-mobile-site-world');
+        tabs.forEach((item) => {
+          const active = item.getAttribute('data-mobile-site-world') === world;
+          item.classList.toggle('is-active', active);
+          item.setAttribute('aria-selected', active ? 'true' : 'false');
+        });
+        document.querySelectorAll('[data-mobile-site-world-panel]').forEach((panel) => {
+          const active = panel.getAttribute('data-mobile-site-world-panel') === world;
+          panel.classList.toggle('is-active', active);
+          panel.setAttribute('aria-hidden', active ? 'false' : 'true');
+        });
+      });
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initMobileIndexTools);
+  } else {
+    initMobileIndexTools();
+  }
+</script>
+
+<style>
+  .mobile-index-float,
+  .mobile-index-sheet {
+    display: none;
+  }
+
+  @media (max-width: 760px) {
+    :global(body.mobile-site-index-open) {
+      overflow: hidden;
+    }
+
+    .mobile-index-float {
+      position: fixed;
+      left: 50%;
+      bottom: calc(18px + env(safe-area-inset-bottom));
+      z-index: 180;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 52px;
+      padding: 0 18px;
+      border: 1px solid var(--mobile-hairline, color-mix(in srgb, var(--color-primary, #1a1a1a) 18%, transparent));
+      border-radius: 999px;
+      background: var(--mobile-control-bg, color-mix(in srgb, var(--color-bg, #f5f2ed) 94%, white));
+      color: var(--color-primary, #1a1a1a);
+      box-shadow: 0 12px 34px rgba(26, 26, 26, 0.1);
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 14px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transform: translateX(-50%);
+      backdrop-filter: blur(18px);
+      cursor: pointer;
+    }
+
+    .mobile-index-float svg {
+      width: 20px;
+      height: 20px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.65;
+      stroke-linecap: round;
+    }
+
+    .mobile-index-sheet {
+      position: fixed;
+      inset: 0;
+      z-index: 950;
+      display: block;
+      padding: calc(var(--site-nav-height) + 14px) 12px calc(12px + env(safe-area-inset-bottom));
+      box-sizing: border-box;
+      background: rgba(26, 26, 26, 0);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.22s ease, background 0.22s ease;
+    }
+
+    .mobile-index-sheet.is-open {
+      opacity: 1;
+      pointer-events: auto;
+      background: rgba(26, 26, 26, 0.12);
+    }
+
+    .mobile-index-panel {
+      box-sizing: border-box;
+      width: 100%;
+      max-height: calc(100svh - var(--site-nav-height) - 28px);
+      margin: 0 auto;
+      padding: 24px 22px 28px;
+      overflow: auto;
+      border: 1px solid var(--mobile-hairline, color-mix(in srgb, var(--color-primary, #1a1a1a) 18%, transparent));
+      border-radius: var(--mobile-panel-radius, 24px);
+      background: var(--mobile-surface-bg, color-mix(in srgb, var(--color-bg, #f5f2ed) 96%, white));
+      box-shadow: var(--mobile-soft-shadow, 0 24px 70px rgba(26, 26, 26, 0.18));
+      transform: translateY(16px) scale(0.985);
+      transition: transform 0.32s var(--ui-ease-out, ease);
+    }
+
+    .mobile-index-sheet.is-open .mobile-index-panel {
+      transform: translateY(0) scale(1);
+    }
+
+    .mobile-index-header {
+      position: sticky;
+      top: -24px;
+      z-index: 3;
+      padding-top: 24px;
+      padding-right: 52px;
+      margin-top: -24px;
+      margin-bottom: 22px;
+      background: var(--mobile-surface-bg, color-mix(in srgb, var(--color-bg, #f5f2ed) 96%, white));
+    }
+
+    .mobile-index-kicker {
+      margin: 0 0 8px;
+      color: var(--color-accent, #c0392b);
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .mobile-index-header h2 {
+      margin: 0;
+      font-size: clamp(32px, 10vw, 48px);
+      line-height: 0.96;
+      font-weight: normal;
+      letter-spacing: -0.035em;
+    }
+
+    .mobile-index-close {
+      position: absolute;
+      top: 16px;
+      right: -8px;
+      width: 46px;
+      height: 46px;
+      border: 0;
+      border-radius: 50%;
+      background: transparent;
+      color: var(--color-primary, #1a1a1a);
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 28px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .mobile-index-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .mobile-index-tabs::-webkit-scrollbar {
+      display: none;
+    }
+
+    .mobile-index-tab {
+      flex: 0 0 auto;
+      min-height: 42px;
+      padding: 0 14px;
+      border: 1px solid var(--mobile-hairline, color-mix(in srgb, var(--color-primary, #1a1a1a) 14%, transparent));
+      border-radius: 999px;
+      background: transparent;
+      color: var(--color-meta, #595959);
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .mobile-index-tab.is-active {
+      border-color: color-mix(in srgb, var(--color-accent, #c0392b) 48%, transparent);
+      color: var(--color-primary, #1a1a1a);
+      background: color-mix(in srgb, var(--color-accent, #c0392b) 8%, transparent);
+    }
+
+    .mobile-index-world {
+      display: none;
+    }
+
+    .mobile-index-world.is-active {
+      display: block;
+    }
+
+    .mobile-index-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .mobile-index-item {
+      border-top: 1px solid var(--mobile-rule, color-mix(in srgb, var(--color-primary, #1a1a1a) 8%, transparent));
+    }
+
+    .mobile-index-link {
+      display: flex;
+      gap: 14px;
+      padding: 16px 0;
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .mobile-index-order {
+      width: 2.4rem;
+      flex: 0 0 auto;
+      padding-top: 0.12em;
+      color: var(--color-meta, #595959);
+      font-size: 12px;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.08em;
+    }
+
+    .mobile-index-copy {
+      min-width: 0;
+      display: grid;
+      gap: 5px;
+    }
+
+    .mobile-index-title {
+      font-size: 20px;
+      line-height: 1.2;
+      letter-spacing: -0.012em;
+    }
+
+    .mobile-index-line {
+      color: var(--color-meta, #595959);
+      font-size: 14px;
+      line-height: 1.45;
+      font-style: italic;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+  }
+</style>

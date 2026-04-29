@@ -46,7 +46,7 @@ const siteDescription =
     </p>
   </div>
 
-  <main class="home-entry" aria-labelledby="home-entry-title">
+  <main class="home-entry desktop-entry" aria-labelledby="home-entry-title">
     <section class="entry-card" aria-live="polite">
       <p class="entry-kicker">Three Worlds</p>
       <h1 id="home-entry-title">Entering the collection</h1>
@@ -60,6 +60,23 @@ const siteDescription =
         JavaScript is needed for the rotating entry. You can still
         <a href="/collection">browse the collection index</a>.
       </noscript>
+    </section>
+  </main>
+
+  <main class="mobile-home" aria-labelledby="mobile-home-title">
+    <section class="mobile-home-hero">
+      <p class="mobile-home-kicker">2024 — 2026</p>
+      <h1 id="mobile-home-title">Three Worlds</h1>
+      <p class="mobile-home-copy">
+        Poems by Dai Pan. Three fields of perception, address, and exterior.
+      </p>
+    </section>
+
+    <section class="mobile-home-actions" aria-label="Start reading">
+      <button class="mobile-home-primary" type="button" id="mobile-enter-button">
+        <span>Read</span>
+        <span aria-hidden="true">↝</span>
+      </button>
     </section>
   </main>
 </BaseLayout>
@@ -114,7 +131,13 @@ const siteDescription =
     window.location.replace(`/${poem.world}/${poem.id}`);
   }
 
-  enterCollection();
+  const mobileQuery = window.matchMedia('(max-width: 760px)');
+  const mobileEnterButton = document.getElementById('mobile-enter-button');
+  mobileEnterButton?.addEventListener('click', enterCollection);
+
+  if (!mobileQuery.matches) {
+    enterCollection();
+  }
 </script>
 
 <style>
@@ -188,5 +211,102 @@ const siteDescription =
   noscript a {
     color: currentColor;
     text-underline-offset: 0.18em;
+  }
+
+  .mobile-home {
+    display: none;
+  }
+
+  @media (max-width: 760px) {
+    .desktop-entry {
+      display: none;
+    }
+
+    .mobile-home {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      box-sizing: border-box;
+      min-height: calc(100svh - var(--site-content-offset));
+      padding:
+        clamp(34px, 9vh, 72px)
+        var(--margin-x)
+        calc(clamp(34px, 9vh, 72px) + env(safe-area-inset-bottom));
+      color: var(--color-primary, #1a1a1a);
+      text-align: center;
+    }
+
+    .mobile-home-hero {
+      display: grid;
+      justify-items: center;
+    }
+
+    .mobile-home-kicker {
+      margin: 0 0 20px;
+      color: var(--color-meta, #595959);
+      font-size: 12px;
+      line-height: 1.4;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .mobile-home h1 {
+      margin: 0;
+      max-width: 8ch;
+      font-size: clamp(54px, 16.5vw, 76px);
+      line-height: 0.92;
+      font-weight: normal;
+      letter-spacing: -0.052em;
+    }
+
+    .mobile-home-copy {
+      margin: 24px 0 0;
+      max-width: 22rem;
+      color: var(--color-meta, #595959);
+      font-size: 16px;
+      line-height: 1.64;
+      font-style: italic;
+    }
+
+    .mobile-home-actions {
+      margin-top: clamp(44px, 12vh, 92px);
+    }
+
+    .mobile-home-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      min-height: 44px;
+      padding: 0 0 7px;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      color: var(--color-primary, #1a1a1a);
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 17px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition:
+        color 0.2s var(--ui-ease-out, ease),
+        transform 0.24s var(--ui-ease-spring, ease);
+    }
+
+    .mobile-home-primary span:first-child {
+      text-decoration: underline;
+      text-decoration-style: wavy;
+      text-decoration-color: color-mix(in srgb, var(--color-accent, #c0392b) 74%, transparent);
+      text-underline-offset: 8px;
+      text-decoration-thickness: 1px;
+    }
+
+    .mobile-home-primary:hover,
+    .mobile-home-primary:focus-visible {
+      color: var(--color-accent, #c0392b);
+      transform: translateY(-1px);
+    }
   }
 </style>

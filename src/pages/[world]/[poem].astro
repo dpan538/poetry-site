@@ -5,6 +5,8 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import PoemCanvas from '../../components/PoemCanvas.astro';
 import IndexMenu from '../../components/IndexMenu.astro';
 import AtlasOverlay from '../../components/AtlasOverlay.astro';
+import MobilePoemReader from '../../components/MobilePoemReader.astro';
+import MobilePoemDock from '../../components/MobilePoemDock.astro';
 import { loadPoemsByWorldForIndexMenu } from '../../lib/index-menu-data';
 import { analyzePoemText, computeEmotionScore } from '../../lib/poem-analyzer';
 import { excerptWords } from '../../lib/seo';
@@ -83,8 +85,8 @@ const breadcrumbs = [
 >
   <main class="poem-shell">
     <nav class="poem-nav" id="poem-nav">
-      <a class="nav-prev" id="nav-prev" href="#" aria-label="Previous poem">←</a>
-      <a class="nav-next" id="nav-next" href="#" aria-label="Next poem">→</a>
+      <a class="nav-prev" id="nav-prev" data-poem-nav="prev" href="#" aria-label="Previous poem">←</a>
+      <a class="nav-next" id="nav-next" data-poem-nav="next" href="#" aria-label="Next poem">→</a>
     </nav>
 
     <!--
@@ -119,8 +121,20 @@ const breadcrumbs = [
       rawText={rawText}
       order={poem.data.order}
     />
+    <MobilePoemReader
+      world={world}
+      title={poem.data.title}
+      rawText={rawText}
+      order={poem.data.order}
+    />
     <IndexMenu currentWorld={world} currentPoemId={poem.id} poemsByWorld={poemsByWorld} />
     <AtlasOverlay poemId={poem.id} world={world} />
+    <MobilePoemDock
+      currentWorld={world}
+      currentPoemId={poem.id}
+      title={poem.data.title}
+      poemsByWorld={poemsByWorld}
+    />
   </main>
 </BaseLayout>
 
@@ -247,6 +261,21 @@ const breadcrumbs = [
     });
   }
 
+  function setNavTargets(role, poem) {
+    const targets = document.querySelectorAll(`[data-poem-nav="${role}"]`);
+    targets.forEach((target) => {
+      if (poem) {
+        target.setAttribute('href', `/${poem.world}/${poem.id}`);
+        target.style.display = '';
+        target.removeAttribute('aria-disabled');
+      } else {
+        target.setAttribute('href', '#');
+        target.style.display = 'none';
+        target.setAttribute('aria-disabled', 'true');
+      }
+    });
+  }
+
   async function initNav() {
     bindKeyboard();
 
@@ -282,24 +311,12 @@ const breadcrumbs = [
       const prevId = getPrevPoemId(ctx);
       const prevPoem = prevId ? allPoems.find((p) => p.id === prevId) : null;
 
-      if (nextPoem) {
-        const nextEl = document.getElementById('nav-next');
-        if (nextEl) nextEl.setAttribute('href', `/${nextPoem.world}/${nextPoem.id}`);
-      }
-
-      if (prevPoem) {
-        const prevEl = document.getElementById('nav-prev');
-        if (prevEl) prevEl.setAttribute('href', `/${prevPoem.world}/${prevPoem.id}`);
-      } else {
-        const prevEl = document.getElementById('nav-prev');
-        if (prevEl) prevEl.style.display = 'none';
-      }
+      setNavTargets('next', nextPoem);
+      setNavTargets('prev', prevPoem);
     } catch (err) {
       console.error('[dynamic-nav] failed to initialize:', err);
-      const prevEl = document.getElementById('nav-prev');
-      const nextEl = document.getElementById('nav-next');
-      if (prevEl) prevEl.style.display = 'none';
-      if (nextEl) nextEl.style.display = 'none';
+      setNavTargets('prev', null);
+      setNavTargets('next', null);
     }
   }
 
@@ -407,5 +424,17 @@ const breadcrumbs = [
     outline: 2px solid var(--color-accent, #c0392b);
     outline-offset: 4px;
     border-radius: 2px;
+  }
+
+  @media (max-width: 760px) {
+    .poem-shell {
+      min-height: calc(100svh - var(--site-content-offset));
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+
+    .poem-nav {
+      display: none;
+    }
   }
 </style>

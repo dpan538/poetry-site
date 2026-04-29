@@ -21,7 +21,7 @@ const aboutActive = norm === '/about' || norm.startsWith('/about/');
   <div class="nav-right">
     <a
       href="/collection"
-      class:list={['nav-link', { 'is-active': collectionActive }]}
+      class:list={['nav-link', 'nav-link--collection', { 'is-active': collectionActive }]}
       aria-current={collectionActive ? 'page' : undefined}
     >Collection</a>
     <a
@@ -89,6 +89,47 @@ const aboutActive = norm === '/about' || norm.startsWith('/about/');
     text-decoration-style: wavy;
     text-decoration-color: var(--ui-wavy-color, currentColor);
     text-underline-offset: 4px;
+  }
+
+  @media (max-width: 760px) {
+    .site-nav {
+      align-items: stretch;
+      padding-inline: var(--margin-x);
+      padding-top: var(--safe-top, 0px);
+      border-bottom-color: color-mix(in srgb, var(--color-primary, #1a1a1a) 10%, transparent);
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      min-height: 60px;
+      font-size: 19px;
+      letter-spacing: 0;
+    }
+
+    .nav-right {
+      flex-direction: row;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 0;
+      min-height: 60px;
+    }
+
+    .nav-link--collection {
+      display: none;
+    }
+
+    .nav-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: flex-end;
+      min-width: 74px;
+      min-height: 48px;
+      padding: 0 0 0 14px;
+      font-size: 13px;
+      line-height: 1;
+      letter-spacing: 0.085em;
+    }
   }
 </style>
 

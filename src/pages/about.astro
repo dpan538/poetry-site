@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { publication } from '../lib/publication';
+import { getCollection } from 'astro:content';
+import { publication, worldMetadata, worldOrder } from '../lib/publication';
 
 const aboutDescription =
   'Dai Pan (潘岱, also written Pan Dai) is a visual artist, photographer, printmaker and writer based in Brisbane, Australia. BFA, School of Visual Arts, New York.';
@@ -9,6 +10,15 @@ const breadcrumbs = [
   { name: 'Three Worlds', url: 'https://daipan.ink/' },
   { name: 'About', url: 'https://daipan.ink/about' },
 ];
+
+const poemCounts = Object.fromEntries(
+  await Promise.all(
+    worldOrder.map(async (world) => {
+      const poems = await getCollection(world);
+      return [world, poems.length] as const;
+    }),
+  ),
+) as Record<(typeof worldOrder)[number], number>;
 ---
 
 <BaseLayout title="About" description={aboutDescription} breadcrumbs={breadcrumbs}>
@@ -24,13 +34,13 @@ const breadcrumbs = [
         painting, and language. Born in China, formed in Shanghai and New York, his work traces the
         distance between places and the things that remain.
       </p>
-      <p>
+      <p class="about-detail">
         This page is the author record for Dai Pan (潘岱), also romanized as Pan Dai and sometimes
         searched as PANDAI, DaiPan, or daipan. <em>daipan.ink</em> is his poetry website and digital
         collection space; <em>daipan.art</em> is the companion site for his visual art practice.
         The .ink domain is used as a writer's site, not as an ink, pen, printing, or pigment brand.
       </p>
-      <p>
+      <p class="about-detail">
         He holds a BFA from the School of Visual Arts, New York, and is currently pursuing a Master of
         Information Technology at the University of Queensland.
       </p>
@@ -41,6 +51,38 @@ const breadcrumbs = [
           target="_blank"
           rel="noopener noreferrer">@jumpingchick666</a>
       </p>
+      <section class="mobile-about-collection" aria-label="Collection record">
+        <h2>Three Worlds</h2>
+        <p class="mobile-about-collection-copy">
+          An ongoing digital poetry collection, written and updated between 2024 and 2026.
+        </p>
+        <dl class="mobile-about-record">
+          <div>
+            <dt>Edition</dt>
+            <dd>{publication.digitalEditionLabel}</dd>
+          </div>
+          <div>
+            <dt>Version</dt>
+            <dd>{publication.versionLabel}</dd>
+          </div>
+          <div>
+            <dt>Language</dt>
+            <dd>{publication.language}</dd>
+          </div>
+        </dl>
+        <ol class="mobile-about-volumes" aria-label="Volumes">
+          {worldOrder.map((world) => (
+            <li>
+              <span>{worldMetadata[world].label}</span>
+              <small>{poemCounts[world]} poems · {worldMetadata[world].shortRegister}</small>
+            </li>
+          ))}
+        </ol>
+        <div class="mobile-about-citation">
+          <h3>Citation</h3>
+          <p>{publication.collectionCitation}</p>
+        </div>
+      </section>
       <div class="reading-copyright-block">
         <p>
           All written and visual works by Dai Pan (潘岱, also romanized Pan Dai) are protected under
@@ -64,6 +106,10 @@ const breadcrumbs = [
     align-items: baseline;
   }
 
+  .mobile-about-collection {
+    display: none;
+  }
+
   .about-links a {
     font-size: calc(var(--type-body) + 1px);
     color: var(--color-primary, #1a1a1a);
@@ -74,5 +120,117 @@ const breadcrumbs = [
 
   .about-links a:hover {
     color: var(--color-accent, #c0392b);
+  }
+
+  @media (max-width: 760px) {
+    .reading-copyright-block {
+      display: none;
+    }
+
+    .about-links {
+      gap: var(--space-md);
+      padding-top: var(--space-md);
+      padding-bottom: var(--space-md);
+      border-top: 1px solid color-mix(in srgb, var(--color-primary, #1a1a1a) 10%, transparent);
+      border-bottom: 1px solid color-mix(in srgb, var(--color-primary, #1a1a1a) 10%, transparent);
+    }
+
+    .about-links a {
+      font-size: 16px;
+    }
+
+    .mobile-about-collection {
+      display: block;
+      margin-top: var(--space-lg);
+      padding-bottom: calc(var(--space-xl) + 20px);
+    }
+
+    .mobile-about-collection h2 {
+      margin: 0 0 8px;
+      font-size: clamp(34px, 10vw, 46px);
+      line-height: 1;
+      font-weight: normal;
+      letter-spacing: -0.035em;
+    }
+
+    .mobile-about-collection-copy {
+      margin: 0 0 var(--space-md);
+      color: var(--color-meta, #595959);
+      font-size: 16px !important;
+      line-height: 1.55 !important;
+      font-style: italic;
+    }
+
+    .mobile-about-record {
+      margin: 0 0 var(--space-md);
+      padding: 0;
+      border-top: 1px solid color-mix(in srgb, var(--color-primary, #1a1a1a) 9%, transparent);
+    }
+
+    .mobile-about-record div {
+      padding: 10px 0;
+      border-bottom: 1px solid color-mix(in srgb, var(--color-primary, #1a1a1a) 8%, transparent);
+    }
+
+    .mobile-about-record dt {
+      margin: 0 0 3px;
+      color: var(--color-meta, #595959);
+      font-size: 11.5px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .mobile-about-record dd {
+      margin: 0;
+      font-size: 16px;
+      line-height: 1.42;
+    }
+
+    .mobile-about-volumes {
+      list-style: none;
+      margin: 0 0 var(--space-md);
+      padding: 0;
+      border-top: 1px solid color-mix(in srgb, var(--color-primary, #1a1a1a) 9%, transparent);
+    }
+
+    .mobile-about-volumes li {
+      display: grid;
+      gap: 3px;
+      padding: 11px 0;
+      border-bottom: 1px solid color-mix(in srgb, var(--color-primary, #1a1a1a) 8%, transparent);
+    }
+
+    .mobile-about-volumes span {
+      font-size: 20px;
+      line-height: 1.16;
+    }
+
+    .mobile-about-volumes small {
+      color: var(--color-meta, #595959);
+      font-size: 12.5px;
+      letter-spacing: 0.03em;
+    }
+
+    .mobile-about-citation {
+      padding: 13px 15px;
+      border-left: 2px solid var(--color-accent, #c0392b);
+      background: rgba(26, 26, 26, 0.03);
+    }
+
+    .mobile-about-citation h3 {
+      margin: 0 0 7px;
+      color: var(--color-accent, #c0392b);
+      font-size: 11.5px;
+      font-weight: normal;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .mobile-about-citation p {
+      margin: 0;
+      font-size: 15px !important;
+      line-height: 1.48 !important;
+      word-break: break-word;
+    }
   }
 </style>

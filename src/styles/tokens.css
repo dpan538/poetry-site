@@ -45,6 +45,7 @@
   --ui-overlay-z: 900;
   --ui-control-size: 52px;
   --ui-close-size: 44px;
+  --safe-top: env(safe-area-inset-top, 0px);
 
   /* Fixed header (see Nav.astro height) — in-flow content starts below this inset */
   --site-nav-height: 56px;
@@ -67,4 +68,26 @@
   --color-primary: #1a1a1a;
   --color-accent: #c0392b;
   --color-meta: #595959;
+}
+
+@media (max-width: 760px) {
+  :root {
+    --margin-x: 22px;
+    --content-w: 100%;
+
+    --type-body: 18px;
+    --type-subtitle: 22px;
+    --type-title: 34px;
+    --type-display: 48px;
+    --type-hero: 72px;
+
+    --space-xs: 7px;
+    --space-sm: 11px;
+    --space-md: 18px;
+    --space-lg: 29px;
+    --space-xl: 46px;
+
+    --site-nav-height: calc(60px + var(--safe-top));
+    --site-content-offset: calc(var(--site-nav-height) + var(--space-lg));
+  }
 }
