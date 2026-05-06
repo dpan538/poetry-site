@@ -11,6 +11,7 @@
     "clean:vite": "node scripts/clean-vite-cache.mjs",
     "dev:clean": "node scripts/clean-vite-cache.mjs && astro dev",
     "check:atlas": "node scripts/check-atlas.mjs",
+    "check:sitemap": "node scripts/check-sitemap.mjs",
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro"

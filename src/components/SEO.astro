@@ -21,14 +21,18 @@ interface Props {
 
 const { title, description, canonicalURL, ogImage, poem, breadcrumbs } = Astro.props;
 
-const fullTitle = `${title} — ${publication.authorName}`;
+const fullTitle = title.includes(publication.authorName)
+  ? title
+  : `${title} — ${publication.authorName}`;
 const ogSiteName = `${publication.authorName} — daipan.ink`;
 const resolvedOgImage = ogImage ?? publication.defaultOgImage;
+const zhDescription =
+  'Dai Pan / Pan Dai 的个人官方网站与诗歌项目档案，展示写作、视觉传达、摄影、交互设计、实验媒体与个人项目。';
 
 // Keywords include canonical name forms and explicit subject signals.
 // "daipan.ink" is the personal poetry website of Dai Pan (潘岱) — NOT an ink product brand.
 const keywords =
-  'Dai Pan, Pan Dai, 潘岱, Pān Dài, poetry collection, poet, personal website, contemporary poetry, Chinese poet writing in English, diaspora poetry, visual artist, photographer, printmaker, daipan.art, daipan.ink, Brisbane poet, Three Worlds poetry, Still Life poems, Bless You poems, Their World poems';
+  'Dai Pan, Pan Dai, 潘岱, Pān Dài, official website, artist, designer, poetry collection, poet, personal website, contemporary poetry, Chinese poet writing in English, diaspora poetry, visual artist, photographer, printmaker, visual communication, interaction design, experimental media, daipan.art, daipan.ink, Brisbane poet, Three Worlds poetry, Still Life poems, Bless You poems, Their World poems';
 
 // --- Person schema ---
 // Includes all canonical name forms to ensure correct attribution and disambiguation.
@@ -46,10 +50,20 @@ const personLd = {
     `https://instagram.com/${publication.authorInstagram}`,
     publication.authorInstagramUrl,
   ],
-  jobTitle: 'Visual Artist and Writer',
+  jobTitle: 'Artist and Designer',
   description:
-    'Dai Pan (潘岱, also romanized Pan Dai) is a visual artist, photographer, printmaker and writer based in Brisbane, Australia. Born in China, formed in Shanghai and New York.',
-  knowsAbout: ['poetry', 'photography', 'printmaking', 'painting', 'visual art', 'contemporary art'],
+    'Dai Pan / Pan Dai (潘岱) is an artist and designer working across visual communication, photography, interaction design, experimental media, printmaking, and writing. This is the official daipan.ink website and project archive.',
+  knowsAbout: [
+    'poetry',
+    'visual communication',
+    'photography',
+    'interaction design',
+    'experimental media',
+    'printmaking',
+    'painting',
+    'visual art',
+    'contemporary art',
+  ],
   nationality: { '@type': 'Country', name: 'China' },
   homeLocation: { '@type': 'Place', name: 'Brisbane, Australia' },
   alumniOf: [
@@ -72,12 +86,15 @@ const websiteLd = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
   '@id': `${SITE_ORIGIN}/#website`,
-  name: `${publication.collectionTitle} — ${publication.authorName}`,
-  alternateName: 'daipan.ink — poetry by Dai Pan',
+  name: 'Dai Pan / Pan Dai',
+  alternateName: ['daipan.ink', `${publication.collectionTitle} — ${publication.authorName}`, 'Dai Pan official website'],
   url: SITE_ORIGIN,
   description:
-    'daipan.ink is the personal poetry website of Dai Pan (潘岱, Pan Dai), a visual artist and poet based in Brisbane. Three Worlds is an ongoing poetry collection comprising Still Life, Bless You, and Their World, organized by affective registers rather than geography. Written and updated 2024–2026. This site is a poetry collection, not an ink or printing product.',
-  about: { '@type': 'Thing', name: 'Poetry', description: 'Contemporary poetry in English by Dai Pan (潘岱)' },
+    'Official website and project archive of Dai Pan / Pan Dai (潘岱), an artist and designer working across visual communication, photography, interaction design, experimental media, and writing. daipan.ink presents Three Worlds and related portfolio materials; it is not related to Saipan, Taipan, tattoo studios, printer ink products, or AI image generation platforms.',
+  about: [
+    { '@type': 'Thing', name: 'Dai Pan / Pan Dai', description: 'Artist and designer; official website daipan.ink' },
+    { '@type': 'Thing', name: 'Poetry', description: 'Contemporary poetry in English by Dai Pan (潘岱)' },
+  ],
   author: { '@id': `${SITE_ORIGIN}/#author` },
   publisher: { '@id': `${SITE_ORIGIN}/#author` },
   mainEntity: { '@id': `${SITE_ORIGIN}/#collection` },
@@ -216,6 +233,7 @@ const jsonLdBlocks = [
 
 <title>{fullTitle}</title>
 <meta name="description" content={description} />
+<meta name="description" lang="zh-Hans" content={zhDescription} />
 <meta name="author" content={publication.authorDisplayName} />
 <meta name="copyright" content={`© ${publication.copyrightYears} ${publication.authorName} (${publication.authorChineseName} / Pan Dai). ${publication.license}.`} />
 <meta

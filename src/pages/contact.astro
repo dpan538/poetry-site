@@ -1,0 +1,41 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { publication } from '../lib/publication';
+
+const contactDescription =
+  'Contact and identity page for Dai Pan / Pan Dai (潘岱), the artist and designer behind daipan.ink. Official website, project archive, and permissions reference.';
+
+const breadcrumbs = [
+  { name: 'Three Worlds', url: 'https://daipan.ink/' },
+  { name: 'Contact', url: 'https://daipan.ink/contact' },
+];
+---
+
+<BaseLayout title="Contact" description={contactDescription} breadcrumbs={breadcrumbs}>
+  <main class="reading-page">
+    <header class="reading-header">
+      <h1>Contact</h1>
+      <p class="reading-meta">Dai Pan / Pan Dai 潘岱</p>
+    </header>
+
+    <section class="reading-prose">
+      <p>
+        daipan.ink is the official website and project archive of Dai Pan / Pan Dai (潘岱), an artist
+        and designer working across visual communication, photography, interaction design,
+        experimental media, printmaking, and writing.
+      </p>
+      <p lang="zh-Hans">
+        daipan.ink 是 Dai Pan / Pan Dai 的个人官方网站与项目档案，展示视觉传达、摄影、交互设计、实验媒体与写作。
+      </p>
+      <p>
+        For visual art, portfolio context, and public contact links, visit
+        <a href={publication.visualArtUrl} target="_blank" rel="noopener noreferrer">daipan.art</a>.
+        The same author maintains both daipan.ink and daipan.art.
+      </p>
+      <p>
+        This site is not related to Saipan, Taipan, tattoo studios, printer ink products, or AI image
+        generation platforms.
+      </p>
+    </section>
+  </main>
+</BaseLayout>

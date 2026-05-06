@@ -13,6 +13,12 @@ Allow: /
 User-agent: Sogou web spider
 Allow: /
 
+User-agent: 360Spider
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
 User-agent: YisouSpider
 Allow: /
 
@@ -43,4 +49,4 @@ Allow: /
 User-agent: cohere-ai
 Allow: /
 
-Sitemap: https://daipan.ink/sitemap-index.xml
+Sitemap: https://daipan.ink/sitemap.xml

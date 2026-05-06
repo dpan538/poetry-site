@@ -28,7 +28,8 @@ interface Props {
 const { world, title, description, ogImage, poem, breadcrumbs } = Astro.props;
 const pathname = Astro.url.pathname;
 const site = Astro.site ?? new URL('https://daipan.ink');
-const canonicalURL = new URL(pathname, site).href;
+const canonicalPath = pathname === '/' ? '/' : pathname.replace(/\/$/, '');
+const canonicalURL = new URL(canonicalPath, site).href;
 const showMobileIndexTools = pathname !== '/' && !poem;
 const mobilePoemsByWorld = showMobileIndexTools ? await loadPoemsByWorldForIndexMenu() : undefined;
 ---
@@ -39,6 +40,7 @@ const mobilePoemsByWorld = showMobileIndexTools ? await loadPoemsByWorldForIndex
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
     <meta name="theme-color" content="#1a1a1a" />
     <SEO title={title} description={description} canonicalURL={canonicalURL} ogImage={ogImage} poem={poem} breadcrumbs={breadcrumbs} />
@@ -52,7 +54,8 @@ const mobilePoemsByWorld = showMobileIndexTools ? await loadPoemsByWorldForIndex
       </div>
       <footer class="site-copyright" role="contentinfo" aria-label="Site copyright">
         <p>
-          © {publication.copyrightYears} {publication.authorDisplayName}. {publication.license}. Poems may not be reproduced without written permission.
+          © {publication.copyrightYears} {publication.authorDisplayName}. Official website: daipan.ink.
+          {publication.license}. Poems may not be reproduced without written permission.
         </p>
       </footer>
       {showMobileIndexTools && mobilePoemsByWorld && (

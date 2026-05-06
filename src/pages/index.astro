@@ -23,26 +23,35 @@ if (!entryPoems.length) {
 
 // Stable site-level description: the root URL is now an entry point, not a poem page.
 const siteDescription =
-  `${publication.collectionTitle} is an ongoing poetry collection by ${publication.authorDisplayName} across three affective volumes: Still Life, Bless You, and Their World. Written and updated ${publication.copyrightYears}, published as a digital edition on daipan.ink.`;
+  `Official website of Dai Pan / Pan Dai, an artist and designer working across visual communication, photography, interaction design, experimental media, and writing. Explore ${publication.collectionTitle}, selected projects, writings, and portfolio materials on daipan.ink.`;
 ---
 
-<BaseLayout title="Three Worlds" description={siteDescription}>
+<BaseLayout title="Dai Pan / Pan Dai | Official Artist & Designer Website" description={siteDescription}>
   <!--
     SEO anchor for the home page: gives crawlers and assistive tech a stable
     description while the visible root page behaves as a collection entry.
   -->
   <div class="home-seo-anchor">
-    <h1>Three Worlds — A Poetry Collection by Dai Pan</h1>
+    <h1>Dai Pan / Pan Dai official website</h1>
     <p>
-      Three Worlds (daipan.ink) is the debut poetry collection by Dai Pan (潘岱, also written Pan Dai),
-      a visual artist and poet based in Brisbane. The collection is organized into three affective
-      volumes — Still Life, Bless You, and Their World — written and updated between 2024 and 2026.
+      This is the official website of Dai Pan / Pan Dai (潘岱), an artist and designer working
+      across visual communication, photography, interaction design, experimental media, printmaking,
+      and writing. daipan.ink is the official portfolio, poetry collection, and project archive for
+      Dai Pan / Pan Dai.
+    </p>
+    <p lang="zh-Hans">
+      Dai Pan / Pan Dai 的个人官方网站，展示视觉传达、摄影、交互设计、实验媒体、写作与个人项目档案。
+    </p>
+    <p>
+      daipan.ink is not related to Saipan, Taipan, tattoo studios, printer ink products, or AI image
+      generation platforms.
     </p>
     <p>
       Enter the collection at <a href="/collection">/collection</a>, read the preface at
       <a href="/preface">/preface</a>, or navigate directly to a world:
       <a href="/their-world">Their World</a>, <a href="/bless-you">Bless You</a>,
-      <a href="/still-life">Still Life</a>.
+      <a href="/still-life">Still Life</a>. Contact and identity details are available at
+      <a href="/contact">/contact</a> and <a href="/about">/about</a>.
     </p>
   </div>
 
