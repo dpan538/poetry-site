@@ -332,3 +332,85 @@ After deployment:
 7. Run Google/Baidu manual search queries listed above.
 8. Inspect Google-selected canonical in Search Console.
 9. Use Baidu crawl diagnosis for homepage, robots, sitemap, About, and Contact.
+
+## 18. Post-deployment Verification
+
+Verification date: 2026-05-06  
+Vercel project: `dpan538s-projects/poetry-site`  
+Deployment ID: `dpl_322WEXMw3GULePTupC61NRkCH2iR`  
+Deployment URL: `https://poetry-site-akrquddvt-dpan538s-projects.vercel.app`  
+Vercel inspector: `https://vercel.com/dpan538s-projects/poetry-site/322WEXMw3GULePTupC61NRkCH2iR`
+
+### Vercel Domain Configuration
+
+Observed with Vercel CLI:
+
+- `npx vercel project ls` shows `poetry-site` latest production URL as `https://www.daipan.ink`.
+- `npx vercel domains inspect daipan.ink` shows project `poetry-site` has domains `www.daipan.ink, daipan.ink`.
+- `npx vercel domains inspect www.daipan.ink` shows `www.daipan.ink` attached to `poetry-site`.
+- `npx vercel alias set poetry-site-akrquddvt-dpan538s-projects.vercel.app daipan.ink` succeeded, but Vercel still returns apex `307` to `https://www.daipan.ink/`.
+
+Conclusion: the code is deployed and apex is aliased to the deployment, but the Vercel project primary-domain / redirect setting still treats `www.daipan.ink` as canonical. This cannot be fixed safely in code without risking a redirect loop. Recommended manual action: in Vercel Dashboard, set `daipan.ink` as the project primary domain and configure `www.daipan.ink` to redirect to `https://daipan.ink/`.
+
+### HTTP Status Verification
+
+| URL | Command | Result | Final target | Status |
+|---|---|---|---|---|
+| `https://daipan.ink` | `curl -I https://daipan.ink` | `307` | `https://www.daipan.ink/` | Not ideal |
+| `https://www.daipan.ink` | `curl -I https://www.daipan.ink` | `200` | `https://www.daipan.ink` | Works, but www is still primary |
+| `http://daipan.ink` | `curl -I http://daipan.ink` | `308` | `https://daipan.ink/`, then live apex redirects to www | Partial |
+| `http://www.daipan.ink` | `curl -I http://www.daipan.ink` | `308` | `https://www.daipan.ink/` | Works, but should ultimately redirect to apex |
+
+### Content Endpoint Verification
+
+All required resources now exist and return content, but apex requests still pass through a `307` redirect to `www`.
+
+| URL | Result |
+|---|---|
+| `https://daipan.ink/robots.txt` | `307` to `https://www.daipan.ink/robots.txt`, then `200`; contains `Sitemap: https://daipan.ink/sitemap.xml` |
+| `https://daipan.ink/sitemap.xml` | `307` to `https://www.daipan.ink/sitemap.xml`, then `200`; XML includes 87 apex URLs |
+| `https://daipan.ink/contact` | `307` to `https://www.daipan.ink/contact`, then `200` |
+| `https://daipan.ink/llms.txt` | `307` to `https://www.daipan.ink/llms.txt`, then `200` |
+| `https://daipan.ink/humans.txt` | `307` to `https://www.daipan.ink/humans.txt`, then `200` |
+
+### Sitemap URL Verification
+
+Command:
+
+```bash
+npm run check:sitemap -- https://daipan.ink/sitemap.xml
+```
+
+Result:
+
+- `87/87` sitemap URLs returned final status `200`.
+- Every sitemap URL currently redirects from `https://daipan.ink/...` to `https://www.daipan.ink/...`.
+- This confirms content availability, but not ideal canonical host behavior.
+
+### Homepage HTML Verification
+
+Command:
+
+```bash
+curl -L https://daipan.ink
+```
+
+The deployed homepage HTML directly contains:
+
+- `Dai Pan / Pan Dai`
+- `Dai Pan / Pan Dai | Official Artist & Designer Website`
+- `official website`
+- `artist and designer`
+- Chinese identity text: `Dai Pan / Pan Dai 的个人官方网站，展示视觉传达、摄影、交互设计、实验媒体、写作与个人项目档案。`
+- Canonical tag: `<link rel="canonical" href="https://daipan.ink/">`
+- JSON-LD blocks
+- Open Graph tags including `og:title`, `og:description`, and `og:url`
+
+### Deployment Verdict
+
+Code deployment succeeded and all new crawlability endpoints are live. The remaining blocker is not code-side; it is Vercel domain normalization. Until Vercel primary domain is changed, search engines will see a conflict:
+
+- HTTP redirect target: `https://www.daipan.ink/`
+- Canonical / sitemap / robots / OG URL target: `https://daipan.ink/`
+
+Do not change canonical to `www` unless the owner explicitly chooses `www` as the permanent primary domain.
