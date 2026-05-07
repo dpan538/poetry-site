@@ -414,3 +414,38 @@ Code deployment succeeded and all new crawlability endpoints are live. The remai
 - Canonical / sitemap / robots / OG URL target: `https://daipan.ink/`
 
 Do not change canonical to `www` unless the owner explicitly chooses `www` as the permanent primary domain.
+
+## 19. Search Result Targeting Follow-up
+
+Follow-up date: 2026-05-06  
+Restore deployment ID: `dpl_8gB9zZoXYSG78PaWJQ26wLAtYN5W`  
+Restore deployment URL: `https://poetry-site-ldjwana6j-dpan538s-projects.vercel.app`
+
+### User-visible Google Result Issue
+
+After sitemap submission succeeded in Google Search Console, Google began showing indexed poem pages such as:
+
+- `https://www.daipan.ink/their-world/side`
+- `https://www.daipan.ink/still-life/dusk`
+
+This confirms that Google can crawl the site. The owner's preference is for brand/domain searches to surface a site-level page such as `/`, `/collection`, or `/about`, but the site's reading experience must remain intact.
+
+### Retracted Experiment
+
+A temporary experiment removed the automatic homepage entry behavior and added an explicit desktop `Read` button. That was rejected because the automatic random-poem entry is core to the intended user experience. The experiment was reverted and redeployed immediately.
+
+Current intentional behavior:
+
+- Desktop `/` automatically opens a rotating poem entry.
+- Mobile `/` keeps the existing explicit `Read` interaction.
+- Mobile `/collection` redirects to `/about`.
+- Canonical, sitemap, robots, metadata, and JSON-LD remain on apex `https://daipan.ink`.
+
+### Recommended Non-visual Alternatives
+
+Do not change the homepage interaction just to influence search snippets. Safer alternatives are:
+
+- Keep requesting indexing for `https://daipan.ink/`, `https://daipan.ink/about`, and `https://daipan.ink/collection`.
+- In Vercel, redirect `https://www.daipan.ink/*` to `https://daipan.ink/*` so Google stops showing `www` URLs over time.
+- Let canonical, sitemap, internal nav, and structured data consolidate the homepage/about/collection signals.
+- If poem pages keep dominating brand queries after recrawl, consider only a search-specific content strategy such as stronger internal links to `/about` and `/collection`; do not alter the entry UX without explicit approval.
