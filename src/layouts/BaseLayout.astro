@@ -12,6 +12,13 @@ interface Props {
   title: string;
   description: string;
   ogImage?: string;
+  social?: {
+    title?: string;
+    description?: string;
+    image?: string;
+    imageAlt?: string;
+    type?: 'website' | 'article';
+  };
   /** When set, SEO emits Poem JSON-LD and OG article type. */
   poem?: {
     id: string;
@@ -25,7 +32,7 @@ interface Props {
   breadcrumbs?: { name: string; url: string }[];
 }
 
-const { world, title, description, ogImage, poem, breadcrumbs } = Astro.props;
+const { world, title, description, ogImage, social, poem, breadcrumbs } = Astro.props;
 const pathname = Astro.url.pathname;
 const site = Astro.site ?? new URL('https://daipan.ink');
 const canonicalPath = pathname === '/' ? '/' : pathname.replace(/\/$/, '');
@@ -43,7 +50,15 @@ const mobilePoemsByWorld = showMobileIndexTools ? await loadPoemsByWorldForIndex
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
     <meta name="theme-color" content="#1a1a1a" />
-    <SEO title={title} description={description} canonicalURL={canonicalURL} ogImage={ogImage} poem={poem} breadcrumbs={breadcrumbs} />
+    <SEO
+      title={title}
+      description={description}
+      canonicalURL={canonicalURL}
+      ogImage={ogImage}
+      social={social}
+      poem={poem}
+      breadcrumbs={breadcrumbs}
+    />
   </head>
   <body>
     <Nav pathname={pathname} />

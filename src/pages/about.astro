@@ -6,6 +6,13 @@ import { publication, worldMetadata, worldOrder } from '../lib/publication';
 const aboutDescription =
   'Dai Pan / Pan Dai (潘岱) is an artist and designer working across visual communication, photography, interaction design, experimental media, printmaking, and writing. daipan.ink is his official website and poetry project archive.';
 
+const social = {
+  title: 'About Dai Pan / Pan Dai',
+  description:
+    'Author record for Dai Pan / Pan Dai (潘岱), artist, designer, and writer behind daipan.ink and Three Worlds.',
+  imageAlt: 'About Dai Pan / Pan Dai — author record on daipan.ink',
+};
+
 const breadcrumbs = [
   { name: 'Three Worlds', url: 'https://daipan.ink/' },
   { name: 'About', url: 'https://daipan.ink/about' },
@@ -21,7 +28,7 @@ const poemCounts = Object.fromEntries(
 ) as Record<(typeof worldOrder)[number], number>;
 ---
 
-<BaseLayout title="About" description={aboutDescription} breadcrumbs={breadcrumbs}>
+<BaseLayout title="About" description={aboutDescription} social={social} breadcrumbs={breadcrumbs}>
   <main class="reading-page">
     <header class="reading-header">
       <h1>About</h1>

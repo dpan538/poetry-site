@@ -6,6 +6,13 @@ interface Props {
   description: string;
   canonicalURL: string;
   ogImage?: string;
+  social?: {
+    title?: string;
+    description?: string;
+    image?: string;
+    imageAlt?: string;
+    type?: 'website' | 'article';
+  };
   /** When provided, emits a Poem JSON-LD block */
   poem?: {
     id: string;
@@ -19,13 +26,18 @@ interface Props {
   breadcrumbs?: { name: string; url: string }[];
 }
 
-const { title, description, canonicalURL, ogImage, poem, breadcrumbs } = Astro.props;
+const { title, description, canonicalURL, ogImage, social, poem, breadcrumbs } = Astro.props;
 
 const fullTitle = title.includes(publication.authorName)
   ? title
   : `${title} — ${publication.authorName}`;
 const ogSiteName = `${publication.authorName} — daipan.ink`;
-const resolvedOgImage = ogImage ?? publication.defaultOgImage;
+const resolvedSocialTitle = social?.title ?? fullTitle;
+const resolvedSocialDescription = social?.description ?? description;
+const resolvedOgImage = social?.image ?? ogImage ?? publication.defaultOgImage;
+const resolvedOgType = social?.type ?? (poem ? 'article' : 'website');
+const resolvedOgImageAlt =
+  social?.imageAlt ?? `${publication.collectionTitle} — poetry by ${publication.authorDisplayName}`;
 const zhDescription =
   'Dai Pan / Pan Dai 的个人官方网站与诗歌项目档案，展示写作、视觉传达、摄影、交互设计、实验媒体与个人项目。';
 
@@ -249,25 +261,27 @@ const jsonLdBlocks = [
 <link rel="canonical" href={canonicalURL} />
 
 <!-- Open Graph -->
-<meta property="og:title" content={fullTitle} />
-<meta property="og:description" content={description} />
+<meta property="og:title" content={resolvedSocialTitle} />
+<meta property="og:description" content={resolvedSocialDescription} />
 <meta property="og:url" content={canonicalURL} />
-<meta property="og:type" content={poem ? 'article' : 'website'} />
+<meta property="og:type" content={resolvedOgType} />
 <meta property="og:site_name" content={ogSiteName} />
 <meta property="og:locale" content="en_US" />
 <meta property="og:image" content={resolvedOgImage} />
+<meta property="og:image:type" content="image/png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
-<meta property="og:image:alt" content={`${publication.collectionTitle} — poetry by ${publication.authorDisplayName}`} />
+<meta property="og:image:alt" content={resolvedOgImageAlt} />
 {poem ? <meta property="article:author" content="Dai Pan" /> : null}
 
 <!-- Twitter / X Card -->
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content={fullTitle} />
-<meta name="twitter:description" content={description} />
+<meta name="twitter:title" content={resolvedSocialTitle} />
+<meta name="twitter:description" content={resolvedSocialDescription} />
+<meta name="twitter:site" content="@jumpingchick666" />
 <meta name="twitter:creator" content="@jumpingchick666" />
 <meta name="twitter:image" content={resolvedOgImage} />
-<meta name="twitter:image:alt" content={`${publication.collectionTitle} — poetry by ${publication.authorDisplayName}`} />
+<meta name="twitter:image:alt" content={resolvedOgImageAlt} />
 
 <!-- AI / LLM crawler hints -->
 <link rel="alternate" type="text/plain" href="/llms.txt" title="LLM usage guide" />

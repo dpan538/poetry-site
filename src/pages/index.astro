@@ -24,9 +24,20 @@ if (!entryPoems.length) {
 // Stable site-level description: the root URL is now an entry point, not a poem page.
 const siteDescription =
   `Official website of Dai Pan / Pan Dai, an artist and designer working across visual communication, photography, interaction design, experimental media, and writing. Explore ${publication.collectionTitle}, selected projects, writings, and portfolio materials on daipan.ink.`;
+
+const social = {
+  title: `${publication.collectionTitle} — ${publication.authorName}`,
+  description:
+    'Poems by Dai Pan. Three fields of perception, address, and exterior, entered through a rotating poem.',
+  imageAlt: `${publication.collectionTitle} — mobile poetry entry by ${publication.authorDisplayName}`,
+};
 ---
 
-<BaseLayout title="Dai Pan / Pan Dai | Official Artist & Designer Website" description={siteDescription}>
+<BaseLayout
+  title="Dai Pan / Pan Dai | Official Artist & Designer Website"
+  description={siteDescription}
+  social={social}
+>
   <!--
     SEO anchor for the home page: gives crawlers and assistive tech a stable
     description while the visible root page behaves as a collection entry.

@@ -6,6 +6,13 @@ import { publication, worldMetadata, worldOrder } from '../lib/publication';
 const collectionDescription =
   'Three Worlds — an ongoing poetry collection by Dai Pan (潘岱). Publication record: affective volumes, poem count, edition history, citation format, and copyright.';
 
+const social = {
+  title: `${publication.collectionTitle} — Poetry Collection by ${publication.authorName}`,
+  description:
+    'Still Life, Bless You, and Their World — an ongoing digital poetry collection by Dai Pan (潘岱).',
+  imageAlt: `${publication.collectionTitle} — poetry collection by ${publication.authorDisplayName}`,
+};
+
 const poemCounts = Object.fromEntries(
   await Promise.all(
     worldOrder.map(async (world) => {
@@ -21,7 +28,7 @@ const breadcrumbs = [
 ];
 ---
 
-<BaseLayout title="Collection" description={collectionDescription} breadcrumbs={breadcrumbs}>
+<BaseLayout title="Collection" description={collectionDescription} social={social} breadcrumbs={breadcrumbs}>
   <main class="reading-page collection-page">
 
     <!-- ── Colophon / Publication Record ───────────────────────────────────── -->

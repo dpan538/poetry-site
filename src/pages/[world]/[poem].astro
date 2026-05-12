@@ -62,6 +62,15 @@ const seoStanzas = rawText
 const poemUrl = `https://daipan.ink/${world}/${poem.id}`;
 const worldLabel = worldMetadata[world].label;
 const citation = poemCitation(poem.data.title, world, poem.data.order, poemUrl, poem.data.writtenYear);
+const socialDescription = poem.data.firstLine
+  ? `From ${worldLabel}, ${publication.collectionTitle} by ${publication.authorName}. ${poem.data.firstLine}`
+  : `From ${worldLabel}, ${publication.collectionTitle} by ${publication.authorName}. ${metaDescription}`;
+const social = {
+  title: `${poem.data.title} — ${publication.authorName}`,
+  description: socialDescription,
+  imageAlt: `${poem.data.title} — poem by ${publication.authorDisplayName}`,
+  type: 'article' as const,
+};
 const breadcrumbs = [
   { name: publication.collectionTitle, url: `${publication.canonicalUrl}/` },
   { name: worldLabel, url: `${publication.canonicalUrl}/${world}` },
@@ -73,6 +82,7 @@ const breadcrumbs = [
   world={world}
   title={poem.data.title}
   description={metaDescription}
+  social={social}
   breadcrumbs={breadcrumbs}
   poem={{
     id: poem.id,
