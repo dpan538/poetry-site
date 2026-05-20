@@ -11,13 +11,18 @@ interface Props {
   /** Short page title (shown as `{title} — Dai Pan` in &lt;title&gt; and Open Graph). */
   title: string;
   description: string;
+  keywords?: string;
   ogImage?: string;
   social?: {
     title?: string;
     description?: string;
     image?: string;
     imageAlt?: string;
-    type?: 'website' | 'article';
+    twitterTitle?: string;
+    twitterDescription?: string;
+    twitterImage?: string;
+    twitterImageAlt?: string;
+    type?: 'website' | 'article' | 'profile';
   };
   /** When set, SEO emits Poem JSON-LD and OG article type. */
   poem?: {
@@ -32,7 +37,7 @@ interface Props {
   breadcrumbs?: { name: string; url: string }[];
 }
 
-const { world, title, description, ogImage, social, poem, breadcrumbs } = Astro.props;
+const { world, title, description, keywords, ogImage, social, poem, breadcrumbs } = Astro.props;
 const pathname = Astro.url.pathname;
 const site = Astro.site ?? new URL('https://daipan.ink');
 const canonicalPath = pathname === '/' ? '/' : pathname.replace(/\/$/, '');
@@ -53,6 +58,7 @@ const mobilePoemsByWorld = showMobileIndexTools ? await loadPoemsByWorldForIndex
     <SEO
       title={title}
       description={description}
+      keywords={keywords}
       canonicalURL={canonicalURL}
       ogImage={ogImage}
       social={social}

@@ -9,7 +9,7 @@ import MobilePoemReader from '../../components/MobilePoemReader.astro';
 import MobilePoemDock from '../../components/MobilePoemDock.astro';
 import { loadPoemsByWorldForIndexMenu } from '../../lib/index-menu-data';
 import { analyzePoemText, computeEmotionScore } from '../../lib/poem-analyzer';
-import { excerptWords } from '../../lib/seo';
+import { truncateChars } from '../../lib/seo';
 import { poemCitation, publication, worldMetadata } from '../../lib/publication';
 
 type World = 'their-world' | 'bless-you' | 'still-life';
@@ -51,7 +51,19 @@ const { poem, world, poemsByWorld } = Astro.props;
 const rawText = poem.body ?? '';
 const analysis = analyzePoemText(rawText, poem.data.title);
 const currentEmotionScore = Math.round(computeEmotionScore(analysis.metrics) * 1000) / 1000;
-const metaDescription = excerptWords(rawText, 30) || poem.data.title;
+const worldLabel = worldMetadata[world].label;
+const opening = truncateChars(
+  poem.data.firstLine ||
+    rawText
+      .split('\n')
+      .map((line) => line.trim())
+      .filter(Boolean)
+      .slice(0, 2)
+      .join(' '),
+  150,
+);
+const metaDescription = `${poem.data.title} — a poem by ${publication.authorDisplayName}, from ${worldLabel}, ${publication.collectionTitle}.`;
+const metaKeywords = `${publication.authorName}, ${publication.authorChineseName}, ${publication.collectionTitle}, ${worldLabel}, ${poem.data.title}, threshold poetry, poem, contemporary poetry`;
 
 // Build stanzas for SSR static rendering (SEO + screen readers)
 const seoStanzas = rawText
@@ -60,11 +72,8 @@ const seoStanzas = rawText
   .filter((s) => s.length > 0);
 
 const poemUrl = `https://daipan.ink/${world}/${poem.id}`;
-const worldLabel = worldMetadata[world].label;
 const citation = poemCitation(poem.data.title, world, poem.data.order, poemUrl, poem.data.writtenYear);
-const socialDescription = poem.data.firstLine
-  ? `From ${worldLabel}, ${publication.collectionTitle} by ${publication.authorName}. ${poem.data.firstLine}`
-  : `From ${worldLabel}, ${publication.collectionTitle} by ${publication.authorName}. ${metaDescription}`;
+const socialDescription = `From ${worldLabel}, ${publication.collectionTitle} by ${publication.authorName}. ${opening}`;
 const social = {
   title: `${poem.data.title} — ${publication.authorName}`,
   description: socialDescription,
@@ -82,6 +91,7 @@ const breadcrumbs = [
   world={world}
   title={poem.data.title}
   description={metaDescription}
+  keywords={metaKeywords}
   social={social}
   breadcrumbs={breadcrumbs}
   poem={{

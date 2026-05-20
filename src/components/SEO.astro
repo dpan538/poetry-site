@@ -5,13 +5,18 @@ interface Props {
   title: string;
   description: string;
   canonicalURL: string;
+  keywords?: string;
   ogImage?: string;
   social?: {
     title?: string;
     description?: string;
     image?: string;
     imageAlt?: string;
-    type?: 'website' | 'article';
+    twitterTitle?: string;
+    twitterDescription?: string;
+    twitterImage?: string;
+    twitterImageAlt?: string;
+    type?: 'website' | 'article' | 'profile';
   };
   /** When provided, emits a Poem JSON-LD block */
   poem?: {
@@ -26,7 +31,7 @@ interface Props {
   breadcrumbs?: { name: string; url: string }[];
 }
 
-const { title, description, canonicalURL, ogImage, social, poem, breadcrumbs } = Astro.props;
+const { title, description, canonicalURL, keywords, ogImage, social, poem, breadcrumbs } = Astro.props;
 
 const fullTitle = title.includes(publication.authorName)
   ? title
@@ -35,16 +40,19 @@ const ogSiteName = `${publication.authorName} — daipan.ink`;
 const resolvedSocialTitle = social?.title ?? fullTitle;
 const resolvedSocialDescription = social?.description ?? description;
 const resolvedOgImage = social?.image ?? ogImage ?? publication.defaultOgImage;
+const resolvedTwitterTitle = social?.twitterTitle ?? resolvedSocialTitle;
+const resolvedTwitterDescription = social?.twitterDescription ?? resolvedSocialDescription;
+const resolvedTwitterImage = social?.twitterImage ?? resolvedOgImage;
 const resolvedOgType = social?.type ?? (poem ? 'article' : 'website');
 const resolvedOgImageAlt =
   social?.imageAlt ?? `${publication.collectionTitle} — poetry by ${publication.authorDisplayName}`;
+const resolvedTwitterImageAlt = social?.twitterImageAlt ?? resolvedOgImageAlt;
 const zhDescription =
-  'Dai Pan / Pan Dai 的个人官方网站与诗歌项目档案，展示写作、视觉传达、摄影、交互设计、实验媒体与个人项目。';
+  'daipan.ink 是潘岱的诗集站点，收录 2024 至 2026 年间写成的《三个世界》。';
 
-// Keywords include canonical name forms and explicit subject signals.
-// "daipan.ink" is the personal poetry website of Dai Pan (潘岱) — NOT an ink product brand.
-const keywords =
-  'Dai Pan, Pan Dai, 潘岱, Pān Dài, official website, artist, designer, poetry collection, poet, personal website, contemporary poetry, Chinese poet writing in English, diaspora poetry, visual artist, photographer, printmaker, visual communication, interaction design, experimental media, daipan.art, daipan.ink, Brisbane poet, Three Worlds poetry, Still Life poems, Bless You poems, Their World poems';
+const defaultKeywords =
+  'Dai Pan, Pan Dai, 潘岱, Pān Dài, poet, poetry, Three Worlds, threshold poetry, threshold poetics, Their World, Bless You, Still Life, daipan.ink, contemporary poetry, second-person address, observation, displaced grammar';
+const resolvedKeywords = keywords ?? defaultKeywords;
 
 // --- Person schema ---
 // Includes all canonical name forms to ensure correct attribution and disambiguation.
@@ -59,22 +67,21 @@ const personLd = {
   mainEntityOfPage: publication.aboutUrl,
   sameAs: [
     publication.visualArtUrl,
+    publication.archiveUrl,
     `https://instagram.com/${publication.authorInstagram}`,
     publication.authorInstagramUrl,
   ],
-  jobTitle: 'Artist and Designer',
+  jobTitle: 'Poet',
   description:
-    'Dai Pan / Pan Dai (潘岱) is an artist and designer working across visual communication, photography, interaction design, experimental media, printmaking, and writing. This is the official daipan.ink website and project archive.',
+    'Dai Pan / 潘岱 is a poet writing in English from Brisbane. Three Worlds is his first collection, written from the threshold.',
   knowsAbout: [
     'poetry',
-    'visual communication',
-    'photography',
-    'interaction design',
-    'experimental media',
-    'printmaking',
-    'painting',
-    'visual art',
-    'contemporary art',
+    'threshold poetry',
+    'threshold poetics',
+    'contemporary poetry',
+    'second-person address',
+    'observation',
+    'displaced grammar',
   ],
   nationality: { '@type': 'Country', name: 'China' },
   homeLocation: { '@type': 'Place', name: 'Brisbane, Australia' },
@@ -98,14 +105,18 @@ const websiteLd = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
   '@id': `${SITE_ORIGIN}/#website`,
-  name: 'Dai Pan / Pan Dai',
-  alternateName: ['daipan.ink', `${publication.collectionTitle} — ${publication.authorName}`, 'Dai Pan official website'],
+  name: 'daipan.ink',
+  alternateName: [
+    'Dai Pan / 潘岱',
+    `${publication.collectionTitle} — ${publication.authorName}`,
+    'Dai Pan poetry site',
+  ],
   url: SITE_ORIGIN,
   description:
-    'Official website and project archive of Dai Pan / Pan Dai (潘岱), an artist and designer working across visual communication, photography, interaction design, experimental media, and writing. daipan.ink presents Three Worlds and related portfolio materials; it is not related to Saipan, Taipan, tattoo studios, printer ink products, or AI image generation platforms.',
+    'The poetry site of Dai Pan / 潘岱. It contains Three Worlds, a collection of 79 poems written from the threshold.',
   about: [
-    { '@type': 'Thing', name: 'Dai Pan / Pan Dai', description: 'Artist and designer; official website daipan.ink' },
-    { '@type': 'Thing', name: 'Poetry', description: 'Contemporary poetry in English by Dai Pan (潘岱)' },
+    { '@type': 'Thing', name: 'Dai Pan / 潘岱', description: 'Poet; author of Three Worlds' },
+    { '@type': 'Thing', name: 'Three Worlds', description: 'A poetry collection written from the threshold' },
   ],
   author: { '@id': `${SITE_ORIGIN}/#author` },
   publisher: { '@id': `${SITE_ORIGIN}/#author` },
@@ -156,7 +167,7 @@ const bookLd = {
   '@type': 'Book',
   '@id': `${SITE_ORIGIN}/#collection`,
   name: publication.collectionTitle,
-  alternativeHeadline: 'Still Life · Bless You · Their World',
+  alternativeHeadline: 'Their World · Bless You · Still Life',
   url: publication.collectionUrl,
   mainEntityOfPage: publication.collectionUrl,
   author: { '@id': `${SITE_ORIGIN}/#author` },
@@ -176,7 +187,7 @@ const bookLd = {
   isPartOf: { '@id': `${SITE_ORIGIN}/#three-worlds-series` },
   hasPart: volumeLd.map((volume) => ({ '@id': volume['@id'] })),
   description:
-    'Three Worlds is the ongoing debut poetry collection by Dai Pan (潘岱), organized into three affective volumes — Still Life, Bless You, and Their World — written and updated between 2024 and 2026.',
+    'Three Worlds is a collection of 79 poems by Dai Pan (潘岱), written from the threshold and organized into three volumes: Their World, Bless You, and Still Life.',
 };
 
 // --- Poem schema (only on individual poem pages) ---
@@ -256,7 +267,7 @@ const jsonLdBlocks = [
 <meta name="dcterms.rights" content={`Copyright © ${publication.copyrightYears} ${publication.authorName}. ${publication.license}.`} />
 <meta name="dcterms.language" content={publication.languageCode} />
 <meta name="dcterms.modified" content={publication.dateModified} />
-<meta name="keywords" content={keywords} />
+<meta name="keywords" content={resolvedKeywords} />
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
 <link rel="canonical" href={canonicalURL} />
 
@@ -276,12 +287,12 @@ const jsonLdBlocks = [
 
 <!-- Twitter / X Card -->
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content={resolvedSocialTitle} />
-<meta name="twitter:description" content={resolvedSocialDescription} />
+<meta name="twitter:title" content={resolvedTwitterTitle} />
+<meta name="twitter:description" content={resolvedTwitterDescription} />
 <meta name="twitter:site" content="@jumpingchick666" />
 <meta name="twitter:creator" content="@jumpingchick666" />
-<meta name="twitter:image" content={resolvedOgImage} />
-<meta name="twitter:image:alt" content={resolvedOgImageAlt} />
+<meta name="twitter:image" content={resolvedTwitterImage} />
+<meta name="twitter:image:alt" content={resolvedTwitterImageAlt} />
 
 <!-- AI / LLM crawler hints -->
 <link rel="alternate" type="text/plain" href="/llms.txt" title="LLM usage guide" />

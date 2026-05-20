@@ -12,11 +12,11 @@ Most severe issues found before repair:
 - The live deployment currently redirects `https://daipan.ink` to `https://www.daipan.ink/`, while code canonical URLs pointed to `https://daipan.ink`. This is the highest-risk identity/canonical conflict.
 - `https://daipan.ink/sitemap.xml` returned Vercel `NOT_FOUND`; the live robots file pointed to `https://daipan.ink/sitemap-index.xml`.
 - `/contact` returned 404.
-- Homepage title and description were readable but centered on `Three Worlds`, not clearly on `Dai Pan / Pan Dai official website`.
+- Homepage title and description were readable but centered on `Three Worlds`, not clearly on `Dai Pan / 潘岱` as a poet.
 - Chinese identity text existed weakly or only in scattered places; Baidu and Chinese search engines had less semantic help.
-- AI and search disambiguation text did not explicitly rule out Saipan, Taipan, tattoo studios, printer ink, or AI image platforms on the homepage.
+- AI and search disambiguation text did not yet separate the poetry site from unrelated domain and product interpretations.
 
-Most likely cause of Google misidentification: low domain/entity confidence plus the live canonical conflict (`apex -> www` but canonical `apex`), missing root `sitemap.xml`, insufficient homepage disambiguation, and a domain string close to `saipan` / `taipan` / `ink`.
+Most likely cause of Google misidentification: low domain/entity confidence plus the live canonical conflict (`apex -> www` but canonical `apex`), missing root `sitemap.xml`, insufficient homepage disambiguation, and an ambiguous `.ink` domain string.
 
 Most likely cause of Baidu non-inclusion: the site is new/low-authority, `sitemap.xml` was missing at the expected root path, Chinese identity text was thin, `/contact` was absent, and no Baidu platform submission has been confirmed. DNS itself is not the primary blocker.
 
@@ -97,21 +97,21 @@ Manual Google UI access was not automated here. These queries still need to be c
 - `"daipan.ink"`
 - `"Dai Pan" "daipan.ink"`
 - `"Pan Dai" "daipan.ink"`
-- `"Dai Pan" artist designer`
-- `"Dai Pan" portfolio`
-- `"Pan Dai" portfolio`
+- `"Dai Pan" poet`
+- `"Three Worlds" "Dai Pan"`
+- `"threshold poetry" "Dai Pan"`
 - `"潘岱" "daipan.ink"`
 
-Likely reasons Google may show `Including results for saipan.ink` or unrelated `Saipan / Taipan / tattoo ink` content:
+Likely reasons Google may show unrelated domain or product interpretations:
 
-- Domain string is close to higher-confidence words/domains (`saipan`, `taipan`, generic `ink`).
+- Domain string is close to higher-confidence terms and generic `.ink` meanings.
 - Live apex redirects to www while HTML canonical points to apex.
 - Expected root `sitemap.xml` did not exist.
-- Homepage title was previously `Three Worlds — Dai Pan`, which is literary and less explicit as a domain identity statement.
-- Homepage did not directly say it is the official website of Dai Pan / Pan Dai and not Saipan/Taipan/ink products.
+- Homepage title was previously `Three Worlds — Dai Pan`, which is literary and less explicit as a poetry-site identity statement.
+- Homepage did not directly say that daipan.ink is the poetry site of Dai Pan / 潘岱.
 - External authority and search console submissions are likely low or absent.
 
-Local fix: homepage title and meta now explicitly identify `Dai Pan / Pan Dai | Official Artist & Designer Website`, and the initial HTML contains direct disambiguation text.
+Local fix: homepage title and meta now explicitly identify `Dai Pan / 潘岱 — Three Worlds, Poems of the Threshold`, and the initial HTML contains direct poetry-site identity text.
 
 ## 6. Baidu / Chinese Search Visibility Findings
 
@@ -135,14 +135,14 @@ Manual Baidu actions are required in `docs/daipan_ink_search_submission_checklis
 
 ## 7. AI Search Misinterpretation Findings
 
-AI search tools likely misinterpreted the domain because crawler-visible identity signals were weaker than the domain ambiguity. If an AI search system cannot fetch the site, cannot find a sitemap, or sees a generic `.ink` domain with limited entity text, it may fill gaps with similar strings such as Saipan, Taipan, tattoo studios, printer ink, or AI image platforms.
+AI search tools likely misinterpreted the domain because crawler-visible identity signals were weaker than the domain ambiguity. If an AI search system cannot fetch the site, cannot find a sitemap, or sees a generic `.ink` domain with limited entity text, it may fill gaps from unrelated domains or product categories.
 
 Local fixes:
 
-- Homepage HTML now includes `Dai Pan / Pan Dai official website`.
-- Homepage, About, Contact, JSON-LD, and `llms.txt` now explicitly say the site is not related to Saipan, Taipan, tattoo studios, printer ink products, or AI image generation platforms.
-- `WebSite` JSON-LD now names `Dai Pan / Pan Dai` and `daipan.ink`.
-- `Person` JSON-LD uses `Artist and Designer` and includes alternate names.
+- Homepage HTML now identifies daipan.ink as the poetry site of Dai Pan / 潘岱.
+- Homepage, About, Contact, JSON-LD, and `llms.txt` now describe the site as poems-only.
+- `WebSite` JSON-LD now names `daipan.ink`, `Dai Pan / 潘岱`, and `Three Worlds`.
+- `Person` JSON-LD uses `Poet` and includes alternate names.
 - `/llms.txt` exists and now starts with a concise identity/disambiguation block.
 - `/humans.txt` added.
 
@@ -208,8 +208,8 @@ Before:
 
 After local fix:
 
-- Homepage title: `Dai Pan / Pan Dai | Official Artist & Designer Website`.
-- Homepage description clearly identifies Dai Pan / Pan Dai and fields.
+- Homepage title: `Dai Pan / 潘岱 — Three Worlds, Poems of the Threshold`.
+- Homepage description clearly identifies daipan.ink as the poetry site of Dai Pan / 潘岱.
 - Chinese meta description added.
 - Canonicals normalized to apex without trailing slash except homepage.
 - OG/Twitter inherit the improved title and descriptions.
@@ -224,10 +224,10 @@ Before:
 
 After local fix:
 
-- `WebSite` name is now `Dai Pan / Pan Dai`.
-- `alternateName` includes `daipan.ink`, `Three Worlds — Dai Pan`, and `Dai Pan official website`.
-- `Person` job title changed to `Artist and Designer`.
-- Descriptions include official website, project archive, and disambiguation.
+- `WebSite` name is now `daipan.ink`.
+- `alternateName` includes `Dai Pan / 潘岱`, `Three Worlds — Dai Pan`, and `Dai Pan poetry site`.
+- `Person` job title changed to `Poet`.
+- Descriptions identify the site as a poems-only home for `Three Worlds`.
 
 Caution:
 
@@ -260,8 +260,8 @@ No large public images over 500 KB were found. Mainland compatibility is general
 
 Current relationship in content:
 
-- `daipan.ink` is the poetry/digital edition/project archive site.
-- `daipan.art` is described as the companion visual art practice site.
+- `daipan.ink` is the poetry site and digital edition for `Three Worlds`.
+- `daipan.art` is the external home for visual work.
 
 Risk:
 
@@ -270,8 +270,8 @@ Risk:
 
 Options:
 
-- Option A: `daipan.ink` official site, `daipan.art` visual art portfolio. Keep both, cross-link both ways, do not canonical one to the other. Good if `daipan.ink` is the personal official domain.
-- Option B: `daipan.art` main official site, `daipan.ink` poetry archive. Keep `daipan.ink` canonical to itself for poetry pages, but make About text say it is the poetry archive. Good if art portfolio is the main public identity.
+- Option A: `daipan.ink` poetry site, `daipan.art` visual work site. Keep both, cross-link both ways, do not canonical one to the other.
+- Option B: `daipan.art` broader public site, `daipan.ink` poetry site. Keep `daipan.ink` canonical to itself for poetry pages.
 - Option C: redirect one domain to the other. Only use if the content is mostly duplicate and one domain should disappear from search. This is not recommended without a deliberate branding decision.
 
 Do not canonical `daipan.ink` pages to `daipan.art` unless you want `daipan.ink` not to rank independently. Do not redirect either domain until the owner decides the primary-domain strategy.
@@ -288,7 +288,7 @@ P1: should fix
 
 - Verify Baidu Search Resource Platform and use crawl diagnosis.
 - Re-run production sitemap check after deploy.
-- Add reciprocal link from `daipan.art` to `https://daipan.ink/` with clear text such as "Poetry and project archive: daipan.ink".
+- Add reciprocal link from `daipan.art` to `https://daipan.ink/` with clear text such as "Poetry: daipan.ink".
 - Monitor Google-selected canonical in Search Console.
 
 P2: nice to have
@@ -397,11 +397,11 @@ curl -L https://daipan.ink
 
 The deployed homepage HTML directly contains:
 
-- `Dai Pan / Pan Dai`
-- `Dai Pan / Pan Dai | Official Artist & Designer Website`
-- `official website`
-- `artist and designer`
-- Chinese identity text: `Dai Pan / Pan Dai 的个人官方网站，展示视觉传达、摄影、交互设计、实验媒体、写作与个人项目档案。`
+- `Dai Pan / 潘岱`
+- `Dai Pan / 潘岱 — Three Worlds, Poems of the Threshold`
+- `daipan.ink is the poetry site of Dai Pan / 潘岱`
+- `Poems of the threshold`
+- Chinese identity text: `daipan.ink 是潘岱的诗集站点。所收为《三个世界》`
 - Canonical tag: `<link rel="canonical" href="https://daipan.ink/">`
 - JSON-LD blocks
 - Open Graph tags including `og:title`, `og:description`, and `og:url`

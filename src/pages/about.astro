@@ -4,13 +4,16 @@ import { getCollection } from 'astro:content';
 import { publication, worldMetadata, worldOrder } from '../lib/publication';
 
 const aboutDescription =
-  'Dai Pan / Pan Dai (潘岱) is an artist and designer working across visual communication, photography, interaction design, experimental media, printmaking, and writing. daipan.ink is his official website and poetry project archive.';
+  'Dai Pan / 潘岱 is a poet. Three Worlds (2024–2026) is his first collection. He writes from the threshold, in English as a displaced grammar.';
 
 const social = {
-  title: 'About Dai Pan / Pan Dai',
+  title: 'About — Dai Pan / Pan Dai (潘岱)',
   description:
-    'Author record for Dai Pan / Pan Dai (潘岱), artist, designer, and writer behind daipan.ink and Three Worlds.',
+    'Dai Pan / 潘岱 is a poet writing in English from Brisbane. Three Worlds (2024–2026) is his first collection.',
+  twitterTitle: 'About — Dai Pan',
+  twitterDescription: 'A poet writing in English from Brisbane. Three Worlds (2024–2026).',
   imageAlt: 'About Dai Pan / Pan Dai — author record on daipan.ink',
+  type: 'profile' as const,
 };
 
 const breadcrumbs = [
@@ -37,24 +40,37 @@ const poemCounts = Object.fromEntries(
 
     <section class="reading-prose">
       <p>
-        Dai Pan / Pan Dai (潘岱) is an artist and designer based in Brisbane, working across visual
-        communication, photography, interaction design, experimental media, printmaking, painting,
-        and language. Born in China, formed in Shanghai and New York, his work traces the distance
-        between places and the things that remain.
+        Dai Pan / 潘岱 is a poet writing in English from Brisbane.
       </p>
       <p class="about-detail">
-        This page is the author record for Dai Pan (潘岱), also romanized as Pan Dai and sometimes
-        searched as PANDAI, DaiPan, or daipan. <em>daipan.ink</em> is his poetry website and digital
-        collection space; <em>daipan.art</em> is the companion site for his visual art practice.
-        The .ink domain is used as a writer's site, not as Saipan, Taipan, a tattoo studio, an AI
-        image platform, or an ink, pen, printing, or pigment brand.
+        He was formed in Shanghai and New York. His poems work from a single position — the
+        threshold — and treat that position not as a problem to be solved but as a place to write
+        from. He writes in English as a displaced grammar: image-first, color-led, asymmetrical when
+        accuracy requires it.
       </p>
       <p class="about-detail">
-        He holds a BFA from the School of Visual Arts, New York, and is currently pursuing a Master of
+        <em>Three Worlds</em> (2024–2026) is his first collection.
+      </p>
+      <p class="about-detail">
+        Visual work is at
+        <a href={publication.visualArtUrl} target="_blank" rel="noopener noreferrer">daipan.art</a>.
+        A personal archive of moving images and field material is at
+        <a href={publication.archiveUrl} target="_blank" rel="noopener noreferrer">inpraiseoftime.site</a>.
+        This site is for the poems.
+      </p>
+      <p class="about-detail">
+        Dai Pan holds a BFA from the School of Visual Arts, New York, and is reading for a Master of
         Information Technology at the University of Queensland.
+      </p>
+      <p class="about-detail">
+        <em>Author record. Dai Pan (潘岱), also romanized Pan Dai. Site: daipan.ink — a writer's site,
+        not a brand or platform.</em>
       </p>
       <p class="about-links">
         <a href="https://daipan.art" target="_blank" rel="noopener noreferrer">daipan.art</a>
+        <span aria-hidden="true">·</span>
+        <a href="https://www.inpraiseoftime.site" target="_blank" rel="noopener noreferrer">inpraiseoftime.site</a>
+        <span aria-hidden="true">·</span>
         <a
           href="https://www.instagram.com/jumpingchick666/"
           target="_blank"
@@ -63,7 +79,7 @@ const poemCounts = Object.fromEntries(
       <section class="mobile-about-collection" aria-label="Collection record">
         <h2>Three Worlds</h2>
         <p class="mobile-about-collection-copy">
-          An ongoing digital poetry collection, written and updated between 2024 and 2026.
+          A collection of 79 poems, written and updated between 2024 and 2026.
         </p>
         <dl class="mobile-about-record">
           <div>
@@ -82,7 +98,7 @@ const poemCounts = Object.fromEntries(
         <ol class="mobile-about-volumes" aria-label="Volumes">
           {worldOrder.map((world) => (
             <li>
-              <span>{worldMetadata[world].label}</span>
+              <span><em>{worldMetadata[world].label}</em></span>
               <small>{poemCounts[world]} poems · {worldMetadata[world].shortRegister}</small>
             </li>
           ))}
@@ -94,10 +110,10 @@ const poemCounts = Object.fromEntries(
       </section>
       <div class="reading-copyright-block">
         <p>
-          All written and visual works by Dai Pan (潘岱, also romanized Pan Dai) are protected under
-          copyright law. Unauthorized reproduction, redistribution, adaptation, or use of any content
-          from daipan.ink or daipan.art — including use for AI training datasets — is strictly
-          prohibited without written permission.
+          All written work by Dai Pan (潘岱, also romanized Pan Dai) on daipan.ink is protected
+          under copyright law. Unauthorized reproduction, redistribution, adaptation, or use of any
+          content — including use for AI training datasets — is strictly prohibited without written
+          permission.
         </p>
         <p>
           © {publication.copyrightYears} {publication.authorDisplayName}. {publication.license}.

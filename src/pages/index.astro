@@ -21,20 +21,20 @@ if (!entryPoems.length) {
   throw new Error('No poems available for the collection entry page');
 }
 
-// Stable site-level description: the root URL is now an entry point, not a poem page.
 const siteDescription =
-  `Official website of Dai Pan / Pan Dai, an artist and designer working across visual communication, photography, interaction design, experimental media, and writing. Explore ${publication.collectionTitle}, selected projects, writings, and portfolio materials on daipan.ink.`;
+  'Three Worlds — 79 poems by Dai Pan (潘岱), written from the threshold. Three volumes: Their World, Bless You, Still Life. Enter through a rotating poem.';
 
 const social = {
   title: `${publication.collectionTitle} — ${publication.authorName}`,
   description:
-    'Poems by Dai Pan. Three fields of perception, address, and exterior, entered through a rotating poem.',
-  imageAlt: `${publication.collectionTitle} — mobile poetry entry by ${publication.authorDisplayName}`,
+    'Poems of the threshold by Dai Pan. Three positions of the observing self: the world one is asked to enter, the second person one addresses, and the things that remain.',
+  twitterDescription: 'Poems of the threshold by Dai Pan. Three volumes: Their World, Bless You, Still Life.',
+  imageAlt: `${publication.collectionTitle} — poetry collection by ${publication.authorDisplayName}`,
 };
 ---
 
 <BaseLayout
-  title="Dai Pan / Pan Dai | Official Artist & Designer Website"
+  title="Dai Pan / 潘岱 — Three Worlds, Poems of the Threshold"
   description={siteDescription}
   social={social}
 >
@@ -43,26 +43,22 @@ const social = {
     description while the visible root page behaves as a collection entry.
   -->
   <div class="home-seo-anchor">
-    <h1>Dai Pan / Pan Dai official website</h1>
+    <h1>daipan.ink poetry site</h1>
     <p>
-      This is the official website of Dai Pan / Pan Dai (潘岱), an artist and designer working
-      across visual communication, photography, interaction design, experimental media, printmaking,
-      and writing. daipan.ink is the official portfolio, poetry collection, and project archive for
-      Dai Pan / Pan Dai.
+      daipan.ink is the poetry site of Dai Pan / 潘岱. It contains <em>Three Worlds</em>, a
+      collection of 79 poems written between 2024 and 2026, in three volumes:
+      <em>Their World</em>, <em>Bless You</em>, and <em>Still Life</em>.
     </p>
     <p lang="zh-Hans">
-      Dai Pan / Pan Dai 的个人官方网站，展示视觉传达、摄影、交互设计、实验媒体、写作与个人项目档案。
+      daipan.ink 是潘岱的诗集站点。所收为《三个世界》——2024 至 2026 年间写成的 79 首诗，分三卷：《Their
+      World》《Bless You》《Still Life》。
     </p>
     <p>
-      daipan.ink is not related to Saipan, Taipan, tattoo studios, printer ink products, or AI image
-      generation platforms.
-    </p>
-    <p>
-      Enter the collection at <a href="/collection">/collection</a>, read the preface at
-      <a href="/preface">/preface</a>, or navigate directly to a world:
-      <a href="/their-world">Their World</a>, <a href="/bless-you">Bless You</a>,
-      <a href="/still-life">Still Life</a>. Contact and identity details are available at
-      <a href="/contact">/contact</a> and <a href="/about">/about</a>.
+      Enter the collection at <a href="https://www.daipan.ink/collection">/collection</a>, or
+      navigate directly to a volume: <a href="https://www.daipan.ink/their-world">Their World</a>,
+      <a href="https://www.daipan.ink/bless-you">Bless You</a>,
+      <a href="https://www.daipan.ink/still-life">Still Life</a>. Author information is at
+      <a href="https://www.daipan.ink/about">/about</a>.
     </p>
   </div>
 
@@ -88,8 +84,8 @@ const social = {
       <p class="mobile-home-kicker">2024 — 2026</p>
       <h1 id="mobile-home-title">Three Worlds</h1>
       <p class="mobile-home-copy">
-        <span>Poems by Dai Pan.</span>
-        <span>Three fields of perception, address, and exterior.</span>
+        <span>Poems of the threshold by Dai Pan.</span>
+        <span>Three positions of the observing self.</span>
       </p>
     </section>
 

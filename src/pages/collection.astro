@@ -4,12 +4,13 @@ import { getCollection } from 'astro:content';
 import { publication, worldMetadata, worldOrder } from '../lib/publication';
 
 const collectionDescription =
-  'Three Worlds — an ongoing poetry collection by Dai Pan (潘岱). Publication record: affective volumes, poem count, edition history, citation format, and copyright.';
+  'Three Worlds — 79 poems by Dai Pan (潘岱), in three volumes: Their World (24), Bless You (28), Still Life (27). Written from the threshold, 2024–2026.';
 
 const social = {
   title: `${publication.collectionTitle} — Poetry Collection by ${publication.authorName}`,
   description:
-    'Still Life, Bless You, and Their World — an ongoing digital poetry collection by Dai Pan (潘岱).',
+    'A collection of 79 poems by Dai Pan, organized in three volumes corresponding to three positions of the observing self.',
+  twitterDescription: '79 poems in three volumes. Their World, Bless You, Still Life.',
   imageAlt: `${publication.collectionTitle} — poetry collection by ${publication.authorDisplayName}`,
 };
 
@@ -28,13 +29,19 @@ const breadcrumbs = [
 ];
 ---
 
-<BaseLayout title="Collection" description={collectionDescription} social={social} breadcrumbs={breadcrumbs}>
+<BaseLayout
+  title="Three Worlds — Poetry Collection by Dai Pan"
+  description={collectionDescription}
+  social={social}
+  breadcrumbs={breadcrumbs}
+>
   <main class="reading-page collection-page">
 
     <!-- ── Colophon / Publication Record ───────────────────────────────────── -->
     <header class="collection-masthead">
       <h1 class="collection-title">{publication.collectionTitle}</h1>
-      <p class="collection-subtitle">Still Life · Bless You · Their World</p>
+      <p class="collection-subtitle">Their World · Bless You · Still Life</p>
+      <p class="collection-threshold"><em>Poems of the threshold.</em></p>
     </header>
 
     <section class="colophon" aria-label="Publication record">
@@ -47,7 +54,7 @@ const breadcrumbs = [
           <dt>Author</dt>
           <dd>
             {publication.authorName} <span class="colophon-zh">{publication.authorChineseName}</span>
-            <span class="colophon-aliases">also indexed as Pan Dai / PANDAI / daipan</span>
+            <span class="colophon-aliases">(also: Pan Dai)</span>
           </dd>
         </div>
         <div class="colophon-row">
@@ -55,7 +62,7 @@ const breadcrumbs = [
           <dd>{publication.writtenRangeLabel}</dd>
         </div>
         <div class="colophon-row">
-          <dt>Digital edition</dt>
+          <dt>Edition</dt>
           <dd>{publication.digitalEditionLabel}</dd>
         </div>
         <div class="colophon-row">
@@ -74,13 +81,6 @@ const breadcrumbs = [
           <dt>Contact</dt>
           <dd><a href={publication.visualArtUrl} target="_blank" rel="noopener noreferrer">daipan.art</a></dd>
         </div>
-        <div class="colophon-row mobile-secondary-row">
-          <dt>Site relation</dt>
-          <dd>
-            daipan.ink is the poetry and digital edition site; daipan.art is the visual art site by
-            the same author, Dai Pan (潘岱).
-          </dd>
-        </div>
       </dl>
     </section>
 
@@ -92,7 +92,7 @@ const breadcrumbs = [
           <div class="volume-link" aria-label="Their World volume">
             <span class="volume-roman">I</span>
             <span class="volume-info">
-                <span class="volume-name">{worldMetadata['their-world'].label}</span>
+                <span class="volume-name"><em>{worldMetadata['their-world'].label}</em></span>
                 <span class="volume-meta">{poemCounts['their-world']} poems · {worldMetadata['their-world'].register}</span>
             </span>
           </div>
@@ -101,7 +101,7 @@ const breadcrumbs = [
           <div class="volume-link" aria-label="Bless You volume">
             <span class="volume-roman">II</span>
             <span class="volume-info">
-              <span class="volume-name">{worldMetadata['bless-you'].label}</span>
+              <span class="volume-name"><em>{worldMetadata['bless-you'].label}</em></span>
               <span class="volume-meta">{poemCounts['bless-you']} poems · {worldMetadata['bless-you'].register}</span>
             </span>
           </div>
@@ -110,7 +110,7 @@ const breadcrumbs = [
           <div class="volume-link" aria-label="Still Life volume">
             <span class="volume-roman">III</span>
             <span class="volume-info">
-              <span class="volume-name">{worldMetadata['still-life'].label}</span>
+              <span class="volume-name"><em>{worldMetadata['still-life'].label}</em></span>
               <span class="volume-meta">{poemCounts['still-life']} poems · {worldMetadata['still-life'].register}</span>
             </span>
           </div>
@@ -135,8 +135,9 @@ const breadcrumbs = [
     <section class="collection-mobile-note" aria-label="Mobile editorial note">
       <h2 class="colophon-section-label">Editorial frame</h2>
       <p>
-        The three worlds are affective registers rather than geographic divisions:
-        interior perception, address, and symbolic exterior.
+        The three volumes are three positions of the observing self — not geographies. They are
+        porous; the speaker moves between them the way memory actually moves: by return, by angle,
+        by failing to arrive.
       </p>
       <p>
         This is an ongoing digital edition, written and updated between 2024 and 2026.
@@ -147,30 +148,30 @@ const breadcrumbs = [
     <section class="reading-prose collection-note mobile-secondary-section" aria-label="Editorial note">
       <h2 class="colophon-section-label">Note</h2>
       <p>
-        Begun in 2024 and continuing through 2026, this collection emerged from a period of quiet
-        withdrawal and has since become an ongoing digital record. Communication grew sparse, and
-        something harder to name grew in its place: introspection, narrative reconfiguration, and
-        an emotional intensity that had nowhere else to go.
+        <em>Three Worlds</em> is a collection of 79 poems written between 2024 and 2026, organized
+        into three volumes.
       </p>
       <p>
-        Dai Pan was born in Jiangsu, formed in Shanghai and New York. He has since lived across
-        cities that never quite became home — which is not rootlessness, but a particular way of
-        seeing: from the edges, in transit, between. <em>Three Worlds</em> holds that displacement
-        without resolving it.
+        <em>Their World</em> — the world one is asked to enter, and the conditions of that asking.<br />
+        <em>Bless You</em> — the second person, into which love and belief and grief collapse.<br />
+        <em>Still Life</em> — the things that remain when both have grown quiet.
       </p>
       <p>
-        The three volumes — <em>Still Life</em>, <em>Bless You</em>, and <em>Their World</em> —
-        are not geographic divisions. They correspond to three affective registers: the internal
-        world colored by intuition and perception; the address toward others, collapsing love and
-        belief and grief into a single 'you'; and the symbolic exterior, the mechanical world that
-        disfigures and defines us. These worlds are porous and overlapping, the way memory actually
-        moves.
+        The three are porous. The speaker moves between them the way memory actually moves: by
+        return, by angle, by failing to arrive.
       </p>
       <p>
-        Writing, for this author, becomes a way of circling the unreachable present. These poems
-        do not capture reality; they return to it again and again, from different angles, hoping
-        to touch a vanishing future. You are invited not to arrive at any answer, but to lose
-        yourself in the memory.
+        These are poems of the threshold. They are written from the edges of scenes — windows,
+        tables, train walls, mirrors, the cold skin of a thermos — by a speaker who has learned to
+        stand just short of entry. Arrival is not the subject. Standing close to arrival, and
+        watching oneself stand, is the subject.
+      </p>
+      <p>
+        The poems are written in English as a displaced grammar: image-first, color-led,
+        asymmetrical when accuracy requires it.
+      </p>
+      <p>
+        Ongoing digital edition.
       </p>
       <div class="reading-copyright-block">
         <p>
@@ -217,6 +218,12 @@ const breadcrumbs = [
     font-size: var(--type-body);
     color: var(--color-meta, #595959);
     letter-spacing: 0.06em;
+  }
+
+  .collection-threshold {
+    margin: var(--space-sm) 0 0;
+    font-size: calc(var(--type-body) - 1px);
+    color: var(--color-meta, #595959);
   }
 
   /* ── Colophon grid ──────────────────────────────────────────────────────── */

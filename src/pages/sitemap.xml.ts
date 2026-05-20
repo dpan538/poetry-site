@@ -2,7 +2,7 @@ import type { APIRoute } from 'astro';
 import { getCollection } from 'astro:content';
 import { publication, worldOrder, type WorldId } from '../lib/publication';
 
-const LASTMOD = '2026-05-06';
+const LASTMOD = publication.dateModified;
 
 function escapeXml(value: string): string {
   return value

@@ -66,7 +66,7 @@ Run these on Google, Bing, Baidu, 360, Sogou, and AI search tools after deployme
 - `"潘岱" "daipan.ink"`
 - `"Dai Pan" portfolio`
 - `"Pan Dai" portfolio`
-- `"daipan.ink" -saipan -taipan -tattoo -printer`
+- `"daipan.ink" "Dai Pan" "Three Worlds"`
 
 ## Domain / Deployment Tasks
 
