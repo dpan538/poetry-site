@@ -242,6 +242,14 @@ html[data-world='still-life'] {
   outline-offset: 4px;
 }
 
+@media (hover: none) and (pointer: coarse) {
+  a,
+  button,
+  [role='button'] {
+    touch-action: manipulation;
+  }
+}
+
 @media (max-width: 760px) {
   html,
   body {

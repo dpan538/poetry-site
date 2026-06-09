@@ -1,0 +1,16 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.daipan.ink"
+        }
+      ],
+      "destination": "https://daipan.ink/$1",
+      "permanent": true
+    }
+  ]
+}
