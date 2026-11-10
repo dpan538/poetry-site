@@ -2,6 +2,10 @@
 
 Three Worlds by Dai Pan. The Rust compiler renders the publication to static files, and Rust WASM runs the reading grid, navigation and overlays in the browser.
 
+## Technology
+
+The Cargo workspace uses Rust 2024. The static compiler turns Markdown manuscripts and HTML templates into pages, a sitemap and discovery metadata. The reader uses WebAssembly with `wasm-bindgen` and `web-sys` for DOM and Canvas access, and CSS for the responsive presentation. The separate editorial compiler uses Candle and MiniLM to rank scene matches, with Typst available for generating visual studies.
+
 ## Run locally
 
 From the repository root:
@@ -31,3 +35,9 @@ Run `sh scripts/site lab 4376` to preview the six custom MANIFOLD animations and
 - `site/data/manifold.json` maps each work to its ranked Canvas scene, source excerpt and three keywords. Both scene players render a still frame when reduced motion is enabled. [ascii.rest scene documentation](https://ascii.rest/docs/pieces/)
 
 The scene manifest is a checked-in editorial asset. To update semantic rankings after editing manuscript text, run the [editorial compiler](prototype/README.md), review its choices, and copy the generated manifest into `site/data/manifold.json`. The site compiler checks that each excerpt matches its work. Model weights stay in the editor's local cache.
+
+## Credits and rights
+
+Thank you to [ascii.rest](https://ascii.rest/) and its open-source contributors. MANIFOLD includes 34 of its scenes alongside six Rust-rendered loops. The bundled ascii.rest player and scenes retain their [MIT license](site/assets/manifold/ascii.rest-LICENSE.txt).
+
+The poems, prose and other original literary text are by Dai Pan (潘岱). All rights reserved. See the [repository rights notice](LICENSE.md) for copying and reuse terms.
