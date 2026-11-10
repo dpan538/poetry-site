@@ -2,4 +2,3 @@
 name = "reader-core"
 edition.workspace = true
 version.workspace = true
-
