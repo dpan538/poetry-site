@@ -1,16 +1,8 @@
 # build output
 dist/
-# generated types
+# local caches from the retired build
 .astro/
-
-# dependencies
 node_modules/
-
-# logs
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
 
 
 # environment variables
