@@ -2,6 +2,7 @@
 title: "The Barn"
 world: "their-world"
 order: 17
+manifoldScene: wivenhoe-park
 firstLine: "Passing by a patch of land, like similar farmland, Yellow and green."
 ---
 Passing by a patch of land, like similar farmland,

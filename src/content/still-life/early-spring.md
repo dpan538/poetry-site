@@ -3,6 +3,9 @@ title: "Early Spring"
 world: "still-life"
 order: 19
 firstLine: "I arrived at the era, to be displayed."
+columnAlignment:
+  leftLine: "shaped by emotions into a sphere,"
+  rightStanza: "From newspapers,"
 ---
 I arrived at the era, to be displayed.
 Like a greeting card printed in gray dust,

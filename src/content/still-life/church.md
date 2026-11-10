@@ -1,0 +1,127 @@
+---
+title: "Church"
+world: "still-life"
+order: 31
+kind: prose
+manifoldScene: winter-church
+source: "The Threes.pdf"
+firstLine: "Today it’s drizzling, so light."
+---
+
+(1)
+
+Today it’s drizzling, so light. It’s like the water mist sprayed at construction sites in summer for cooling. During my thirty-plus minute walk from the dormitory to school, my clothes didn’t feel noticeably damp. The rain was so light it didn’t affect my mood at all, and I even went to buy an egg sandwich. Maybe it’s because of the rain, or the overcast sky, there were only three students in the library. Perhaps the weather truly affects artists’ desire to create and study. Of course, for me, this is perfect. I like quiet, empty libraries.
+
+I watched as the heavens withdrew the rain from the ground, that slight trickle seeping through fingertips into the earth, permeating the air. It crept into the hair of those without umbrellas, leaving streaks on the advertisement papers on the walls.
+
+Walking through rows of bookshelves to the bathroom, I discovered there were many people. They were all sleeping on the sofas next to the periodical shelves. Without exception, they held their backpacks in their arms, heads resting on the sofa armrests, hiding their faces under their clothing hoods. Not a single snore could be heard; the silence was frozen in the clock ticking. After washing my hands, I dried them with paper. I felt it as thin as a plastic bag yet untearable. When did paper stop being soft? Just like how I only realized after arriving in New York that breakfast bread could be so hard. They told me that the bread I’d eaten for breakfast for the previous eighteen years was toast, not “bread.” Chewing on bread with a crust tougher than bathroom tissue, I thought again of the earthen houses in my hometown.
+
+The outer layer of plaster mixed with cement and mud on the red bricks, gradually peeling away under wind and sun. A somewhat desolate courtyard, where weeds and vines grew naturally at the base of the walls. Near the courtyard well was a simple enclosure, supported by dark gray stone slabs, covered with rough straw mats. I could see tree roots mixed in, like those bookshelves with their silver stainless steel screws. My hand brushed over the rough paper, their edges appearing as crude as cheap artificial fur.
+
+(2)
+
+I remember three years ago when I traveled to the county town near my hometown. It was summer. A dazzling sun hung high in the sky, piercing through to the soul. I could picture them with just a closing of my eyes. I saw the people of the county town. Yellow faces, all standing on yellow earth, sun-darkened to the deep yellow color of soil. A faint scent of lime wafted through the air, mixed with the pungent smell of fresh lumber and paint. Some were mixing mortar, others arranging tools, the sharp sound of cutting machines slicing through the heat... No dialect, no smell of smoke, they worked skillfully and in silent coordination, removing the old tiles from the roof one by one.
+
+I sat in the small town’s hotel, able to see the renovation crew below from my window. I saw weathered houses, silent earth, working people. Every young person wants to enter the big city, like me, yet also wishes to return to the soil. Standing under the sun, our hearts cannot be satisfied, always carrying fantasies of the past. I had no particular agenda, merely walking aimlessly, watching, hearing.
+
+I heard them say they hoped I would leave. So I returned to the library.
+
+I looked at the chilblains on my hands, red like berries among grass. Their open mouths between healing and tearing. They seemed to say that New York’s winter this year was so long, so cold. I heard my brain saying, hoping I would stop thinking. I thought of Heidegger’s words: “Thinking is often painful, but refusing to think brings even greater pain.” In the window’s reflection, I saw myself sprawled on the desk, surrounded by empty tables and chairs, but I knew I wasn’t the only one awake here.
+
+I didn’t hear the books inviting me, nor did I plan to see them.
+
+(3)
+
+I want to recall that county town I once visited, where there was an ancient city ruin. The city walls stood exposed to the air, but all visible traces of age had been painted over with black paint, leaving no mark of time. The ground beside the walls was covered with artificial turf, clearly transformed into a garden shaped like a tourist attraction.
+
+Few residents remained in the ancient city. All that was left were some new shops and several abandoned houses. Some farmers who refused to leave watched over their dilapidated houses and farmland that could be seen end-to-end at a glance, growing sparse vegetables. No children played in the empty lots - at least, I hadn’t seen any during these few days. The shape of history here had been preserved, dressed in new clothes and given a new business card. But its soul hadn’t survived at all. Meaning grew like wild grass on the yellow earth, then withered and died under the sunlight. Growing again and again in the empty spaces. There was nothing interesting in this ancient city, not even the sound of laughter or conversation.
+
+It was in such an ancient city that I encountered that church.
+
+It stood lonely amid knee-high green grass, built of earth-yellow bricks. Continuous arched windows lined both sides, their wooden frames painted dark red. The mottled white plaster was peeling, revealing the rough bricks beneath. The iron sheet sloped roof had rusted, giving off a dull gleam in the sunlight.
+
+Some mops leaned against the lower walls, beside cheap colored plastic chairs that had aged and cracked in the sun. A path of trampled dead grass through the wild grass showed traces of human presence. I walked around the church but didn’t see a single silhouette. Those tall arched windows reminded me of Gothic spires, like a tired giant quietly lying on this land, its towering spine still speaking words of perseverance. I stood there, forgetting what I was waiting for. Perhaps I hoped for an old person to drive me away, or for wild dogs to bark at me furiously. The silent sunlight slowly ate away at my waiting.
+
+The side entrance of the church had two deep-colored wooden doors that opened outward, with two symmetrical “Fu” (blessing) characters pasted on them. The doors were carved with geometric patterns, their diamond-shaped reliefs worn blur by time, extending the conventional meaning of symbols. The arched doorway was built piece by piece with dark brown bricks, stretching upward as if imitating a prayer posture. My gaze caressed every line along the cracks, from the lock on the door to the triangular top of the building.
+
+Probably no one would come here anymore. The concrete ground before the door had cracked, with weeds growing through the gaps, thriving on their own. In the distance, a red brick building gazed at this earth-yellow church across a field of wild grass, like two people of different faiths who couldn’t understand each other. Those tall arched windows, divided into fan shapes by dark red wooden frames, were like open book pages, yet told no stories. The library was gradually filling with people, but no one sat near me. I heard laughter from afar, perhaps voices too, trying to isolate me from the church.
+
+I could smell the dust settled on the side window glass, visible in detail under the fierce sun. The round small window at the top of the wall, like an eye gazing into the distance - watching which direction someone left in? Perhaps just waiting for the next dusk to arrive; at this moment, I lowered my head.
+
+There were no shadows under the sun.
+
+(4)
+
+Suddenly I thought of a person forgotten in a corner. In the unsettled mood, in the surrounding wind, no one wanted to hear their story anymore. My thoughts returned to the library, which was now quite full. Looking up, I saw heads of various colors, green and pink curls like plastic, tied onto round molds made of clay. I turned my head and saw the garbage bin against the white wall, with two switches on it, like the eyes of a robot from a twentieth-century novel.
+
+Now we’ve finally begun to reminisce about things from the last century, some written in books, carved on walls. All these things we wouldn’t have cared about destroying back then, things already forgotten by many. When would God descend upon that church in the small town, even though the seats were covered in dust, even though there were no believers, and no one would look up to see?
+
+Someone lit a lamp.
+
+I really hate people who use desk lamps in the library.
+
+There will always be one or two of them. Like those people who turn on reading lights on overnight flights, I’d rather have one more crying child, letting me hear some complaints in the sealed darkness. The desk lamp’s light forced me to see that there was a lamp there, and I thought, perhaps I won’t become a person under the sun.
+
+I hid in the dark church, closing the door.
+
+A beam of light shot down from the high ceiling, illuminating the ground beside my feet. I stepped into that circle of light, feeling the sun’s warmth. Perhaps there was infinite space above my head, and my body had no intention of being confined to a chair. The book spread before me, characters floating in the dust-filled room, in the moment of falling, their dancing traces clearly visible. The church gradually peeled away in the sunlight, revealing the original appearance of the brick walls.
+
+*I watched, in the sunlight, unable to see.*
+
+The soil, tree roots, and stones told me,
+they knew where my home was.
+
+(5)
+
+I looked at the silver stainless steel pot on the stove, with its long handles designed for two-handed gripping. At the end was a smooth ring, perhaps often hung on the wall. This small pot sat on a baking tray lined with a blue and white striped towel. Beside it were some palm-sized oval pastries made of flour. Like a combination of Italian pizza and Chinese dumplings - perhaps that’s a strange way to put it. What I saw was filling like Italian pizza’s cheese and tomato mixture, with thin pizza dough folded inward, its edges pinched into delicate wave-shaped pleats by fingers.
+
+The white tile counter was clean, without even water marks from wiping, reflecting sunlight and a romantic flavor. I looked at the recipe in my hands, “karjalanpiirakka,” watching oil drip from the filling.
+
+With a “snap,” the wind helped me close that page of the recipe, and the sticky feeling of cheese between my lips disappeared. My ears returned to the noisy crowd, people chatting casually, laughing. The sunlight remained, I could smell the warm fragrance in the dust, allowing nostalgia to continue flowing. From the church in the small town to the library.
+
+Sunlight crawled from the bright kitchen onto the desk, stopping on the back of my hand, and I saw the window framed by the sunny day. What the sunlight saw was this recipe, complaining about the pages closed by the breeze, breathing behind me. Just at this moment, I suddenly felt myself falling into a kind of familiar trance, my vision gradually blurring then becoming clear again.
+
+I saw a figure slowly walking toward me, wearing simple gray-white clothes, shoulders slightly drooping, a large bunch of dull keys hanging at the waist, making crisp clinking sounds as they moved. They walked carelessly toward the church door, mumbling something, probably complaining about the dry heat, their voice indistinct.
+
+“Wait... don’t lock the door!”
+I shouted, running toward the door.
+
+“Click.”
+
+The sound of the bolt locking was desperately clear, their footsteps’ echo gradually fading away. I rushed to the door, pounding hard on the heavy wooden doors, shouting with all my might, but only my own echoing voice scattered around my ears. Darkness quickly surrounded me, all sunlight and warmth sealed outside, and I knew that no matter what, no one would hear anymore.
+
+All I could hear was my heartbeat.
+I turned around,
+that beam of light was still there.
+
+(6)
+
+“What do you seek?” A whispering voice suddenly resonated in the air, seemingly coming from all directions, yet leaving no trace to follow.
+
+I stared into the thick darkness before me, trying to discern something, but the shadows were too deep, my vision unable to grasp anything. Perhaps all this was merely my mind’s swift imagination. I scanned that space of pitch blackness. Rows of empty, silent wooden seats, as if many people had once sat here, their coat hems sweeping away the dust. But now nothing remained, only my heartbeat in the darkness. Or perhaps, they were watching me from within the shadows.
+
+I smelled the accumulated dust in the air, the scent of colored plastic and worn cotton fermenting in dirty water. Some light began to appear before my eyes. Sunlight shouldn’t exist here; my mind seemed increasingly sluggish. My gaze lingered on the faintly emerging statue at the end of the church, a grayish-white silhouette. My thoughts desperately searched through memories of Jesus or Madonna figures I had seen before, but none seemed right. It was a face that felt familiar yet seemingly never encountered. The darkness gathered slowly there, like a forgotten cloud of mist, with only faint breaths occasionally escaping. I felt I could hear Its breathing, ancient and lingering.
+
+Suddenly, that flickering became clear, like a silent mirror reflecting myself in sunshine. I saw another me standing in bright, warm daylight, turning to look at me in the darkness, brow slightly furrowed, expression puzzled, as if trying to recognize something, but no matter how hard he tried, he seemed unable to see me.
+
+I hesitated, then finally spoke:
+“I cannot find where my home is.”
+
+The words floated gently in the air, carrying a hint of hesitation, uncertainty, and faint expectation. I remained silent for a few seconds, then added softly,
+
+*“Please pray for me,*
+*you are powerless to do anything for me.”*
+
+I watched as shadows cast by sunlight transformed their shapes, gliding along the trajectory I anticipated with my gaze, bouncing.
+
+I stood there, trembling slightly with fear, and after remaining frozen in darkness for several minutes, suddenly could not help but laugh. How strange that I had actually been expecting something.
+
+Nature, continuously changing, yet I sought to contemplate something from momentary disillusionment. Lost in fantasy, situated within a self-constructed church, under this private sky.
+
+(end)
+
+I slowly closed the book in my hand. Outside the window, the light rain continued to fall gently. The humid air enveloped the room, quiet and gloomy.
+
+*“There was never any sunshine,”*
+
+I whispered to myself, picking up the half sandwich on the table, taking a slow bite. My gaze falls aimlessly on the gray sky in the distance.

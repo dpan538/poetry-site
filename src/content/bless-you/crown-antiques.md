@@ -3,6 +3,9 @@ title: "Crown Antiques"
 world: "bless-you"
 order: 21
 firstLine: "Crown Antiques, At 1018 Fifth Ave, Near Duquesne University."
+columnAlignment:
+  leftLine: "Don't procrastinate, its exterior maintains a golden splendor."
+  rightStanza: "The glass is sealed with dust,"
 ---
 Crown Antiques,
 At 1018 Fifth Ave,
