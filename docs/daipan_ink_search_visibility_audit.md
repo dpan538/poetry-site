@@ -1,5 +1,7 @@
 # daipan.ink Search Visibility Audit
 
+This is the May 2026 audit of the earlier Astro publication. See the repository README for the current Rust build and deployment.
+
 Date: 2026-05-06  
 Target canonical proposed by owner: `https://daipan.ink/`
 
