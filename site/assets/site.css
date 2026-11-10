@@ -1,0 +1,691 @@
+/* The original site chrome and reading styles live in base.css and poem.css. */
+:root, html[data-world="their-world"] {
+  --highlight-blue: #286ead;
+  --highlight-red: #bb392e;
+  --highlight-orange: #ca582a;
+  --highlight-blue-text: #235e93;
+  --highlight-red-text: #ab3228;
+  --highlight-orange-text: #aa461f;
+  --highlight-line: var(--highlight-blue);
+  --highlight-text: var(--highlight-blue-text);
+  --highlight-side: var(--highlight-orange);
+  --color-accent: #234856;
+  --color-rule: #5c682c;
+  --color-hover: #846127;
+  --ui-wavy-color: var(--highlight-line);
+}
+html[data-world="bless-you"] {
+  --highlight-line: var(--highlight-red);
+  --highlight-text: var(--highlight-red-text);
+  --highlight-side: var(--highlight-blue);
+  --color-primary: #24231f;
+  --color-meta: #6b6257;
+  --color-accent: #426653;
+  --color-rule: #ab812c;
+  --color-hover: #9c4c32;
+}
+html[data-world="still-life"] {
+  --highlight-line: var(--highlight-orange);
+  --highlight-text: var(--highlight-orange-text);
+  --highlight-side: var(--highlight-blue);
+  --color-accent: #285e83;
+  --color-rule: #a39372;
+  --color-hover: #a94d35;
+}
+
+.site-nav .nav-link:is([aria-current="page"], :hover, :focus-visible) {
+  text-decoration: underline wavy var(--ui-wavy-color);
+  text-underline-offset: 4px;
+}
+.reading-page { animation: none; }
+body[data-entry-page] .site-copyright { display: none; }
+.poem-page.legacy-reading .title-frame { border-color: var(--highlight-side); }
+.poem-page.legacy-reading::before { background-color: var(--highlight-side); }
+.poem-page.legacy-reading .poem-line--accent-soft {
+  color: var(--highlight-text);
+}
+.poem-page.legacy-reading .poem-meta { color: var(--highlight-text); }
+.colophon-section-label[data-skin-3kz4ziuf] { color: var(--highlight-blue-text); }
+.colophon-citation .colophon-section-label[data-skin-3kz4ziuf] { color: var(--highlight-red-text); }
+.collection-note .colophon-section-label[data-skin-3kz4ziuf] { color: var(--highlight-orange-text); }
+.citation-block[data-skin-3kz4ziuf] { border-left-color: var(--highlight-orange); }
+.volume-item:nth-child(1) .volume-roman { color: var(--highlight-blue-text); }
+.volume-item:nth-child(2) .volume-roman { color: var(--highlight-red-text); }
+.volume-item:nth-child(3) .volume-roman { color: var(--highlight-orange-text); }
+@media (min-width: 761px) {
+  :is(.colophon, .colophon-volumes, .colophon-citation)[data-skin-3kz4ziuf] {
+    margin-bottom: calc(var(--space-xl) * 2 / 3);
+    padding-bottom: calc(var(--space-xl) * 2 / 3);
+  }
+  .colophon-section-label[data-skin-3kz4ziuf] { margin-bottom: calc(var(--space-md) * 2 / 3); }
+  .volume-link[data-skin-3kz4ziuf] { padding-block: calc(var(--space-md) * 2 / 3); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
+:is(.nav-prev, .nav-next)[data-poem-nav]:is(:hover, :focus-visible),
+:is(.mobile-index-close, .mobile-sheet-close):is(:hover, :focus-visible) {
+  color: var(--color-hover);
+}
+.index-overlay {
+  transform: none;
+  transition: opacity .28s ease-out, visibility 0s linear .28s;
+}
+.index-overlay.is-open { transition: opacity .36s ease-out, visibility 0s linear; }
+.index-overlay .index-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+.world-switcher {
+  grid-column: 2;
+  position: relative;
+  justify-content: center;
+  flex-wrap: nowrap;
+  gap: clamp(12px, 3.4vw, var(--space-xl));
+}
+.world-tab {
+  font-size: clamp(24px, 4.2vw, var(--type-display));
+  white-space: nowrap;
+}
+.world-switcher[data-index-world="their-world"] { --tab-rule: var(--highlight-blue); }
+.world-switcher[data-index-world="bless-you"] { --tab-rule: var(--highlight-red); }
+.world-switcher[data-index-world="still-life"] { --tab-rule: var(--highlight-orange); }
+.world-tab::after { content: none; }
+.world-switcher::after {
+  content: "";
+  position: absolute;
+  inset: auto auto 0 var(--index-rule-left, 0px);
+  width: var(--index-rule-width, 0px);
+  height: 1.5px;
+  background: var(--tab-rule);
+  pointer-events: none;
+  transition: left .42s cubic-bezier(.22,.8,.28,1),
+    width .42s cubic-bezier(.22,.8,.28,1), background-color .3s linear;
+}
+.world-panels {
+  grid-column: 2 / -1;
+  position: relative;
+  container-type: inline-size;
+}
+.world-panel:not(.is-shown, .is-leaving) { display: none; }
+.world-panel:is(.is-shown, .is-leaving) {
+  max-height: none;
+  padding-top: var(--space-xl);
+  transform: none;
+  transition: none;
+  visibility: visible;
+  opacity: 1;
+}
+.world-panel.is-leaving {
+  position: absolute;
+  inset: 0 0 auto;
+  pointer-events: none;
+}
+.world-panel.is-shown .poem-item { animation: none; }
+.index-overlay .poem-link .poem-title { transition: color .22s linear; }
+.index-overlay .poem-link:is(:hover, :focus-visible) .poem-title {
+  transform: none;
+  color: var(--highlight-text);
+}
+.poem-item.is-current .poem-title,
+.mobile-index-item.is-current .mobile-index-title { text-decoration: none; }
+.poem-item.is-current .poem-order,
+.mobile-index-item.is-current .mobile-index-order { color: var(--highlight-text); }
+.index-overlay .poem-first-line {
+  max-inline-size: 70%;
+  text-wrap: pretty;
+  overflow-wrap: anywhere;
+}
+
+.about-groups { display: grid; gap: var(--space-lg); }
+.about-group + .about-group {
+  border-top: 1px solid color-mix(in srgb, var(--color-primary) 13%, transparent);
+  padding-top: var(--space-lg);
+}
+.about-group h2 {
+  margin: 0 0 .45em;
+  font-size: var(--type-subtitle);
+  font-weight: 400;
+  line-height: 1.15;
+}
+.about-group p { margin: 0 0 1em; }
+.about-group p:last-child { margin-bottom: 0; }
+.about-projects { list-style: none; margin: .9em 0 0; padding: 0; }
+.about-projects li + li { margin-top: .65em; }
+.about-projects a {
+  text-decoration: underline;
+  text-decoration-color: var(--highlight-line);
+  text-underline-offset: .17em;
+}
+.about-group .about-links { display: flex; flex-wrap: wrap; gap: .45rem 1.25rem; }
+.about-links a { text-decoration: underline; text-underline-offset: .2em; }
+.about-links a:hover { color: var(--color-accent); }
+.about-record {
+  margin-top: var(--space-lg);
+  padding-top: var(--space-lg);
+  border-top: 1px solid color-mix(in srgb, var(--color-primary) 13%, transparent);
+}
+.about-record h2 { font-size: var(--type-subtitle); font-weight: 400; margin: 0 0 .45em; }
+.about-record h3 { font-size: 1rem; font-weight: 400; margin: 1.9em 0 .5em; }
+.about-citation-url { overflow-wrap: anywhere; }
+.about-collection { display: none; }
+
+.reading-work .poem-shell { padding-bottom: 0; }
+.poem-page.legacy-reading[data-grid-ready] { min-height: 0; padding-bottom: 0; }
+.poem-page.legacy-reading .grid-canvas { grid-template-columns: repeat(24, minmax(0, 1fr)); }
+.legacy-reading:not([data-grid-ready]) .grid-canvas { grid-template-rows: auto; }
+.legacy-reading:not([data-grid-ready]) .title-frame { grid-column: 1 / 9; margin-top: 1.2rem; }
+.legacy-reading:not([data-grid-ready]) .body-frame { grid-column: 10 / 24; margin-top: 1.2rem; }
+.legacy-reading:not([data-grid-ready]) .poem-meta { display: none; }
+.poem-page.legacy-reading[data-grid-ready] .grid-canvas { display: block; }
+.legacy-reading[data-grid-ready] .title-frame,
+.legacy-reading[data-grid-ready] .body-frame { position: absolute; }
+.legacy-reading .title-frame { min-width: 0; overflow-wrap: anywhere; }
+.poem-page.legacy-reading .poem-title { text-wrap: balance; }
+.poem-page.legacy-reading[data-grid-ready] .poem-title {
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: none;
+}
+.poem-page.legacy-reading .poem-line {
+  font-size: var(--reading-body-size, var(--type-body));
+  line-height: var(--reading-leading, var(--leading-body));
+  min-height: 0;
+  white-space: break-spaces;
+  text-wrap-style: pretty;
+  overflow-wrap: anywhere;
+}
+.poem-page.legacy-reading .poem-stanza,
+.poem-page.legacy-reading .body-frame > .prose-section { margin: 0; }
+.poem-page.legacy-reading .body-frame > .reading-break { margin-bottom: var(--reading-breath); }
+.poem-page.legacy-reading .poem-line--section { color: var(--highlight-text); font-size: calc(var(--reading-body-size, var(--type-body)) - 3px); letter-spacing: .12em; }
+.poem-page.legacy-reading .poem-line--stage { color: var(--highlight-text); font-size: calc(var(--reading-body-size, var(--type-body)) - 2px); }
+.poem-page.legacy-reading .poem-line--accent { color: var(--highlight-text); }
+.legacy-reading .grid-canvas .body-frame { overflow: visible; }
+.legacy-reading .grid-canvas .grid-measure {
+  inset: 0 auto auto 0;
+  position: absolute;
+  visibility: hidden;
+  pointer-events: none;
+}
+.legacy-reading .body-frame[data-reading-spread] { scroll-margin-top: calc(var(--site-nav-height, 56px) + 40px); }
+.legacy-reading .body-frame[data-reading-spread]:focus { outline: none; }
+.legacy-reading .body-frame:is(:target, :focus)::before {
+  content: "·";
+  position: absolute;
+  inset-inline-start: -.8em;
+  color: var(--color-accent);
+}
+.reading-continue {
+  position: absolute;
+  inset-block-start: calc(100% + 2px);
+  inset-inline-end: 0;
+  min-height: 34px;
+  min-width: 34px;
+  display: grid;
+  place-items: center;
+  padding-inline: .4em;
+  font-size: .9em;
+  letter-spacing: .06em;
+  color: var(--color-meta, #595959);
+  text-decoration: none;
+}
+.reading-continue:hover, .reading-continue:focus-visible { color: var(--color-hover); }
+.legacy-reading .prose-paragraph { line-height: var(--reading-leading, var(--leading-body)); overflow-wrap: anywhere; }
+.prose-section { font-size: .82em; font-weight: normal; color: var(--color-accent); margin: 1.8em 0 .85em; }
+.prose-section:first-child { margin-top: 0; }
+.legacy-reading[data-kind="prose"][data-grid-ready] .body-frame > .prose-section {
+  position: relative;
+  align-self: flex-start;
+  height: 0;
+  inset-inline-start: calc(-1 * var(--prose-rail));
+  inset-block-start: calc(var(--reading-breath, 0px) + .25em);
+  color: var(--highlight-text);
+}
+.legacy-reading[data-work="church"][data-grid-ready] .body-frame > .prose-section {
+  align-self: stretch;
+  height: auto;
+  inset: auto;
+  text-align: center;
+}
+.mobile-poem-reader .mobile-poem-line[data-line] { white-space: pre-wrap; overflow-wrap: anywhere; }
+.mobile-poem-reader .mobile-poem-line[data-line]:not([data-composed]) {
+  padding-inline-start: var(--mobile-wrap-indent, .75em);
+  text-indent: calc(-1 * var(--mobile-wrap-indent, .75em));
+}
+.mobile-poem-reader .mobile-poem-line .line-part { display: block; }
+.mobile-poem-reader .mobile-poem-line .line-part + .line-part {
+  padding-inline-start: var(--mobile-wrap-indent, .75em);
+}
+.mobile-poem-reader h1 { overflow-wrap: anywhere; }
+
+@media (min-width: 761px) {
+  .poem-page.legacy-reading.is-paginated { margin-top: calc(-1 * var(--space-xl)); }
+}
+.mobile-poem-reader .mobile-poem-body[data-grid-ready] > :is(.mobile-poem-stanza, .prose-section) {
+  position: relative;
+  margin: 0 0 var(--reading-breath);
+  line-height: var(--reading-leading);
+}
+
+[data-reading-type="book"] { --reader-face: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif; }
+[data-reading-type="lyric"] { --reader-face: Baskerville, "Baskerville Old Face", Georgia, serif; }
+.legacy-reading #title-frame,
+.poem-page.legacy-reading .body-frame,
+.mobile-poem-header h1,
+.mobile-poem-body,
+.manifold figcaption { display: flex; flex-direction: column; }
+.manifold blockquote { font-family: var(--reader-face, Georgia, "Times New Roman", serif); }
+
+.manifold-trigger {
+  position: fixed;
+  top: calc(var(--site-nav-height, 56px) + var(--space-lg, 34px));
+  right: max(var(--margin-x, 24px), 12px);
+  z-index: 150;
+  min-height: 44px;
+  padding: 12px 8px;
+  border: 0;
+  background: none;
+  color: var(--color-meta, #595959);
+  font: inherit;
+  font-size: 19px;
+  line-height: 1.2;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color .18s linear;
+}
+.manifold-trigger:is(:hover, :focus-visible) { color: var(--color-primary); text-decoration: underline wavy var(--highlight-line); text-underline-offset: 4px; }
+.manifold {
+  --manifold-paper: #f5f1e8;
+  --manifold-ink: #211f1c;
+  --manifold-keyword: #36584e;
+  --manifold-hover: #526e5d;
+  --manifold-edge: #689686;
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  box-sizing: border-box;
+  margin: 0;
+  padding: clamp(68px, 8.5dvh, 94px) 0;
+  border: 0;
+  background: var(--manifold-paper);
+  color: var(--manifold-ink);
+  overscroll-behavior: contain;
+}
+.manifold[data-piece="misty-forest"] { --manifold-edge: #f1ebdc; }
+.manifold:is(
+  [data-piece="amer-fort"], [data-piece="kyoto-dusk"], [data-piece="storm-plains"],
+  [data-piece="alpine-dawn"], [data-piece="desert-night"], [data-piece="gangaur-ghat"],
+  [data-piece="jal-mahal"], [data-piece="kite-festival"], [data-piece="lake-pichola"],
+  [data-piece="lava-wall"], [data-piece="marine-drive"], [data-piece="night-highway"],
+  [data-piece="ocean-sunset"], [data-piece="salt-flat"], [data-piece="taj-dawn"],
+  [data-piece="varanasi-ghats"], [data-piece="volcano-night"]
+) {
+  --manifold-keyword: #693b2f;
+  --manifold-hover: #9f4434;
+  --manifold-edge: #ba4b3a;
+}
+.manifold[data-piece="storm-plains"] { --manifold-edge: #9cbeb5; }
+.manifold:is(
+  [data-piece="planet-scale"], [data-piece="night-coast"], [data-piece="snow-train"],
+  [data-piece="aurora-fjord"], [data-piece="black-prism"], [data-piece="command-city"],
+  [data-piece="deep-reef"], [data-piece="earthrise"], [data-piece="edge-orbit"],
+  [data-piece="green-storm"], [data-piece="prism-city"], [data-piece="saturn-rise"], [data-piece="tokyo-rain"]
+) {
+  --manifold-keyword: #49466a;
+  --manifold-hover: #355e62;
+  --manifold-edge: #aed4d2;
+}
+.manifold[data-piece="night-coast"] { --manifold-edge: #16151a; }
+.manifold[data-photo] { --scene-ratio: 1.7; }
+body:has(#poem-page[data-work="platform"]) .manifold { --manifold-edge: #aed4d2; }
+.manifold[open] {
+  display: grid;
+  grid-template: minmax(min-content, 1fr) / minmax(0, 1fr);
+  place-items: center;
+}
+
+.manifold::backdrop { background: transparent; }
+body:has(#manifold[open]) { overflow: hidden; }
+.manifold-exit {
+  position: fixed;
+  inset: 22px var(--margin-x, 24px) auto auto;
+  z-index: 1;
+  margin: 0;
+}
+.manifold-close {
+  min-width: var(--ui-close-size, 44px);
+  min-height: var(--ui-close-size, 44px);
+  border: 0;
+  padding: 0;
+  color: inherit;
+  background: transparent;
+  cursor: pointer;
+  font: normal 52px/1 Georgia, "Times New Roman", serif;
+  transition: color .18s linear, transform .18s linear;
+}
+:is(.manifold-close, .index-close) { transition: color .18s linear, transform .18s linear; }
+:is(.manifold-close, .index-close):hover {
+  color: var(--manifold-hover, var(--highlight-text));
+  transform: rotate(12deg);
+}
+:is(.manifold-close, .index-close):focus-visible {
+  outline: 2px solid var(--manifold-hover, var(--highlight-text));
+  outline-offset: 4px;
+}
+.manifold-center { width: min(954px, 68.4vw, 142dvh); margin: 0; text-align: center; }
+.manifold-plate {
+  position: relative;
+  aspect-ratio: var(--scene-ratio, 2 / 1);
+  overflow: hidden;
+  background: #050505;
+  outline: 1px solid var(--manifold-edge);
+  opacity: 0;
+}
+.manifold[data-scene-ready] .manifold-plate { animation: manifold-enter .52s ease-out both; }
+@keyframes manifold-enter { from { opacity: 0; } to { opacity: 1; } }
+.manifold-plate canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: contain; }
+.manifold-playback {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.manifold-playback:focus-visible { outline: 2px solid white; outline-offset: -4px; }
+.manifold-playback[data-paused]::after {
+  content: "▶";
+  position: absolute;
+  inset: auto .8rem .65rem auto;
+  color: white;
+  font-size: .8rem;
+  text-shadow: 0 1px 4px black;
+}
+.manifold blockquote {
+  order: -1;
+  width: min(100%, 42rem);
+  margin: clamp(1.2rem, 3vw, 2.15rem) auto 0;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  font-size: clamp(.9rem, 1.62vw, 1.152rem);
+  font-weight: 400;
+  color: color-mix(in srgb, var(--manifold-ink) 75%, var(--manifold-paper));
+  line-height: 1.5;
+}
+.manifold-quote-line {
+  display: block;
+  white-space: normal;
+  text-wrap: balance;
+}
+.manifold blockquote:has(.manifold-quote-line) { white-space: normal; }
+.manifold-quote-tail { white-space: nowrap; }
+.manifold-keywords {
+  margin: 1.15rem 0 0;
+  font-size: .88rem;
+  line-height: 1.45;
+  text-box: trim-end text alphabetic;
+  letter-spacing: .09em;
+  color: var(--manifold-keyword);
+}
+.manifold-keywords span { margin-inline: .26em; }
+@media (min-width: 761px) {
+  .manifold blockquote {
+    margin-top: clamp(1.35rem, 3.4vw, 2.45rem);
+    font-size: clamp(.99rem, 1.782vw, 1.2672rem);
+  }
+  .manifold-keywords { margin-top: 1.38rem; font-size: .968rem; }
+}
+@media (max-width: 760px) {
+  :root {
+    --mobile-safe-bottom: env(safe-area-inset-bottom, 0px);
+    --mobile-safe-max-bottom: max(var(--mobile-safe-bottom), env(safe-area-max-inset-bottom, 0px));
+    --mobile-dock-edge: 22px;
+    --mobile-dock-height: 56px;
+    --mobile-index-bottom: calc(28px + var(--mobile-safe-bottom));
+    --mobile-index-size: 46px;
+    --mobile-index-clearance: calc(28px + var(--mobile-safe-max-bottom) + var(--mobile-index-size) + 12px);
+    --mobile-ease: cubic-bezier(.32, .12, .22, 1);
+  }
+  :root, html[data-world="their-world"] {
+    --mobile-highlight: #075e7a;
+    --mobile-signal: #c74727;
+  }
+  html[data-world="bless-you"] {
+    --mobile-highlight: #a33a28;
+    --mobile-signal: #387247;
+  }
+  html[data-world="still-life"] {
+    --mobile-highlight: #18568d;
+    --mobile-signal: #a96c24;
+  }
+  .mobile-poem-reader[data-skin-iwd45nhr] {
+    padding-block: clamp(27px, 8.2vw, 39px)
+      calc(var(--mobile-dock-edge) + var(--mobile-safe-max-bottom) + var(--mobile-dock-height) + 16px);
+  }
+  .mobile-poem-header[data-skin-iwd45nhr] { margin-bottom: clamp(32px, 9vw, 43px); }
+  .mobile-poem-kicker[data-skin-iwd45nhr] { color: var(--mobile-highlight); }
+  .mobile-poem-stanza[data-skin-iwd45nhr] {
+    font-size: var(--mobile-verse-size, clamp(18px, 4.55vw, 21px));
+    line-height: 1.55;
+  }
+  .mobile-poem-body > .mobile-poem-stanza--lineated:first-child > [data-line]:first-child {
+    color: var(--reading-opening, var(--mobile-highlight));
+  }
+  .mobile-poem-line[data-reading-pause] { margin-block-start: 1.35em; }
+  .mobile-poem-body [data-reading-pause]:not(:has(.line-part))::first-letter,
+  .mobile-poem-body [data-reading-pause] > .line-part:first-child::first-letter {
+    color: var(--reading-marker);
+  }
+  .reading-phrase { white-space: nowrap; }
+
+  .about-page.reading-page { padding-top: 0; }
+  .about-intro {
+    box-sizing: border-box;
+    min-height: calc(100svh - var(--site-content-offset));
+    padding-top: clamp(26px, 8vw, 40px);
+  }
+  .about-page .reading-header { padding-bottom: 22px; margin-bottom: 21px; }
+  .about-page .reading-meta { color: var(--highlight-blue-text); }
+  .about-page .about-detail { display: none; }
+  .about-group p { font-size: var(--type-body); line-height: 1.56; }
+  .about-group[aria-label="Biography"] p { text-wrap: pretty; }
+  .about-links a:nth-child(1) { --link-underline: var(--highlight-blue); }
+  .about-links a:nth-child(2) { --link-underline: var(--highlight-orange); }
+  .about-links a:nth-child(3) { --link-underline: #387247; }
+  .about-links a { text-decoration-color: var(--link-underline); text-decoration-thickness: 2px; }
+  .about-links a:is(:hover, :focus-visible) { color: var(--link-underline); }
+  .about-group + .about-group { padding-top: clamp(12px, 11vw - 23px, 20px); }
+  .about-group[aria-labelledby="about-links"] {
+    margin-top: min(clamp(0px, 50vw - 184px, 20px), clamp(0px, (100svh - 760px) / 4, 20px));
+  }
+  .about-groups { gap: clamp(13px, 12vw - 25px, 22px); }
+  .about-record { display: none; }
+  .about-collection {
+    display: block;
+    border-top: 1px solid color-mix(in srgb, var(--color-primary) 13%, transparent);
+    padding-top: clamp(26px, 8vw, 40px);
+  }
+
+  body:has(.mobile-index-float) .site-copyright { display: none; }
+  body:has(.mobile-index-float) :is(.reading-page, .world-index) {
+    padding-bottom: var(--mobile-index-clearance);
+  }
+  .mobile-index-float[data-mobile-site-index-open] {
+    bottom: var(--mobile-index-bottom);
+    width: var(--mobile-index-size);
+    height: var(--mobile-index-size);
+    min-height: var(--mobile-index-size);
+    justify-content: center;
+    padding: 0;
+    border: 1px solid var(--mobile-highlight);
+    border-radius: 50%;
+    background: var(--color-bg);
+    color: var(--mobile-highlight);
+    box-shadow: none;
+    transition: color .26s var(--mobile-ease);
+  }
+  .mobile-index-float[data-mobile-site-index-open]:is(:hover, :focus-visible) { color: var(--mobile-signal); }
+  .mobile-poem-dock[data-skin-htlfczsh] {
+    bottom: calc(var(--mobile-dock-edge) + var(--mobile-safe-bottom));
+    min-height: var(--mobile-dock-height);
+    box-sizing: border-box;
+  }
+  .mobile-poem-dock .mobile-dock-button:is([data-manifold-open], [data-mobile-open="index"]) {
+    color: var(--mobile-highlight);
+  }
+  :is(.mobile-poem-dock, .mobile-sheet, .mobile-index-sheet)[data-skin-htlfczsh],
+  .mobile-index-sheet[data-skin-ewxlwce5] { --mobile-index-green: var(--mobile-highlight); }
+  :is(.mobile-sheet, .mobile-index-sheet):is([data-mobile-sheet], [data-mobile-site-index]) {
+    visibility: hidden;
+    transition: opacity .36s var(--mobile-ease), background-color .36s var(--mobile-ease), visibility 0s linear .36s;
+  }
+  :is(.mobile-sheet, .mobile-index-sheet):is([data-mobile-sheet], [data-mobile-site-index]).is-open {
+    visibility: visible;
+    transition-delay: 0s;
+  }
+  :is(.mobile-sheet, .mobile-index-sheet) > :is(.mobile-sheet-panel, .mobile-index-panel) {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding-block: 13px 0;
+    padding-inline: clamp(12px, 9vw - 13px, 22px);
+    border-radius: 8px;
+    background: var(--color-bg);
+    box-shadow: none;
+    transform: translateY(9px);
+    transition: transform .42s var(--mobile-ease);
+  }
+  :is(.mobile-sheet, .mobile-index-sheet).is-open > :is(.mobile-sheet-panel, .mobile-index-panel) {
+    transform: translateY(0);
+  }
+  :is(.mobile-sheet-panel, .mobile-index-panel) > :is(.mobile-sheet-header, .mobile-index-header) {
+    position: relative;
+    inset: auto;
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    margin: 0;
+    padding-top: 0;
+    flex: none;
+    background: var(--color-bg);
+    box-shadow: none;
+  }
+  .mobile-sheet-header[data-skin-htlfczsh] h2[data-skin-htlfczsh],
+  .mobile-index-header[data-skin-ewxlwce5] h2[data-skin-ewxlwce5] {
+    color: var(--highlight-blue-text);
+    font-size: .82rem;
+    line-height: 1.2;
+    letter-spacing: .12em;
+  }
+  :is(.mobile-sheet-panel, .mobile-index-panel) > [role="tabpanel"] {
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    padding-block-end: 14px;
+  }
+  :is(.mobile-world-tabs, .mobile-index-tabs):is([data-skin-htlfczsh], [data-skin-ewxlwce5]) {
+    display: flex;
+    align-items: baseline;
+    flex: none;
+    justify-content: space-between;
+    gap: clamp(.35rem, 1.7vw, .9rem);
+    overflow: visible;
+  }
+  :is(.mobile-world-tabs, .mobile-index-tabs) > :is(.mobile-world-tab, .mobile-index-tab) {
+    position: relative;
+    flex: 0 0 auto;
+    min-height: 44px;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: #68655f;
+    text-align: start;
+    white-space: nowrap;
+    font-size: clamp(.85rem, 4.1vw, 1.12rem);
+    line-height: 1.08;
+    transition: color .14s linear;
+  }
+  :is(.mobile-world-tabs, .mobile-index-tabs) > :is(.mobile-world-tab, .mobile-index-tab).is-active {
+    z-index: 1;
+    background: transparent;
+    color: var(--color-primary);
+    font-size: clamp(1.22rem, 11vw - 13px, 2rem);
+  }
+  :is(.mobile-sheet-close, .mobile-index-close)[aria-label] {
+    top: 0;
+    right: -7px;
+    font: normal 40px/1 Georgia, "Times New Roman", serif;
+    transition: color .26s var(--mobile-ease);
+  }
+  :is(.mobile-sheet-close, .mobile-index-close)[aria-label]:is(:hover, :focus-visible) {
+    color: var(--mobile-signal);
+  }
+
+  .manifold-trigger { display: none; }
+  .manifold[open] {
+    grid-template-rows: minmax(16px, 2fr) auto minmax(18px, 1fr) auto minmax(18px, 1fr);
+    padding-block: calc(env(safe-area-inset-top) + clamp(0px, 24dvh - 100px, 70px))
+      env(safe-area-inset-bottom);
+  }
+  .manifold-center { grid-row: 2; width: min(87vw, 142dvh); }
+  .manifold-plate { aspect-ratio: 1.7; }
+  .manifold-plate canvas { object-fit: cover; }
+  .manifold[data-painting] .manifold-plate { aspect-ratio: var(--scene-ratio, 2 / 1); }
+  .manifold-exit { position: static; grid-row: 4; }
+  .manifold-close { width: 44px; height: 44px; font-size: 43px; }
+  .manifold-keywords { margin-top: 1.26rem; }
+  .manifold blockquote { order: 0; margin-top: 1.32rem; }
+  .manifold[data-scene-ready] .manifold-plate {
+    animation-duration: .6s;
+    animation-timing-function: var(--mobile-ease);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .manifold[data-scene-ready] .manifold-plate { animation: none; opacity: 1; }
+  :is(.index-overlay, .index-overlay.is-open, .world-panel, .world-panel.is-shown,
+      .world-tab, .index-overlay .poem-title,
+      .mobile-sheet[data-mobile-sheet], .mobile-index-sheet[data-mobile-site-index],
+      .mobile-sheet[data-mobile-sheet].is-open, .mobile-index-sheet[data-mobile-site-index].is-open,
+      .mobile-sheet > .mobile-sheet-panel, .mobile-index-sheet > .mobile-index-panel,
+      .mobile-world-tabs > .mobile-world-tab, .mobile-index-tabs > .mobile-index-tab,
+      .manifold-close, .index-close) { transition: none; }
+  :is(.manifold-close, .index-close):hover { transform: none; }
+  .world-switcher::after { transition: none; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html[data-reading-turn] { view-transition-name: none; }
+  html[data-reading-turn] :is(.poem-page.legacy-reading, .mobile-poem-reader) { view-transition-name: reading; }
+  html[data-reading-turn="next"] { --reading-travel: 10px; }
+  html[data-reading-turn="prev"] { --reading-travel: -10px; }
+  html[data-reading-turn]::view-transition {
+    clip-path: inset(var(--site-nav-height, 56px) 0 0);
+    pointer-events: none;
+  }
+  ::view-transition-group(reading) { animation: none; }
+  ::view-transition-image-pair(reading) { isolation: auto; }
+  ::view-transition-old(reading), ::view-transition-new(reading) { mix-blend-mode: normal; }
+  ::view-transition-old(reading) { animation: reading-out .64s cubic-bezier(.3,.02,.3,1) both; }
+  ::view-transition-new(reading) { animation: reading-in .64s cubic-bezier(.3,.02,.3,1) both; }
+}
+@keyframes reading-out {
+  from { opacity: 1; translate: 0; }
+  28% { opacity: .94; }
+  to { opacity: 0; translate: calc(-1 * var(--reading-travel, 10px)); }
+}
+@keyframes reading-in {
+  from { opacity: 0; translate: var(--reading-travel, 10px); }
+  to { opacity: 1; translate: 0; }
+}
