@@ -1,5 +1,9 @@
 # daipan.ink
 
+[![Read Three Worlds](https://img.shields.io/badge/Read-daipan.ink-285e72?style=flat-square)](https://daipan.ink/)
+[![Rust](https://img.shields.io/badge/Rust-2024-b2492e?style=flat-square&logo=rust&logoColor=white)](https://www.rust-lang.org/)
+[![WebAssembly](https://img.shields.io/badge/WebAssembly-reader-526353?style=flat-square&logo=webassembly&logoColor=white)](https://webassembly.org/)
+
 Three Worlds by Dai Pan. The Rust compiler renders the publication to static files, and Rust WASM runs the reading grid, navigation and overlays in the browser.
 
 ## Technology
