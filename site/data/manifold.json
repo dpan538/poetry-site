@@ -1,0 +1,832 @@
+{
+  "bless-you/a-new-york-home": {
+    "piece": "yellow-screen",
+    "description": "A rectangular yellow light brightens and fades behind a house at dusk.",
+    "excerpt": "This is an invisible home.\nIn the city, it stands briefly,",
+    "keywords": [
+      "invisible",
+      "home",
+      "dwelling"
+    ]
+  },
+  "bless-you/behind-my-mind": {
+    "description": "Aurora curtains rippling over a still fjord, a cabin lit on the shore.",
+    "excerpt": "Still, you wave from where you stand,\nYour eyes fixed past me, their light no longer gleams.",
+    "keywords": [
+      "gleams",
+      "wave",
+      "clouded"
+    ],
+    "piece": "aurora-fjord"
+  },
+  "bless-you/beloved": {
+    "piece": "heart-flare",
+    "description": "A golden silhouette, with a point of light at the heart that blooms and recedes.",
+    "excerpt": "The lingering love,\nflowing endlessly where hope slowly descends.",
+    "keywords": [
+      "flower",
+      "sunset-tinged",
+      "petals"
+    ]
+  },
+  "bless-you/crown-antiques": {
+    "description": "Mumbai's queen's necklace at night, lamps curving round the bay.",
+    "excerpt": "Crown Antiques,\nAt 1018 Fifth Ave,",
+    "keywords": [
+      "antiques",
+      "crown",
+      "glass"
+    ],
+    "piece": "marine-drive"
+  },
+  "bless-you/cube": {
+    "description": "The vercel triangle as a glass prism, splitting white light to a rainbow.",
+    "excerpt": "Your faltering faith.\nYou preach self-sacrifice, for others to change to triangles.",
+    "keywords": [
+      "triangles",
+      "self-sacrifice",
+      "faith"
+    ],
+    "piece": "black-prism"
+  },
+  "bless-you/dancing-children": {
+    "description": "Dusk aarti on the ganga, lamps on the steps and diyas on the water.",
+    "excerpt": "Squares, tiles, branches, broken leaves,\nDancing between lines,",
+    "keywords": [
+      "leaves",
+      "dusk",
+      "tiles"
+    ],
+    "piece": "varanasi-ghats"
+  },
+  "bless-you/drowned-spirit": {
+    "description": "Sky lanterns rising over a still mountain lake, one let go from a boat.",
+    "excerpt": "At the bottom of the river, you,\nWere replaced by someone's spirit.",
+    "keywords": [
+      "river",
+      "spirit",
+      "drowned"
+    ],
+    "piece": "lantern-lake"
+  },
+  "bless-you/ears": {
+    "description": "A tokyo side street in the rain, neon signs shining on the wet road.",
+    "excerpt": "Skin brushing against plastic, then the luminous floor,\nGray spots pulsing, dancing along familiar streets, across length.",
+    "keywords": [
+      "streets",
+      "luminous",
+      "pulsing"
+    ],
+    "piece": "tokyo-rain"
+  },
+  "bless-you/feet": {
+    "description": "Snow peaks catching first light above a still, misty mountain lake.",
+    "excerpt": "Replacing street lights' gleam,\nIn bridge tunnels where snow convince.",
+    "keywords": [
+      "snow",
+      "lights",
+      "gleam"
+    ],
+    "piece": "alpine-dawn"
+  },
+  "bless-you/flying-away": {
+    "description": "The sun sinks into a drifting sea of orange cloud at dusk.",
+    "excerpt": "While we remain, on earth by day and night,",
+    "keywords": [
+      "sunlight",
+      "night",
+      "earth"
+    ],
+    "piece": "cloud-sea"
+  },
+  "bless-you/gentleness": {
+    "description": "Dusk aarti on the ganga, lamps on the steps and diyas on the water.",
+    "excerpt": "A gentle breeze comes softly, brushing past my ears,\nIt brings sunlight, filtering through my eyes.",
+    "keywords": [
+      "sunlight",
+      "breeze",
+      "wind"
+    ],
+    "piece": "varanasi-ghats"
+  },
+  "bless-you/how": {
+    "description": "Sunset on lake pichola, udaipur's palaces glowing over the water.",
+    "excerpt": "The heart's pulse, emotions flowing,\nWatching sunlight reflect on waves.",
+    "keywords": [
+      "sunlight",
+      "sunshine",
+      "waves"
+    ],
+    "piece": "lake-pichola"
+  },
+  "bless-you/in-the-sunlight": {
+    "description": "The earth rising over a cratered lunar horizon in long low sunlight.",
+    "excerpt": "Awaiting sunlight's touch, where children stay and play.\nShadows retreat as moments hold their way,",
+    "keywords": [
+      "sunlight",
+      "shadows",
+      "retreat"
+    ],
+    "piece": "earthrise"
+  },
+  "bless-you/kite": {
+    "description": "Pine ridges fading into morning fog, sunbeams slanting through.",
+    "excerpt": "Your figure shows then fade,\nDuring the night.",
+    "keywords": [
+      "fade",
+      "night",
+      "shadow"
+    ],
+    "piece": "misty-forest"
+  },
+  "bless-you/milk-cow-cat": {
+    "description": "The sun sets past a pine headland, lit cloud, glitter on rolling sea.",
+    "excerpt": "Is it the wild wind that whispers verse and rhyme,\nOr earth's rich soil that clothes you through all time?",
+    "keywords": [
+      "rhyme",
+      "verse",
+      "wind"
+    ],
+    "piece": "ocean-sunset"
+  },
+  "bless-you/missing": {
+    "description": "Saturn and its rings hanging over the cracked ice and geysers of a moon.",
+    "excerpt": "Round domes, Roman style,\nSurrounded by rock, infused with faith,",
+    "keywords": [
+      "domes",
+      "rock",
+      "roman"
+    ],
+    "piece": "saturn-rise"
+  },
+  "bless-you/perplexity": {
+    "piece": "mount-corcoran",
+    "description": "A forest-green lake and narrow waterfall lie under jagged snowy mountains and high clouds.",
+    "excerpt": "Telling children tales of skies up high to the hill.\n\"Will I become a cloud when I am gone?\"",
+    "keywords": [
+      "skies",
+      "clouds",
+      "tales"
+    ]
+  },
+  "bless-you/river": {
+    "description": "The taj mahal at sunrise, mirrored in its pool through morning haze.",
+    "excerpt": "Within the pen, You are ever mine.\nDream a diver, on a noiseless land,",
+    "keywords": [
+      "diver",
+      "dream",
+      "pen"
+    ],
+    "piece": "taj-dawn"
+  },
+  "bless-you/silver-tipped-shoes": {
+    "description": "A thunderstorm at sea, the lightning striking in the supabase bolt.",
+    "excerpt": "Silver-tipped shoes, shiny and bright,\nCatch my eyes with their gleaming light.",
+    "keywords": [
+      "shoes",
+      "gleaming",
+      "silver-tipped"
+    ],
+    "piece": "green-storm"
+  },
+  "bless-you/symphony": {
+    "piece": "moonlit-bridge",
+    "description": "Moonlight glints on a quiet river below a stone bridge, between shadowed trees and distant houses.",
+    "excerpt": "Walking through the night,\nListening to symphonies played by moonlight.",
+    "keywords": [
+      "moonlight",
+      "night",
+      "darkness"
+    ]
+  },
+  "bless-you/telecine": {
+    "piece": "salt-flat",
+    "description": "The vercel triangle over a mirror of salt, the sun rising behind its tip.",
+    "excerpt": "Unable to pick up flowers and wine,\nThe pen I put down now turns into your food.",
+    "keywords": [
+      "desert",
+      "thinking",
+      "farewell"
+    ]
+  },
+  "bless-you/the-absurd": {
+    "description": "The sun sets past a pine headland, lit cloud, glitter on rolling sea.",
+    "excerpt": "Dancing, she dances, is the absurd, the absurd and more,\nLike clouds your polished mind changes shape forevermore.",
+    "keywords": [
+      "clouds",
+      "dances",
+      "dancing"
+    ],
+    "piece": "ocean-sunset"
+  },
+  "bless-you/the-only": {
+    "description": "A wall of lava lamps under the glowing orange cloud, watched by a camera.",
+    "excerpt": "It is the distant light on the edge of the building,\nSomething we can only imagine but don't know the name of,",
+    "keywords": [
+      "light",
+      "clouds",
+      "sun"
+    ],
+    "piece": "lava-wall"
+  },
+  "bless-you/today": {
+    "description": "Light shafts, swaying kelp and a turning school of fish over a reef.",
+    "excerpt": "While shrimp floats in the sink below,\njust a fork needed till dawn's light is thrown.",
+    "keywords": [
+      "shrimp",
+      "floats",
+      "sink"
+    ],
+    "piece": "deep-reef"
+  },
+  "bless-you/traces-of-healing": {
+    "piece": "deep-reef",
+    "description": "Light shafts, swaying kelp and a turning school of fish over a reef.",
+    "excerpt": "I see what little green remains, dwells,\nLingering between the broken steps of the church,",
+    "keywords": [
+      "church",
+      "dwells",
+      "remains"
+    ]
+  },
+  "bless-you/unworthy": {
+    "description": "Amer fort floodlit gold on its hill, mirrored in maota lake at night.",
+    "excerpt": "My worth and my value—how would I be aware?",
+    "keywords": [
+      "value",
+      "worth",
+      "valued"
+    ],
+    "piece": "amer-fort"
+  },
+  "bless-you/wandering": {
+    "description": "The vercel triangle over a mirror of salt, the sun rising behind its tip.",
+    "excerpt": "In silent rooms where words remain spoken,\nThe kitten bites the mouse, hunger awoken.",
+    "keywords": [
+      "awoken",
+      "kitten",
+      "hunger"
+    ],
+    "piece": "salt-flat"
+  },
+  "bless-you/young-blood": {
+    "description": "A volcano erupting at night, lava rivers, an ash plume full of lightning.",
+    "excerpt": "To be infused by your stale demands, decayed,\nInto the blood of the young, to keep outdated ideologies burning,",
+    "keywords": [
+      "burning",
+      "ideologies",
+      "blood"
+    ],
+    "piece": "volcano-night"
+  },
+  "still-life/a-flowing-song": {
+    "description": "The milky way over a lone acacia on moonless dunes, meteors falling.",
+    "excerpt": "Rain and people were both tangled in the moon.\nI don’t understand,",
+    "keywords": [
+      "moon",
+      "rain",
+      "earth"
+    ],
+    "piece": "desert-night"
+  },
+  "still-life/after-snow": {
+    "description": "Pine ridges fading into morning fog, sunbeams slanting through.",
+    "excerpt": "Cotton filling in the quilt trash can,\nAnd snow beyond the window's frosted pane.",
+    "keywords": [
+      "snow",
+      "frosted",
+      "cotton"
+    ],
+    "piece": "misty-forest"
+  },
+  "still-life/afternoon-nap": {
+    "description": "Udaipur at night, a lit gateway on lake pichola and diyas on the water.",
+    "excerpt": "A few hours, or perhaps until dusk,\nI woke to the aroma of dinner,",
+    "keywords": [
+      "dusk",
+      "woke",
+      "naps"
+    ],
+    "piece": "gangaur-ghat"
+  },
+  "still-life/black-paint": {
+    "description": "The vercel triangle as a glass prism, splitting white light to a rainbow.",
+    "excerpt": "Yet the shadow between mask and body remains covered,\nWhich is called white in meaning,",
+    "keywords": [
+      "mask",
+      "shadow",
+      "whiteness"
+    ],
+    "piece": "black-prism"
+  },
+  "still-life/boring-clouds": {
+    "description": "The sun sets past a pine headland, lit cloud, glitter on rolling sea.",
+    "excerpt": "Clouds drift overhead, laden with boredom,",
+    "keywords": [
+      "clouds",
+      "boredom",
+      "drift"
+    ],
+    "piece": "ocean-sunset"
+  },
+  "still-life/breathe-away": {
+    "description": "A black spire and an orange cloud over a blue hour city and its river.",
+    "excerpt": "Watching footsteps beyond the wall.\nWhite goose rise with wings spread wild,",
+    "keywords": [
+      "goose",
+      "wings",
+      "birds"
+    ],
+    "piece": "prism-city"
+  },
+  "still-life/church": {
+    "piece": "winter-church",
+    "description": "A white chapel under a blue sky as the grass gives way to snow.",
+    "excerpt": "Sunlight shouldn’t exist here; my mind seemed increasingly sluggish. My gaze lingered on the faintly emerging statue at the end of the church, a grayish-white silhouette.",
+    "keywords": [
+      "sunlight",
+      "church",
+      "gaze"
+    ]
+  },
+  "still-life/coin": {
+    "description": "The sun sinks into a drifting sea of orange cloud at dusk.",
+    "excerpt": "Consciousness slips past sunlight and smile,\nI gaze upon your face,",
+    "keywords": [
+      "sunlight",
+      "consciousness",
+      "gaze"
+    ],
+    "piece": "cloud-sea"
+  },
+  "still-life/dusk": {
+    "piece": "misty-forest",
+    "description": "Pine ridges fading into morning fog, sunbeams slanting through.",
+    "excerpt": "Wrapped in azure shadows after sunset.\nIn that fleeting moment,",
+    "keywords": [
+      "shadows",
+      "sunset",
+      "grasses"
+    ]
+  },
+  "still-life/early-spring": {
+    "description": "Light shafts, swaying kelp and a turning school of fish over a reef.",
+    "excerpt": "Like a greeting card printed in gray dust,\nplaying on the shelves, faded yet stayed.",
+    "keywords": [
+      "faded",
+      "card",
+      "shelves"
+    ],
+    "piece": "deep-reef"
+  },
+  "still-life/feather": {
+    "description": "The earth rising over a cratered lunar horizon in long low sunlight.",
+    "excerpt": "White feathers descend from the sky.\nI know they will soon change,",
+    "keywords": [
+      "feathers",
+      "descend",
+      "sky"
+    ],
+    "piece": "earthrise"
+  },
+  "still-life/ghost": {
+    "description": "A dark planet cut into the planetscale mark, backlit, a moon circling.",
+    "excerpt": "The prairie, sky, or face in disrepair?\nFinally, eyes dissolved in darkness' snare, reveal.",
+    "keywords": [
+      "darkness",
+      "sky",
+      "sun"
+    ],
+    "piece": "planet-scale"
+  },
+  "still-life/green-tea": {
+    "description": "The taj mahal at sunrise, mirrored in its pool through morning haze.",
+    "excerpt": "I had been eating breakfast for half an hour.\nI nodded, then made myself a cup of hot tea,",
+    "keywords": [
+      "breakfast",
+      "tea",
+      "morning"
+    ],
+    "piece": "taj-dawn"
+  },
+  "still-life/how-to-use-an-edible-tomato": {
+    "description": "The vercel triangle over a mirror of salt, the sun rising behind its tip.",
+    "excerpt": "For a finer texture, score a cross on top, scald it briefly in hot water, then move it to cold and peel. Once the skin falls away, the tomato looks quieter, treated gently by the world.",
+    "keywords": [
+      "tomato",
+      "tomatoes",
+      "peel"
+    ],
+    "piece": "salt-flat"
+  },
+  "still-life/iron-nails": {
+    "description": "A pagoda at dusk behind a cherry tree lit by a stone lantern.",
+    "excerpt": "Trees jutting at angles, green palms nestled between buildings,",
+    "keywords": [
+      "trees",
+      "buildings",
+      "palms"
+    ],
+    "piece": "kyoto-dusk"
+  },
+  "still-life/just-a-sign": {
+    "description": "A tokyo side street in the rain, neon signs shining on the wet road.",
+    "excerpt": "Fading in the sunlight,\nWashed away in the rain.",
+    "keywords": [
+      "fading",
+      "rain",
+      "sunlight"
+    ],
+    "piece": "tokyo-rain"
+  },
+  "still-life/night-light": {
+    "description": "A lighthouse turning its beam under moonlit clouds over a dark sea.",
+    "excerpt": "Like a jellyfish drifting through deep sea waters,\nOr some self-illuminating creature unnamed,",
+    "keywords": [
+      "self-illuminating",
+      "sea",
+      "jellyfish"
+    ],
+    "piece": "night-coast"
+  },
+  "still-life/photo": {
+    "description": "A desert highway at dusk, rushing toward the mountains and last light.",
+    "excerpt": "weeping in the sunny day, where\nwatching distant valleys and trains",
+    "keywords": [
+      "valleys",
+      "weeping",
+      "sunny"
+    ],
+    "piece": "night-highway"
+  },
+  "still-life/platform": {
+    "description": "Dusk aarti on the ganga, lamps on the steps and diyas on the water.",
+    "excerpt": "Midnight blue, Peter River, lightest and mair;\nMoon blurs softly, impressions, beyond aware.",
+    "keywords": [
+      "moon",
+      "river",
+      "midnight"
+    ],
+    "piece": "varanasi-ghats"
+  },
+  "still-life/roaring": {
+    "description": "A volcano erupting at night, lava rivers, an ash plume full of lightning.",
+    "excerpt": "Roaring, sneezing, sobbing.",
+    "keywords": [
+      "roaring",
+      "sobbing",
+      "sneezing"
+    ],
+    "piece": "volcano-night"
+  },
+  "still-life/sleeping-in": {
+    "description": "A lit train crossing a snowy stone viaduct at night as snow falls.",
+    "excerpt": "In lethargy all seems asleep.\nThe train dormant at its station,",
+    "keywords": [
+      "train",
+      "station",
+      "asleep"
+    ],
+    "piece": "snow-train"
+  },
+  "still-life/snowy-county": {
+    "description": "Snow peaks catching first light above a still, misty mountain lake.",
+    "excerpt": "As I walk past, it is white, snowy.\nInto every corner of sight,",
+    "keywords": [
+      "snowy",
+      "snow",
+      "mountains"
+    ],
+    "piece": "alpine-dawn"
+  },
+  "still-life/stone-frog": {
+    "description": "Sky lanterns rising over a still mountain lake, one let go from a boat.",
+    "excerpt": "Following the patterns in books, seeking dreams.\nUntil my tears stopped the smile,",
+    "keywords": [
+      "dreams",
+      "tears",
+      "journey"
+    ],
+    "piece": "lantern-lake"
+  },
+  "still-life/thermos": {
+    "description": "Saturn and its rings hanging over the cracked ice and geysers of a moon.",
+    "excerpt": "Although I cannot merge into your world, I stand on the table,\nMy hard metal interior encased in the exterior, in white.",
+    "keywords": [
+      "encased",
+      "exterior",
+      "interior"
+    ],
+    "piece": "saturn-rise"
+  },
+  "still-life/third-three": {
+    "description": "The night earth from orbit, cloudflare requests arcing city to city.",
+    "excerpt": "While three souls share one dwelling,\nIt’s the third year in New York City,",
+    "keywords": [
+      "third",
+      "three",
+      "prophecy"
+    ],
+    "piece": "edge-orbit"
+  },
+  "still-life/tourist": {
+    "description": "An anvil thunderhead at dusk flickering over a wheat field.",
+    "excerpt": "Pointing to five in the afternoon. Sunlight through the leaves like strung pearls,\nFlickering with the yellow-green light of fireflies, I carry my luggage,",
+    "keywords": [
+      "fireflies",
+      "sunlight",
+      "leaves"
+    ],
+    "piece": "storm-plains"
+  },
+  "still-life/urban-monologue": {
+    "description": "A night city whose boulevards trace the command key in streetlight.",
+    "excerpt": "Red, green, yellow, realities we fail to name,\nColors of signals guiding us through streets the same.",
+    "keywords": [
+      "streets",
+      "urban",
+      "colors"
+    ],
+    "piece": "command-city"
+  },
+  "still-life/waiting-in-line-in-a-dream": {
+    "description": "Mumbai's queen's necklace at night, lamps curving round the bay.",
+    "excerpt": "A twenty-two-year-old man waiting in line in a dream should not, first of all, ask himself where the line leads. That is a question an awake person would ask.",
+    "keywords": [
+      "dream",
+      "line",
+      "awake"
+    ],
+    "piece": "marine-drive"
+  },
+  "still-life/washing": {
+    "description": "The jaipur water palace floating on a misty lake at sunrise.",
+    "excerpt": "At five, I get up from the boat, washing;\nSeven, washing, waking up, washing.",
+    "keywords": [
+      "waking",
+      "boat",
+      "washing"
+    ],
+    "piece": "jal-mahal"
+  },
+  "still-life/winter": {
+    "description": "The sun sets past a pine headland, lit cloud, glitter on rolling sea.",
+    "excerpt": "Together on grass, beneath the snow.\nMissing you and summer's gentle glow,",
+    "keywords": [
+      "sunset",
+      "snow",
+      "grass"
+    ],
+    "piece": "ocean-sunset"
+  },
+  "still-life/yellow": {
+    "description": "Sunset on lake pichola, udaipur's palaces glowing over the water.",
+    "excerpt": "Looking back, I see birds by the water,\nIn the ripples, in the park.",
+    "keywords": [
+      "sunset",
+      "sun",
+      "birds"
+    ],
+    "piece": "lake-pichola"
+  },
+  "their-world/breakfast": {
+    "description": "Light shafts, swaying kelp and a turning school of fish over a reef.",
+    "excerpt": "Seagulls perch on the terrace, watching, waiting.\nOn the plate, yellow eggs, green avocados,",
+    "keywords": [
+      "seagulls",
+      "perch",
+      "eggs"
+    ],
+    "piece": "deep-reef"
+  },
+  "their-world/candle": {
+    "description": "A lighthouse turning its beam under moonlit clouds over a dark sea.",
+    "excerpt": "Candle bright, I cannot hear,\nFriends for him should not appear.",
+    "keywords": [
+      "candle",
+      "moonlight",
+      "bright"
+    ],
+    "piece": "night-coast"
+  },
+  "their-world/cottage": {
+    "description": "Aurora curtains rippling over a still fjord, a cabin lit on the shore.",
+    "excerpt": "I tell grandfather it's time to sleep.\nHe strokes my head. Tell me,",
+    "keywords": [
+      "sleep",
+      "grandfather",
+      "asleep"
+    ],
+    "piece": "aurora-fjord"
+  },
+  "their-world/end-for-the-end": {
+    "description": "The sun sets past a pine headland, lit cloud, glitter on rolling sea.",
+    "excerpt": "Hearing the heartbeat, an echo in the vein,\nGlass of gloomy night, stranded on the milky shoal, in sweet,",
+    "keywords": [
+      "gloomy",
+      "milky",
+      "sun"
+    ],
+    "piece": "ocean-sunset"
+  },
+  "their-world/farewell": {
+    "description": "A desert highway at dusk, rushing toward the mountains and last light.",
+    "excerpt": "Confined beneath this vast sky,\nI, therefore, should begin to say goodbye.",
+    "keywords": [
+      "goodbye",
+      "farewells",
+      "journey"
+    ],
+    "piece": "night-highway"
+  },
+  "their-world/going-home": {
+    "description": "The milky way over a lone acacia on moonless dunes, meteors falling.",
+    "excerpt": "They seem to stand in the forest,\nWatching me go home, go to school,",
+    "keywords": [
+      "forest",
+      "trees",
+      "fallen"
+    ],
+    "piece": "desert-night"
+  },
+  "their-world/hope": {
+    "description": "Sky lanterns rising over a still mountain lake, one let go from a boat.",
+    "excerpt": "Angels with shining wings light up the sky.\nYou hear the whispers, you see the tears.",
+    "keywords": [
+      "angels",
+      "spirits",
+      "sky"
+    ],
+    "piece": "lantern-lake"
+  },
+  "their-world/join-us": {
+    "description": "A tokyo side street in the rain, neon signs shining on the wet road.",
+    "excerpt": "You will see, on street billboards,",
+    "keywords": [
+      "billboards",
+      "street",
+      "see"
+    ],
+    "piece": "tokyo-rain"
+  },
+  "their-world/manifesto": {
+    "description": "The vercel triangle as a glass prism, splitting white light to a rainbow.",
+    "excerpt": "The firelight illuminates you and my face, just quietly watching,\nThen chaos occurs in everything that happens,",
+    "keywords": [
+      "illuminates",
+      "firelight",
+      "light"
+    ],
+    "piece": "black-prism"
+  },
+  "their-world/pockets": {
+    "description": "A dark planet cut into the planetscale mark, backlit, a moon circling.",
+    "excerpt": "Small birds being caught, tight, hold,\nStuffing all the beauty before sunset, into pockets.",
+    "keywords": [
+      "sunset",
+      "birds",
+      "pockets"
+    ],
+    "piece": "planet-scale"
+  },
+  "their-world/private-sky": {
+    "description": "A thunderstorm at sea, the lightning striking in the supabase bolt.",
+    "excerpt": "Standing there, watching the running clouds",
+    "keywords": [
+      "clouds",
+      "standing",
+      "sky"
+    ],
+    "piece": "green-storm"
+  },
+  "their-world/room": {
+    "description": "A night city whose boulevards trace the command key in streetlight.",
+    "excerpt": "Idle soul, drifting without purpose,\nBarren rooms, no spirits to share this life.",
+    "keywords": [
+      "spirits",
+      "rooms",
+      "streets"
+    ],
+    "piece": "command-city"
+  },
+  "their-world/shadow": {
+    "description": "Mumbai's queen's necklace at night, lamps curving round the bay.",
+    "excerpt": "The shadows just stood by my bed, unwavering in purpose.\nThey formed a circle around me, a tight circle.",
+    "keywords": [
+      "shadows",
+      "ghosts",
+      "darkness"
+    ],
+    "piece": "marine-drive"
+  },
+  "their-world/side": {
+    "description": "Sunset on lake pichola, udaipur's palaces glowing over the water.",
+    "excerpt": "Joy from the end of time, so beautiful,\nJoin us, come to the new world.",
+    "keywords": [
+      "joy",
+      "world",
+      "beautiful"
+    ],
+    "piece": "lake-pichola"
+  },
+  "their-world/siren": {
+    "description": "A volcano erupting at night, lava rivers, an ash plume full of lightning.",
+    "excerpt": "I feel the outdoors, from the dark,\nThe wind carrying children's dreams, echoes, happiness.",
+    "keywords": [
+      "echoes",
+      "sirens",
+      "dreams"
+    ],
+    "piece": "volcano-night"
+  },
+  "their-world/synesthesia": {
+    "description": "Dusk aarti on the ganga, lamps on the steps and diyas on the water.",
+    "excerpt": "Where do nature’s wandering flavors go?\nRice cake, salt pork, sliced fish face in a line,",
+    "keywords": [
+      "tastings",
+      "flavors",
+      "tongues"
+    ],
+    "piece": "varanasi-ghats"
+  },
+  "their-world/the-age-of-secrets": {
+    "description": "The night earth from orbit, cloudflare requests arcing city to city.",
+    "excerpt": "In daylight hours filled with tales unplanned,\nLeaving us to question if human, we still stand.",
+    "keywords": [
+      "daylight",
+      "earth",
+      "tales"
+    ],
+    "piece": "edge-orbit"
+  },
+  "their-world/the-barn": {
+    "piece": "wivenhoe-park",
+    "description": "Grazing cattle, a wooden fence and a distant brick house sit beside a lake under summer clouds.",
+    "excerpt": "Hear maturity calling on the plains,\nCows lower their heads, waiting for the train to pass.",
+    "keywords": [
+      "cows",
+      "barn",
+      "plains"
+    ]
+  },
+  "their-world/the-observer": {
+    "description": "A wall of lava lamps under the glowing orange cloud, watched by a camera.",
+    "excerpt": "I am the observer, I watch all this happen.\nWe stand outside the window,",
+    "keywords": [
+      "observer",
+      "observed",
+      "observation"
+    ],
+    "piece": "lava-wall"
+  },
+  "their-world/the-white-tree": {
+    "description": "The earth rising over a cratered lunar horizon in long low sunlight.",
+    "excerpt": "Floating from afar,\nTalking of the white tree like a distant star.",
+    "keywords": [
+      "tree",
+      "afar",
+      "sky"
+    ],
+    "piece": "earthrise"
+  },
+  "their-world/the-wrapper": {
+    "description": "Pine ridges fading into morning fog, sunbeams slanting through.",
+    "excerpt": "Dreams dissolved before it reached the tongue.\nWhat we felt dies when peeled away, that, indispensable sweet,",
+    "keywords": [
+      "fog",
+      "sweetness",
+      "dreams"
+    ],
+    "piece": "misty-forest"
+  },
+  "their-world/trash": {
+    "description": "The sun sinks into a drifting sea of orange cloud at dusk.",
+    "excerpt": "Worn by fingers until colors fade to whispers,\nOr scorched by relentless sun until all living traces vanish.",
+    "keywords": [
+      "sun",
+      "fade",
+      "vanish"
+    ],
+    "piece": "cloud-sea"
+  },
+  "their-world/umbrella": {
+    "description": "A tokyo side street in the rain, neon signs shining on the wet road.",
+    "excerpt": "Walking in the rain,",
+    "keywords": [
+      "rain",
+      "umbrella",
+      "walking"
+    ],
+    "piece": "tokyo-rain"
+  },
+  "their-world/window": {
+    "description": "A wall of lava lamps under the glowing orange cloud, watched by a camera.",
+    "excerpt": "I can't hear anything outside.\nShe must be crazy.",
+    "keywords": [
+      "surveillance",
+      "lights",
+      "crazy"
+    ],
+    "piece": "lava-wall"
+  }
+}
