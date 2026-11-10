@@ -1,9 +1,30 @@
 const active = new WeakMap();
+const moduleRetries = new Map();
 let paintingModule;
 
+async function importScene(path) {
+    for (let attempt = 0; ; attempt++) {
+        const retry = moduleRetries.get(path) ?? 0;
+        try {
+            return await import(retry ? `${path}?retry=${retry}` : path);
+        } catch (error) {
+            moduleRetries.set(path, retry + 1);
+            if (attempt === 1) throw error;
+            await new Promise(resolve => setTimeout(resolve, 180));
+        }
+    }
+}
+
 function loadPaintings() {
-    return paintingModule ??= import("/assets/manifold/paintings.js").then(async (paintings) => {
-        await paintings.default({ module_or_path: "/assets/manifold/paintings_bg.wasm" });
+    return paintingModule ??= importScene("/assets/manifold/paintings.js").then(async (paintings) => {
+        const path = "/assets/manifold/paintings_bg.wasm";
+        let response = await fetch(path).catch(() => null);
+        if (!response?.ok) {
+            await new Promise(resolve => setTimeout(resolve, 180));
+            response = await fetch(path, { cache: "reload" });
+        }
+        if (!response.ok) throw new Error("Painting renderer unavailable");
+        await paintings.default({ module_or_path: response });
         return paintings;
     }).catch((error) => {
         paintingModule = undefined;
@@ -32,8 +53,8 @@ export async function playManifold(dialog) {
             return;
         }
         const [player, piece] = await Promise.all([
-            import("/assets/manifold/mount.js"),
-            import(`/assets/manifold/pieces/${dialog.dataset.piece}.js`),
+            importScene("/assets/manifold/mount.js"),
+            importScene(`/assets/manifold/pieces/${dialog.dataset.piece}.js`),
         ]);
         if (!dialog.open || active.get(dialog) !== playback) return;
 
@@ -43,8 +64,11 @@ export async function playManifold(dialog) {
         playback.unmount = player.mount(canvas, piece);
         dialog.setAttribute("data-scene-ready", "");
     } catch (error) {
-        if (active.get(dialog) === playback) {
-            console.error("Could not load the Manifold scene", error);
+        if (dialog.open && active.get(dialog) === playback) {
+            dialog.setAttribute("data-scene-error", "");
+            dialog.removeAttribute("data-scene-ready");
+            dialog.querySelector("[data-manifold-playback]").hidden = true;
+            console.warn("Could not load the Manifold scene", error);
         }
     }
 }

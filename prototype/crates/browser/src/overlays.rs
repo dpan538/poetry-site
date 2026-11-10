@@ -322,6 +322,7 @@ fn manifold() {
             playing.clone(),
         );
         move || {
+            let _ = dialog.remove_attribute("data-scene-error");
             html(&playback).set_hidden(media.as_ref().is_some_and(|m| m.matches()));
             set(&playback, "aria-label", "Pause animation");
             let _ = playback.remove_attribute("data-paused");
@@ -436,7 +437,7 @@ fn manifold() {
     {
         let (dialog, start, playback) = (dialog.clone(), start.clone(), playback.clone());
         on(playback.clone().as_ref(), "click", move |_| {
-            if dialog.has_attribute("data-closing") {
+            if !dialog.has_attribute("data-scene-ready") || dialog.has_attribute("data-closing") {
                 return;
             }
             if playing.replace(false) {
@@ -445,6 +446,18 @@ fn manifold() {
                 set(&playback, "data-paused", "");
             } else {
                 start();
+            }
+        });
+    }
+    if let Some(retry) = query("[data-manifold-retry]") {
+        let (dialog, start) = (dialog.clone(), start.clone());
+        on(retry.as_ref(), "click", move |_| {
+            if dialog.has_attribute("data-closing") {
+                return;
+            }
+            start();
+            if let Some(close) = query(".manifold-close") {
+                focus(&close);
             }
         });
     }

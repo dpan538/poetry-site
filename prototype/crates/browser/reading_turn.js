@@ -26,16 +26,24 @@ async function loadStyles(page) {
 
 export async function readWork(path, done) {
   let page = null;
-  try {
-    const response = await fetch(path, { credentials: "same-origin" });
-    if (response.ok && new URL(response.url).origin === location.origin) {
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const response = await fetch(path, {
+        credentials: "same-origin",
+        cache: attempt ? "reload" : "default",
+      });
+      if (response.status >= 500) throw new Error("Reader page temporarily unavailable");
+      if (!response.ok || new URL(response.url).origin !== location.origin) break;
       const next = new DOMParser().parseFromString(await response.text(), "text/html");
+      if (!next.querySelector(".site-body-stack")) break;
       await loadStyles(next);
       page = next;
+      break;
+    } catch {
+      if (!attempt) await new Promise(resolve => setTimeout(resolve, 180));
     }
-  } catch {
-    // Let Rust preserve normal link navigation when the next page is unavailable.
   }
+  // Let Rust fall back to normal link navigation if the retry also fails.
   done(page);
 }
 

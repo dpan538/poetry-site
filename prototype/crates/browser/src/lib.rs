@@ -115,6 +115,15 @@ fn world() -> String {
 
 #[wasm_bindgen(start)]
 pub fn start() {
+    if let Some(root) = document().document_element() {
+        let pointer_root = root.clone();
+        on(document().as_ref(), "pointerdown", move |_| {
+            set(&pointer_root, "data-pointer-input", "");
+        });
+        on(document().as_ref(), "keydown", move |_| {
+            let _ = root.remove_attribute("data-pointer-input");
+        });
+    }
     navigation::init();
     overlays::init();
     grid::init();

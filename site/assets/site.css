@@ -403,6 +403,24 @@ body:has(#manifold[open]) { overflow: hidden; }
   cursor: pointer;
 }
 .manifold-playback:focus-visible { outline: 2px solid white; outline-offset: -4px; }
+.manifold-retry { display: none; }
+.manifold[data-scene-error] .manifold-plate {
+  display: grid;
+  place-items: center;
+  opacity: 1;
+  background: transparent;
+}
+.manifold[data-scene-error] canvas { visibility: hidden; }
+.manifold[data-scene-error] .manifold-retry {
+  display: block;
+  min-height: 44px;
+  padding: .4em .9em;
+  border: 1px solid var(--manifold-hover);
+  background: transparent;
+  color: var(--manifold-ink);
+  font: inherit;
+  cursor: pointer;
+}
 .manifold-playback[data-paused]::after {
   content: "▶";
   position: absolute;
@@ -491,8 +509,10 @@ body:has(#manifold[open]) { overflow: hidden; }
   .about-page.reading-page { padding-top: 0; }
   .about-intro {
     box-sizing: border-box;
-    min-height: calc(100svh - var(--site-content-offset));
+    min-height: calc(100vh - var(--site-content-offset));
+    min-height: calc(100lvh - var(--site-content-offset));
     padding-top: clamp(26px, 8vw, 40px);
+    padding-bottom: var(--mobile-index-clearance);
   }
   .about-page .reading-header { padding-bottom: 22px; margin-bottom: 21px; }
   .about-page .reading-meta { color: var(--highlight-blue-text); }
@@ -634,6 +654,21 @@ body:has(#manifold[open]) { overflow: hidden; }
   }
 
   .manifold-trigger { display: none; }
+  .manifold::backdrop { background: var(--manifold-paper); }
+  .manifold[open]::backdrop { animation: manifold-enter .43s var(--mobile-ease) both; }
+  .manifold[data-closing]::backdrop { animation: manifold-backdrop-exit .32s var(--mobile-ease) both; }
+  @keyframes manifold-backdrop-exit { to { opacity: 0; } }
+  :is(.mobile-dock-button, .mobile-index-float, .mobile-sheet-close, .mobile-index-close,
+      .mobile-world-tab, .mobile-index-tab, .manifold-close, .manifold-playback, .manifold-retry) {
+    -webkit-tap-highlight-color: transparent;
+  }
+  html[data-pointer-input] :is(.mobile-dock-button, .mobile-index-float, .mobile-sheet-close,
+      .mobile-index-close, .mobile-world-tab, .mobile-index-tab, .manifold-close,
+      .manifold-playback, .manifold-retry):focus-visible { outline: none; }
+  html[data-pointer-input] .mobile-dock-button[data-skin-htlfczsh]:is(:hover, :focus-visible) {
+    background: transparent;
+    transform: none;
+  }
   .manifold[open] {
     grid-template-rows: minmax(16px, 2fr) auto minmax(18px, 1fr) auto minmax(18px, 1fr);
     padding-block: calc(env(safe-area-inset-top) + clamp(0px, 24dvh - 100px, 70px))
@@ -653,6 +688,7 @@ body:has(#manifold[open]) { overflow: hidden; }
   }
 }
 @media (prefers-reduced-motion: reduce) {
+  .manifold[open]::backdrop { animation: none; }
   .manifold[data-scene-ready] .manifold-plate { animation: none; opacity: 1; }
   :is(.index-overlay, .index-overlay.is-open, .world-panel, .world-panel.is-shown,
       .world-tab, .index-overlay .poem-title,

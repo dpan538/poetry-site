@@ -276,6 +276,7 @@ fn manifold(scene: &Scene, title: &str, painting: Option<&PaintingCredit>) -> St
     <div class="manifold-plate">
       <canvas role="img" aria-label="{desc}"></canvas>
       <button class="manifold-playback" data-manifold-playback type="button" aria-label="Pause animation" hidden></button>
+      <button class="manifold-retry" data-manifold-retry type="button">Retry animation</button>
     </div>
     <figcaption><p class="manifold-keywords">{keywords}</p><blockquote>“{excerpt}”</blockquote></figcaption>
   </figure>
