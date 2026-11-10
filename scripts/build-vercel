@@ -10,5 +10,5 @@ if ! command -v rustup >/dev/null 2>&1; then
     export PATH="${CARGO_HOME:-$HOME/.cargo}/bin:$PATH"
 fi
 
-rustup show active-toolchain
+rustup toolchain install --no-self-update
 exec sh scripts/site build dist
