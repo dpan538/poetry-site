@@ -1,5 +1,11 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "installCommand": "",
+  "buildCommand": "sh scripts/build-vercel",
+  "outputDirectory": "dist",
+  "cleanUrls": true,
+  "trailingSlash": false,
   "redirects": [
     {
       "source": "/(.*)",

@@ -1,43 +1,33 @@
-# Astro Starter Kit: Minimal
+# daipan.ink
+
+Three Worlds by Dai Pan. The Rust compiler renders the publication to static files, and Rust WASM runs the reading grid, navigation and overlays in the browser.
+
+## Run locally
+
+From the repository root:
 
 ```sh
-npm create astro@latest -- --template minimal
+rustup target add wasm32-unknown-unknown
+sh scripts/site serve prototype/target/rust-preview 4373
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+Open [localhost:4373](http://localhost:4373/). To build the static output for a host:
 
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
+```sh
+sh scripts/site build dist
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+Cargo generates the WebAssembly bindings and module entry point. MANIFOLD loads either the ascii.rest player or the Rust painting renderer when opened.
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+Vercel builds production from `main` using `sh scripts/build-vercel`, which installs the pinned Rust toolchain when needed and publishes `dist/`. The production build uses the checked-in scene manifest and requires no model weights or service credentials.
 
-Any static assets, like images, can be placed in the `public/` directory.
+Run `sh scripts/site lab 4376` to preview the six custom MANIFOLD animations and their source credits at [localhost:4376](http://localhost:4376/).
 
-## 🧞 Commands
+## Edit the publication
 
-All commands are run from the root of the project, from a terminal:
+- `src/content/` contains the manuscript Markdown. A work has a stable volume, slug and order, with `kind: prose` for prose and poem as the default.
+- `site/templates/` and `site/assets/` carry forward the existing page structure, typography, colors and CSS. The Rust compiler fills the templates from the manuscript, builds the catalogue and emits the canonical URLs and metadata.
+- The Rust browser crate measures the active typeface, arranges verse into reading spreads, and sets prose in one continuous column. It also handles navigation and dialogs.
+- `site/data/manifold.json` maps each work to its ranked Canvas scene, source excerpt and three keywords. Both scene players render a still frame when reduced motion is enabled. [ascii.rest scene documentation](https://ascii.rest/docs/pieces/)
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+The scene manifest is a checked-in editorial asset. To update semantic rankings after editing manuscript text, run the [editorial compiler](prototype/README.md), review its choices, and copy the generated manifest into `site/data/manifold.json`. The site compiler checks that each excerpt matches its work. Model weights stay in the editor's local cache.
