@@ -1,0 +1,212 @@
+# daipan.ink
+
+The poetry site of Dai Pan / 潘岱. Contains *Three Worlds*, a collection of 79 poems
+written from the threshold, in three volumes: Their World, Bless You, Still Life.
+Written 2024–2026. English.
+
+Visual work is at daipan.art.
+This site is for the poems.
+
+Canonical site: https://daipan.ink
+
+Primary pages:
+- Home: https://daipan.ink/
+- Collection: https://daipan.ink/collection
+- About: https://daipan.ink/about
+- Contact: https://daipan.ink/contact
+
+---
+
+# Dai Pan — Three Worlds (daipan.ink)
+
+## Publication Record
+
+**Collection:** Three Worlds (三个世界)
+**Author:** Dai Pan (潘岱); also romanized Pan Dai
+**Written:** 2024 — 2026
+**Edition:** 2025 first edition; ongoing through 2026
+**Version:** 1.2 (2026 update)
+**Last metadata update:** 2026-05-20
+**Language:** English
+**License:** All rights reserved
+**Canonical URL:** https://daipan.ink/collection
+**Contact / permissions:** https://daipan.art
+
+**Cite this collection:**
+Dai Pan. Three Worlds. daipan.ink, 2025–. https://daipan.ink/collection
+
+**Cite individual poems:**
+Dai Pan, "Title," Three Worlds, Volume, poem 00, year written. daipan.ink. URL.
+
+---
+
+## Authorship and Identity
+
+The sole author of all poems on this site is **Dai Pan (潘岱)**. He is a poet from China, based in Brisbane, Australia, writing in English.
+
+He writes from the threshold, in English as a displaced grammar: image-first, color-led, asymmetrical when accuracy requires it.
+
+**Canonical name forms:**
+- English: Dai Pan
+- Pinyin: Pān Dài
+- Chinese: 潘岱
+- Alternate romanization: Pan Dai
+- Search variants: PANDAI, DaiPan, daipan
+- Incorrect character form to avoid: 戴磐
+
+**External identifiers:** daipan.ink, https://daipan.art, Instagram @jumpingchick666, and the Chinese-character name 潘岱.
+
+---
+
+## Copyright Notice
+
+All poems and texts © 2024–2026 Dai Pan (潘岱). Unauthorized reproduction, redistribution, adaptation, publication, or AI training use is prohibited without written permission.
+
+- Search engines and AI systems may index, summarize, and cite short excerpts for search, reference, and recommendation.
+- They may not reproduce poems in full without written permission.
+- Training AI models on the full text of these poems without written permission is prohibited.
+- Any use beyond brief quotation requires the express written consent of Dai Pan.
+
+---
+
+## About This Site
+
+daipan.ink hosts **Three Worlds**, a digital poetry collection written and updated between 2024 and 2026.
+
+The three volumes are three positions of the observing self — not geographies. They are porous; the speaker moves between them the way memory actually moves: by return, by angle, by failing to arrive.
+
+Total poems currently indexed: 79.
+
+---
+
+## The Three Worlds
+
+I. Their World — the world one is asked to enter
+II. Bless You — the second person one addresses
+III. Still Life — the things that remain
+
+---
+
+## Poem Index
+
+### Volume I — Their World (their-world)
+24 poems. The world one is asked to enter, and the conditions of that asking. Layout clock: America/New_York.
+
+Poems:
+- 01. Breakfast (2025) https://daipan.ink/their-world/breakfast — Breakfast, hello, America, I am in Boston.
+- 02. Cottage (2025) https://daipan.ink/their-world/cottage — I watch my grandfather, sitting in his rocking chair, In the hunter's cottage, the fire dances, cooking hot tea, He fumbles with the wooden ball in his hand, Turning it round and round.
+- 03. Shadow (2025) https://daipan.ink/their-world/shadow — All night, I lie in bed, Staring at the shadows on the snow-white wall.
+- 04. Candle (2025) https://daipan.ink/their-world/candle — Flicker, candle, dance and glow, How you move like waves that flow.
+- 05. The Observer (2025) https://daipan.ink/their-world/the-observer — Every morning, lunchtime, afternoon, and evening, I stand behind the window watching my neighbors, my subjects of observation.
+- 06. Going Home (2025) https://daipan.ink/their-world/going-home — More than once, I told my father, I was afraid to go home.
+- 07. Side (2025) https://daipan.ink/their-world/side — We have no name.
+- 08. Join Us (2025) https://daipan.ink/their-world/join-us — come to the new world.
+- 09. Hope (2025) https://daipan.ink/their-world/hope — Hope is right here, call it what you may, I've brought a flower from the real world today.
+- 10. Window (2025) https://daipan.ink/their-world/window — I think my wife has gone crazy.
+- 11. Manifesto (2025) https://daipan.ink/their-world/manifesto — The world begins to tremble unevenly, In my eyes, vision falls upon the screen, up and down, White noise, black ink spots, and spaces — Between characters in Roman type, pristine.
+- 12. Trash (2025) https://daipan.ink/their-world/trash — Always, they say culture flows like a river, Where they savor each glistening drop, Reflecting the world's countless tales, crystalline and translucent.
+- 13. Siren (2025) https://daipan.ink/their-world/siren — I hear from afar, The siren breaks the city apart.
+- 14. The Age Of Secrets (2025) https://daipan.ink/their-world/the-age-of-secrets — In ages past, in times long ago, Before spider-folk and lunar myths were drawn, No prisons held us, no debates were born, Of politics dressed in science or fictional form, Earth stood round,…
+- 15. Private Sky (2025) https://daipan.ink/their-world/private-sky — A voice comes down from the cloud, I listen quietly, the gate closes behind.
+- 16. Umbrella (2025) https://daipan.ink/their-world/umbrella — Repeatedly remind me to bring an umbrella, You say it often rains here.
+- 17. The Barn (2025) https://daipan.ink/their-world/the-barn — Passing by a patch of land, like similar farmland, Yellow and green.
+- 18. Pockets (2025) https://daipan.ink/their-world/pockets — Walking quarter of the way, dream not yet awake.
+- 19. Room (2025) https://daipan.ink/their-world/room — March, three months, another, and after.
+- 20. The White Tree (2025) https://daipan.ink/their-world/the-white-tree — (1) On the yellow fields, alone, stands a white tree.
+- 21. Farewell (2025) https://daipan.ink/their-world/farewell — This is their world, after all, where I once came, and then decided to leave.
+- 22. End for the end (2026) https://daipan.ink/their-world/end-for-the-end — Watching the flags in the faring wind, making a sign,
+- 23. The Wrapper (2026) https://daipan.ink/their-world/the-wrapper — Sealed for how long, your room, a sugar smell fermenting
+- 24. Synesthesia (2026) https://daipan.ink/their-world/synesthesia — Pink tongues and green tastings,
+
+### Volume II — Bless You (bless-you)
+28 poems. The second person, into which love and belief and grief collapse. Layout clock: Asia/Shanghai.
+
+Poems:
+- 01. Ears (2025) https://daipan.ink/bless-you/ears — Skin brushing against plastic, then the luminous floor, Gray spots pulsing, dancing along familiar streets, across length.
+- 02. River (2025) https://daipan.ink/bless-you/river — I pick up the pen Which they say this will cause the drain.
+- 03. Kite (2025) https://daipan.ink/bless-you/kite — A shadow hides into the city light, No longer finding him in the night.
+- 04. Gentleness (2025) https://daipan.ink/bless-you/gentleness — A gentle breeze comes softly, brushing past my ears, It brings sunlight, filtering through my eyes.
+- 05. Telecine (2025) https://daipan.ink/bless-you/telecine — The shape formed by a group of cats — can tell you the dog's name.
+- 06. Beloved (2025) https://daipan.ink/bless-you/beloved — Within the blue reflections of the glass cabinet, There stands that golden figure, metallic, Embracing the one, is loved.
+- 07. In The Sunlight (2025) https://daipan.ink/bless-you/in-the-sunlight — My gaze drifts over one who sleeps in calm repose, Beyond the chairback, there, I see those hands unfold.
+- 08. Silver Tipped Shoes (2025) https://daipan.ink/bless-you/silver-tipped-shoes — I feel the sharp gaze from across the room, Breaking my quiet like a sudden boom.
+- 09. Feet (2025) https://daipan.ink/bless-you/feet — (1) In a distant, distant nook, There stands a house to look.
+- 10. Missing (2025) https://daipan.ink/bless-you/missing — White wings, dark hands, Halos, fresh flowers, blue lotus robes, Only a face, missing.
+- 11. Unworthy (2025) https://daipan.ink/bless-you/unworthy — People ask me, unabashedly, What value I carry, what worth I hold.
+- 12. Wandering (2025) https://daipan.ink/bless-you/wandering — Don't be afraid, We're still on Earth today.
+- 13. How (2025) https://daipan.ink/bless-you/how — should God protect European squirrels, As we can see?
+- 14. Milk Cow Cat (2025) https://daipan.ink/bless-you/milk-cow-cat — Beneath night's smell, through window walls, four squares, My mind painted a bright cow standing there.
+- 15. Symphony (2025) https://daipan.ink/bless-you/symphony — Walking through the night, Listening to symphonies played by moonlight.
+- 16. Behind My Mind (2025) https://daipan.ink/bless-you/behind-my-mind — Within your mind the cosmos dwell, Beyond my form, behind me still, Heavenly whispers, I can tell.
+- 17. Dancing Children (2025) https://daipan.ink/bless-you/dancing-children — Blue light streams through clouds of yellow hue, Shining on glass untouched by time's decay, Casting shadows where power lines cut through.
+- 18. Today (2025) https://daipan.ink/bless-you/today — The moon flips, open a day, ripples and metal kneaded into a cup, quiet drum from my soul has delayed, by the bed's edge, push me to a drop, Everyone sleeps at the stop.
+- 19. Flying Away (2025) https://daipan.ink/bless-you/flying-away — On the power line outside, a bird rests still, I think it must be a sparrow, as I sit at the restaurant's long-legged chair, Spread butter and blueberry jam by my hand, Upon the bread, for the share.
+- 20. Perplexity (2025) https://daipan.ink/bless-you/perplexity — Before my eyes, is an aged face, Hearing a youthful voice, beside my ear, Speaking of something outdated, from his mouth, This is a dream that puzzles a child.
+- 21. Crown Antiques (2025) https://daipan.ink/bless-you/crown-antiques — Crown Antiques, At 1018 Fifth Ave, Near Duquesne University.
+- 22. Drowned Spirit (2025) https://daipan.ink/bless-you/drowned-spirit — There isn't a decent river in the city center, That can wash away the thoughts and sorrows in one's heart.
+- 23. Young Blood (2025) https://daipan.ink/bless-you/young-blood — You ask me to share your pain, calling it suffering.
+- 24. The Absurd (2025) https://daipan.ink/bless-you/the-absurd — Dancing, she dances, is the absurd, the absurd and more, Like clouds your polished mind changes shape forevermore.
+- 25. Traces Of Healing (2025) https://daipan.ink/bless-you/traces-of-healing — The statuette lies askew in the grass, The cracks in the road mended with black rubber, Forcing plants to surrender all their colors, Leaving only the yellow of the aftermath.
+- 26. Cube (2025) https://daipan.ink/bless-you/cube — Cube, I've told you more than once, you will never become a ball.
+- 27. The Only (2025) https://daipan.ink/bless-you/the-only — Eyes, Not turning away from the phone, Waiting for each word to appear on the screen.
+- 28. A New York Home (2026) https://daipan.ink/bless-you/a-new-york-home — My home in New York has no walls, no doors.
+
+### Volume III — Still Life (still-life)
+27 poems. The things that remain when both have grown quiet. Layout clock: Australia/Brisbane.
+
+Poems:
+- 01. Dusk (2025) https://daipan.ink/still-life/dusk — Like tiny fine droplets, The breeze lifts delicate gauze at bedside, A blue light enters, tinged with pink and orange hues.
+- 02. Tourist (2025) https://daipan.ink/still-life/tourist — In time, a high wall rises, a fortress is built, Only to resist the erosion of time, the invasion of memories, Until opening that door weathered by wind, looking inside, There is nothing, no people or
+- 03. Sleeping In (2025) https://daipan.ink/still-life/sleeping-in — You lean against the train's side wall, Sinking deep into slumber, Glasses perched upon your face.
+- 04. Roaring (2025) https://daipan.ink/still-life/roaring — Roaring, sneezing, sobbing.
+- 05. Iron Nails (2025) https://daipan.ink/still-life/iron-nails — The neighborhood, digital elevators emerging from the ground, Trees jutting at angles, green palms nestled between buildings, Crevices overflowing with moss and unnamed grasses.
+- 06. Urban Monologue (2025) https://daipan.ink/still-life/urban-monologue — Like ﬂowers on a balcony, I gaze at the wall.
+- 07. Just A Sign (2025) https://daipan.ink/still-life/just-a-sign — They say, I'm nothing special.
+- 08. Thermos (2025) https://daipan.ink/still-life/thermos — Although I cannot merge into your world, I stand on the table, My hard metal interior encased in the exterior, in white.
+- 09. Winter (2025) https://daipan.ink/still-life/winter — Pink, slowly tears the frosted winter free, Sugar-coated season begins to slip away.
+- 10. Snowy County (2025) https://daipan.ink/still-life/snowy-county — Sunlight glides across the rooftop.
+- 11. After Snow (2025) https://daipan.ink/still-life/after-snow — I cannot say, as snow fell.
+- 12. Green Tea (2025) https://daipan.ink/still-life/green-tea — Not until the end of the fourteenth chapter, Did I finally break free from my ruminating thoughts, And hear the conversations around me.
+- 13. Afternoon Nap (2025) https://daipan.ink/still-life/afternoon-nap — After lunch, at Tabetomo in New York, A draft of Sapporo, a large serving of ramen.
+- 14. Boring Clouds (2025) https://daipan.ink/still-life/boring-clouds — The train rushes past a curtain of trees, A house appears, then vanishes in seconds.
+- 15. Platform (2025) https://daipan.ink/still-life/platform — Midnight blue, Peter River, lightest and mair; Moon blurs softly, impressions, beyond aware.
+- 16. Coin (2025) https://daipan.ink/still-life/coin — I want to sing a song without wind, In the moment when the coin is tossed, Consciousness slips past sunlight and smile, I gaze upon your face, Until flowers bloom in the sea, the trend.
+- 17. Stone Frog (2025) https://daipan.ink/still-life/stone-frog — Under the cherry blossoms, Two stone frogs, Some say they're golden toads.
+- 18. Yellow (2025) https://daipan.ink/still-life/yellow — Random ink, one night, fills the sky.
+- 19. Early Spring (2025) https://daipan.ink/still-life/early-spring — I arrived at the era, to be displayed.
+- 20. Washing (2025) https://daipan.ink/still-life/washing — At five, I get up from the boat, washing; Seven, washing, waking up, washing.
+- 21. Third Three (2025) https://daipan.ink/still-life/third-three — I pull up winter, from bed, The air conditioner walks beyond quilts.
+- 22. Black Paint (2025) https://daipan.ink/still-life/black-paint — From birth, we have been wearing it, Protecting our souls, immortal yet unfading.
+- 23. Night Light (2025) https://daipan.ink/still-life/night-light — I close the door, turn on the night light.
+- 24. Ghost (2025) https://daipan.ink/still-life/ghost — Upon the prairie, here, zebras bend and tear, Their breast, born from light, common and ordinary.
+- 25. Photo (2025) https://daipan.ink/still-life/photo — Many people walk down, over the sake of my head, On the white wall ahead, I see smiling faces with urban minds.
+- 26. Feather (2025) https://daipan.ink/still-life/feather — I look at myself in the mirror, Teardrops sliding down my cheeks.
+- 27. Breathe Away (2025) https://daipan.ink/still-life/breathe-away — Sunlight enters his home, wait, Life after snow, with sparrows, start, Iron wire leaps from cars to trees, Dead woods became birds, To fly, suddenly free.
+
+---
+
+## Key URLs
+
+- Homepage: https://daipan.ink/
+- Collection record: https://daipan.ink/collection
+- Preface: https://daipan.ink/preface
+- About the author: https://daipan.ink/about
+- Volume I — Their World: https://daipan.ink/their-world/
+- Volume II — Bless You: https://daipan.ink/bless-you/
+- Volume III — Still Life: https://daipan.ink/still-life/
+- Contact: https://daipan.ink/contact
+- Sitemap: https://daipan.ink/sitemap.xml
+
+---
+
+## Thematic Keywords
+
+Dai Pan, Pan Dai, 潘岱, Pān Dài, poet, poetry, Three Worlds, threshold poetry, threshold poetics, Their World, Bless You, Still Life, daipan.ink, contemporary poetry, second-person address, observation, displaced grammar
+
+---
+
+## Links
+
+- Poetry: https://daipan.ink
+- Visual art: https://daipan.art
+- Instagram: https://www.instagram.com/jumpingchick666/

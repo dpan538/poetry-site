@@ -1,0 +1,13 @@
+#!/bin/sh
+set -eu
+cd "$(dirname "$0")/.."
+if [ -d "$PWD/prototype/.cache/cargo" ] && [ -z "${CARGO_HOME:-}" ]; then
+    export CARGO_HOME="$PWD/prototype/.cache/cargo"
+fi
+export CARGO_TARGET_DIR="$PWD/prototype/target"
+cargo build --locked --manifest-path prototype/Cargo.toml --release -p daipan-lab --target wasm32-unknown-unknown
+if [ "${1:-}" = lab ]; then
+    exec cargo run --locked --manifest-path prototype/Cargo.toml -p daipan-site -- "$@"
+fi
+cargo build --locked --manifest-path prototype/Cargo.toml --release -p daipan-browser --target wasm32-unknown-unknown
+exec cargo run --locked --manifest-path prototype/Cargo.toml -p daipan-site -- "$@"

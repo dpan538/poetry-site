@@ -1,0 +1,1793 @@
+[
+  {
+    "id": "breakfast",
+    "world": "their-world",
+    "title": "Breakfast",
+    "firstLine": "Breakfast, hello, America, I am in Boston.",
+    "emotionScore": 0.393,
+    "contentTypes": [
+      "narrative",
+      "observation"
+    ],
+    "atlasRelations": []
+  },
+  {
+    "id": "candle",
+    "world": "their-world",
+    "title": "Candle",
+    "firstLine": "Flicker, candle, dance and glow, How you move like waves that flow.",
+    "emotionScore": 0.567,
+    "contentTypes": [
+      "monologue",
+      "spiritual"
+    ],
+    "atlasRelations": []
+  },
+  {
+    "id": "cottage",
+    "world": "their-world",
+    "title": "Cottage",
+    "firstLine": "I watch my grandfather, sitting in his rocking chair, In the hunter's cottage, the fire dances, cooking hot tea, He fumbles with the wooden ball in his hand, Turning it round and round.",
+    "emotionScore": 0.34,
+    "contentTypes": [
+      "narrative",
+      "spiritual"
+    ],
+    "atlasRelations": []
+  },
+  {
+    "id": "end-for-the-end",
+    "world": "their-world",
+    "title": "End for the end",
+    "firstLine": "Watching the flags in the faring wind, making a sign,",
+    "emotionScore": 0.433,
+    "contentTypes": [
+      "political",
+      "incantatory",
+      "fragmented"
+    ],
+    "atlasRelations": [
+      {
+        "id": "manifesto",
+        "weight": 0.82,
+        "reason": [
+          "mode",
+          "type"
+        ]
+      },
+      {
+        "id": "hope",
+        "weight": 0.78,
+        "reason": [
+          "type",
+          "imagery"
+        ]
+      },
+      {
+        "id": "siren",
+        "weight": 0.74,
+        "reason": [
+          "type",
+          "mode"
+        ]
+      },
+      {
+        "id": "young-blood",
+        "weight": 0.7,
+        "reason": [
+          "type",
+          "mode"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "farewell",
+    "world": "their-world",
+    "title": "Farewell",
+    "firstLine": "This is their world, after all, where I once came, and then decided to leave.",
+    "emotionScore": 0.382,
+    "contentTypes": [
+      "narrative",
+      "spiritual"
+    ],
+    "atlasRelations": []
+  },
+  {
+    "id": "going-home",
+    "world": "their-world",
+    "title": "Going Home",
+    "firstLine": "More than once, I told my father, I was afraid to go home.",
+    "emotionScore": 0.677,
+    "contentTypes": [
+      "narrative",
+      "political"
+    ],
+    "atlasRelations": []
+  },
+  {
+    "id": "hope",
+    "world": "their-world",
+    "title": "Hope",
+    "firstLine": "Hope is right here, call it what you may, I've brought a flower from the real world today.",
+    "emotionScore": 0.342,
+    "contentTypes": [
+      "incantatory",
+      "spiritual",
+      "political"
+    ],
+    "atlasRelations": [
+      {
+        "id": "traces-of-healing",
+        "weight": 0.9,
+        "relation": "transform",
+        "reason": [
+          "type",
+          "imagery"
+        ]
+      },
+      {
+        "id": "missing",
+        "weight": 0.82,
+        "reason": [
+          "imagery",
+          "type"
+        ]
+      },
+      {
+        "id": "manifesto",
+        "weight": 0.81,
+        "reason": [
+          "type",
+          "mode"
+        ]
+      },
+      {
+        "id": "young-blood",
+        "weight": 0.76,
+        "reason": [
+          "mode",
+          "type"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "join-us",
+    "world": "their-world",
+    "title": "Join Us",
+    "firstLine": "come to the new world.",
+    "emotionScore": 0.59,
+    "contentTypes": [
+      "incantatory",
+      "political"
+    ],
+    "atlasRelations": []
+  },
+  {
+    "id": "manifesto",
+    "world": "their-world",
+    "title": "Manifesto",
+    "firstLine": "The world begins to tremble unevenly, In my eyes, vision falls upon the screen, up and down, White noise, black ink spots, and spaces — Between characters in Roman type, pristine.",
+    "emotionScore": 0.308,
+    "contentTypes": [
+      "monologue",
+      "political",
+      "fragmented"
+    ],
+    "atlasRelations": [
+      {
+        "id": "young-blood",
+        "weight": 0.88,
+        "relation": "transform",
+        "reason": [
+          "type",
+          "mode"
+        ]
+      },
+      {
+        "id": "hope",
+        "weight": 0.81,
+        "reason": [
+          "type",
+          "mode"
+        ]
+      },
+      {
+        "id": "the-observer",
+        "weight": 0.77,
+        "reason": [
+          "imagery",
+          "mode"
+        ]
+      },
+      {
+        "id": "room",
+        "weight": 0.72,
+        "reason": [
+          "imagery",
+          "mode"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "pockets",
+    "world": "their-world",
+    "title": "Pockets",
+    "firstLine": "Walking quarter of the way, dream not yet awake.",
+    "emotionScore": 0.673,
+    "contentTypes": [
+      "observation",
+      "political",
+      "fragmented"
+    ],
+    "atlasRelations": []
+  },
+  {
+    "id": "private-sky",
+    "world": "their-world",
+    "title": "Private Sky",
+    "firstLine": "A voice comes down from the cloud, I listen quietly, the gate closes behind.",
+    "emotionScore": 0.363,
+    "contentTypes": [
+      "narrative",
+      "political"
+    ],
+    "atlasRelations": []
+  },
+  {
+    "id": "room",
+    "world": "their-world",
+    "title": "Room",
+    "firstLine": "March, three months, another, and after.",
+    "emotionScore": 0.521,
+    "contentTypes": [
+      "monologue",
+      "fragmented"
+    ],
+    "atlasRelations": [
+      {
+        "id": "night-light",
+        "weight": 0.89,
+        "relation": "transform",
+        "reason": [
+          "mode",
+          "imagery"
+        ]
+      },
+      {
+        "id": "sleeping-in",
+        "weight": 0.76,
+        "reason": [
+          "mode",
+          "imagery"
+        ]
+      },
+      {
+        "id": "shadow",
+        "weight": 0.72,
+        "reason": [
+          "mode",
+          "imagery"
+        ]
+      },
+      {
+        "id": "photo",
+        "weight": 0.7,
+        "reason": [
+          "imagery",
+          "type"
+        ]
+      },
+      {
+        "id": "winter",
+        "weight": 0.68,
+        "reason": [
+          "type",
+          "imagery"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "shadow",
+    "world": "their-world",
+    "title": "Shadow",
+    "firstLine": "All night, I lie in bed, Staring at the shadows on the snow-white wall.",
+    "emotionScore": 0.671,
+    "contentTypes": [
+      "incantatory",
+      "spiritual",
+      "fragmented"
+    ],
+    "atlasRelations": [
+      {
+        "id": "ghost",
+        "weight": 0.93,
+        "relation": "transform",
+        "reason": [
+          "mode",
+          "imagery"
+        ]
+      },
+      {
+        "id": "night-light",
+        "weight": 0.82,
+        "reason": [
+          "imagery",
+          "mode"
+        ]
+      },
+      {
+        "id": "the-observer",
+        "weight": 0.79,
+        "reason": [
+          "imagery",
+          "type"
+        ]
+      },
+      {
+        "id": "photo",
+        "weight": 0.74,
+        "reason": [
+          "imagery",
+          "type"
+        ]
+      },
+      {
+        "id": "traces-of-healing",
+        "weight": 0.7,
+        "reason": [
+          "mode",
+          "imagery"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "side",
+    "world": "their-world",
+    "title": "Side",
+    "firstLine": "We have no name.",
+    "emotionScore": 0.478,
+    "contentTypes": [
+      "political",
+      "fragmented"
+    ],
+    "atlasRelations": []
+  },
+  {
+    "id": "siren",
+    "world": "their-world",
+    "title": "Siren",
+    "firstLine": "I hear from afar, The siren breaks the city apart.",
+    "emotionScore": 0.454,
+    "contentTypes": [
+      "incantatory",
+      "political",
+      "spiritual"
+    ],
+    "atlasRelations": []
+  },
+  {
+    "id": "synesthesia",
+    "world": "their-world",
+    "title": "Synesthesia",
+    "firstLine": "Pink tongues and green tastings,",
+    "emotionScore": 0.289,
+    "contentTypes": [
+      "love",
+      "observation",
+      "spiritual",
+      "fragmented"
+    ],
+    "atlasRelations": [
+      {
+        "id": "hope",
+        "weight": 0.8,
+        "reason": [
+          "type",
+          "imagery"
+        ]
+      },
+      {
+        "id": "traces-of-healing",
+        "weight": 0.76,
+        "reason": [
+          "mode",
+          "type"
+        ]
+      },
+      {
+        "id": "gentleness",
+        "weight": 0.72,
+        "reason": [
+          "mode",
+          "imagery"
+        ]
+      },
+      {
+        "id": "the-wrapper",
+        "weight": 0.68,
+        "reason": [
+          "type",
+          "mode"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "the-age-of-secrets",
+    "world": "their-world",
+    "title": "The Age Of Secrets",
+    "firstLine": "In ages past, in times long ago, Before spider-folk and lunar myths were drawn, No prisons held us, no debates were born, Of politics dressed in science or fictional form, Earth stood round,…",
+    "emotionScore": 0.291,
+    "contentTypes": [
+      "political",
+      "fragmented"
+    ],
+    "atlasRelations": []
+  },
+  {
+    "id": "the-barn",
+    "world": "their-world",
+    "title": "The Barn",
+    "firstLine": "Passing by a patch of land, like similar farmland, Yellow and green.",
+    "emotionScore": 0.33,
+    "contentTypes": [
+      "narrative",
+      "observation"
+    ],
+    "atlasRelations": []
+  },
+  {
+    "id": "the-observer",
+    "world": "their-world",
+    "title": "The Observer",
+    "firstLine": "Every morning, lunchtime, afternoon, and evening, I stand behind the window watching my neighbors, my subjects of observation.",
+    "emotionScore": 0.572,
+    "contentTypes": [
+      "observation",
+      "political"
+    ],
+    "atlasRelations": [
+      {
+        "id": "sleeping-in",
+        "weight": 0.91,
+        "relation": "transform",
+        "reason": [
+          "mode",
+          "imagery"
+        ]
+      },
+      {
+        "id": "shadow",
+        "weight": 0.79,
+        "reason": [
+          "imagery",
+          "type"
+        ]
+      },
+      {
+        "id": "window",
+        "weight": 0.83,
+        "reason": [
+          "imagery",
+          "type"
+        ]
+      },
+      {
+        "id": "hope",
+        "weight": 0.71,
+        "reason": [
+          "mode",
+          "type"
+        ]
+      },
+      {
+        "id": "manifesto",
+        "weight": 0.77,
+        "reason": [
+          "imagery",
+          "mode"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "the-white-tree",
+    "world": "their-world",
+    "title": "The White Tree",
+    "firstLine": "(1) On the yellow fields, alone, stands a white tree.",
+    "emotionScore": 0.533,
+    "contentTypes": [
+      "narrative",
+      "spiritual"
+    ],
+    "atlasRelations": []
+  },
+  {
+    "id": "the-wrapper",
+    "world": "their-world",
+    "title": "The Wrapper",
+    "firstLine": "Sealed for how long, your room, a sugar smell fermenting",
+    "emotionScore": 0.253,
+    "contentTypes": [
+      "love",
+      "narrative",
+      "fragmented"
+    ],
+    "atlasRelations": [
+      {
+        "id": "room",
+        "weight": 0.81,
+        "reason": [
+          "mode",
+          "imagery"
+        ]
+      },
+      {
+        "id": "umbrella",
+        "weight": 0.76,
+        "reason": [
+          "mode",
+          "type"
+        ]
+      },
+      {
+        "id": "river",
+        "weight": 0.7,
+        "reason": [
+          "type",
+          "mode"
+        ]
+      },
+      {
+        "id": "a-new-york-home",
+        "weight": 0.68,
+        "reason": [
+          "type",
+          "imagery"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "trash",
+    "world": "their-world",
+    "title": "Trash",
+    "firstLine": "Always, they say culture flows like a river, Where they savor each glistening drop, Reflecting the world's countless tales, crystalline and translucent.",
+    "emotionScore": 0.398,
+    "contentTypes": [
+      "monologue",
+      "political"
+    ],
+    "atlasRelations": []
+  },
+  {
+    "id": "umbrella",
+    "world": "their-world",
+    "title": "Umbrella",
+    "firstLine": "Repeatedly remind me to bring an umbrella, You say it often rains here.",
+    "emotionScore": 0.421,
+    "contentTypes": [
+      "monologue",
+      "love"
+    ],
+    "atlasRelations": []
+  },
+  {
+    "id": "window",
+    "world": "their-world",
+    "title": "Window",
+    "firstLine": "I think my wife has gone crazy.",
+    "emotionScore": 0.553,
+    "contentTypes": [
+      "narrative",
+      "political"
+    ],
+    "atlasRelations": [
+      {
+        "id": "the-observer",
+        "weight": 0.83,
+        "reason": [
+          "imagery",
+          "type"
+        ]
+      },
+      {
+        "id": "shadow",
+        "weight": 0.78,
+        "reason": [
+          "imagery",
+          "mode"
+        ]
+      },
+      {
+        "id": "room",
+        "weight": 0.75,
+        "reason": [
+          "imagery",
+          "mode"
+        ]
+      },
+      {
+        "id": "ghost",
+        "weight": 0.72,
+        "reason": [
+          "imagery",
+          "type"
+        ]
+      },
+      {
+        "id": "night-light",
+        "weight": 0.68,
+        "reason": [
+          "imagery",
+          "mode"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "a-new-york-home",
+    "world": "bless-you",
+    "title": "A New York Home",
+    "firstLine": "My home in New York has no walls, no doors.",
+    "emotionScore": 0.327,
+    "contentTypes": [
+      "love",
+      "narrative",
+      "observation"
+    ],
+    "atlasRelations": [
+      {
+        "id": "the-barn",
+        "weight": 0.78,
+        "reason": [
+          "imagery",
+          "type"
+        ]
+      },
+      {
+        "id": "sleeping-in",
+        "weight": 0.76,
+        "reason": [
+          "mode",
+          "type"
+        ]
+      },
+      {
+        "id": "cottage",
+        "weight": 0.72,
+        "reason": [
+          "imagery",
+          "type"
+        ]
+      },
+      {
+        "id": "the-wrapper",
+        "weight": 0.68,
+        "reason": [
+          "type",
+          "imagery"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "behind-my-mind",
+    "world": "bless-you",
+    "title": "Behind My Mind",
+    "firstLine": "Within your mind the cosmos dwell, Beyond my form, behind me still, Heavenly whispers, I can tell.",
+    "emotionScore": 0.347,
+    "contentTypes": [
+      "love",
+      "spiritual"
+    ],
+    "atlasRelations": []
+  },
+  {
+    "id": "beloved",
+    "world": "bless-you",
+    "title": "Beloved",
+    "firstLine": "Within the blue reflections of the glass cabinet, There stands that golden figure, metallic, Embracing the one, is loved.",
+    "emotionScore": 0.266,
+    "contentTypes": [
+      "love",
+      "spiritual"
+    ],
+    "atlasRelations": [
+      {
+        "id": "missing",
+        "weight": 0.85,
+        "reason": [
+          "mode",
+          "imagery"
+        ]
+      },
+      {
+        "id": "traces-of-healing",
+        "weight": 0.79,
+        "reason": [
+          "mode",
+          "type"
+        ]
+      },
+      {
+        "id": "dusk",
+        "weight": 0.76,
+        "reason": [
+          "imagery",
+          "type"
+        ]
+      },
+      {
+        "id": "winter",
+        "weight": 0.72,
+        "reason": [
+          "type",
+          "imagery"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "crown-antiques",
+    "world": "bless-you",
+    "title": "Crown Antiques",
+    "firstLine": "Crown Antiques, At 1018 Fifth Ave, Near Duquesne University.",
+    "emotionScore": 0.324,
+    "contentTypes": [
+      "observation",
+      "narrative"
+    ],
+    "atlasRelations": []
+  },
+  {
+    "id": "cube",
+    "world": "bless-you",
+    "title": "Cube",
+    "firstLine": "Cube, I've told you more than once, you will never become a ball.",
+    "emotionScore": 0.668,
+    "contentTypes": [
+      "monologue",
+      "political"
+    ],
+    "atlasRelations": []
+  },
+  {
+    "id": "dancing-children",
+    "world": "bless-you",
+    "title": "Dancing Children",
+    "firstLine": "Blue light streams through clouds of yellow hue, Shining on glass untouched by time's decay, Casting shadows where power lines cut through.",
+    "emotionScore": 0.452,
+    "contentTypes": [
+      "observation",
+      "spiritual"
+    ],
+    "atlasRelations": []
+  },
+  {
+    "id": "drowned-spirit",
+    "world": "bless-you",
+    "title": "Drowned Spirit",
+    "firstLine": "There isn't a decent river in the city center, That can wash away the thoughts and sorrows in one's heart.",
+    "emotionScore": 0.41,
+    "contentTypes": [
+      "narrative",
+      "spiritual"
+    ],
+    "atlasRelations": [
+      {
+        "id": "river",
+        "weight": 0.92,
+        "relation": "transform",
+        "reason": [
+          "imagery",
+          "type"
+        ]
+      },
+      {
+        "id": "missing",
+        "weight": 0.78,
+        "reason": [
+          "mode",
+          "type"
+        ]
+      },
+      {
+        "id": "winter",
+        "weight": 0.74,
+        "reason": [
+          "mode",
+          "type"
+        ]
+      },
+      {
+        "id": "shadow",
+        "weight": 0.7,
+        "reason": [
+          "imagery",
+          "mode"
+        ]
+      },
+      {
+        "id": "young-blood",
+        "weight": 0.67,
+        "reason": [
+          "mode",
+          "type"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ears",
+    "world": "bless-you",
+    "title": "Ears",
+    "firstLine": "Skin brushing against plastic, then the luminous floor, Gray spots pulsing, dancing along familiar streets, across length.",
+    "emotionScore": 0.288,
+    "contentTypes": [
+      "love",
+      "observation"
+    ],
+    "atlasRelations": []
+  },
+  {
+    "id": "feet",
+    "world": "bless-you",
+    "title": "Feet",
+    "firstLine": "(1) In a distant, distant nook, There stands a house to look.",
+    "emotionScore": 0.271,
+    "contentTypes": [
+      "observation",
+      "spiritual",
+      "fragmented"
+    ],
+    "atlasRelations": []
+  },
+  {
+    "id": "flying-away",
+    "world": "bless-you",
+    "title": "Flying Away",
+    "firstLine": "On the power line outside, a bird rests still, I think it must be a sparrow, as I sit at the restaurant's long-legged chair, Spread butter and blueberry jam by my hand, Upon the bread, for the share.",
+    "emotionScore": 0.485,
+    "contentTypes": [
+      "narrative",
+      "observation",
+      "spiritual"
+    ],
+    "atlasRelations": []
+  },
+  {
+    "id": "gentleness",
+    "world": "bless-you",
+    "title": "Gentleness",
+    "firstLine": "A gentle breeze comes softly, brushing past my ears, It brings sunlight, filtering through my eyes.",
+    "emotionScore": 0.309,
+    "contentTypes": [
+      "love",
+      "spiritual"
+    ],
+    "atlasRelations": []
+  },
+  {
+    "id": "how",
+    "world": "bless-you",
+    "title": "How",
+    "firstLine": "should God protect European squirrels, As we can see?",
+    "emotionScore": 0.268,
+    "contentTypes": [
+      "love",
+      "monologue"
+    ],
+    "atlasRelations": []
+  },
+  {
+    "id": "in-the-sunlight",
+    "world": "bless-you",
+    "title": "In The Sunlight",
+    "firstLine": "My gaze drifts over one who sleeps in calm repose, Beyond the chairback, there, I see those hands unfold.",
+    "emotionScore": 0.289,
+    "contentTypes": [
+      "love",
+      "narrative",
+      "observation"
+    ],
+    "atlasRelations": []
+  },
+  {
+    "id": "kite",
+    "world": "bless-you",
+    "title": "Kite",
+    "firstLine": "A shadow hides into the city light, No longer finding him in the night.",
+    "emotionScore": 0.234,
+    "contentTypes": [
+      "love",
+      "monologue"
+    ],
+    "atlasRelations": []
+  },
+  {
+    "id": "milk-cow-cat",
+    "world": "bless-you",
+    "title": "Milk Cow Cat",
+    "firstLine": "Beneath night's smell, through window walls, four squares, My mind painted a bright cow standing there.",
+    "emotionScore": 0.304,
+    "contentTypes": [
+      "love",
+      "narrative"
+    ],
+    "atlasRelations": []
+  },
+  {
+    "id": "missing",
+    "world": "bless-you",
+    "title": "Missing",
+    "firstLine": "White wings, dark hands, Halos, fresh flowers, blue lotus robes, Only a face, missing.",
+    "emotionScore": 0.24,
+    "contentTypes": [
+      "spiritual",
+      "fragmented"
+    ],
+    "atlasRelations": [
+      {
+        "id": "photo",
+        "weight": 0.89,
+        "relation": "transform",
+        "reason": [
+          "type",
+          "imagery"
+        ]
+      },
+      {
+        "id": "beloved",
+        "weight": 0.85,
+        "reason": [
+          "mode",
+          "imagery"
+        ]
+      },
+      {
+        "id": "traces-of-healing",
+        "weight": 0.81,
+        "reason": [
+          "imagery",
+          "type"
+        ]
+      },
+      {
+        "id": "hope",
+        "weight": 0.75,
+        "reason": [
+          "imagery",
+          "type"
+        ]
+      },
+      {
+        "id": "winter",
+        "weight": 0.7,
+        "reason": [
+          "mode",
+          "type"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "perplexity",
+    "world": "bless-you",
+    "title": "Perplexity",
+    "firstLine": "Before my eyes, is an aged face, Hearing a youthful voice, beside my ear, Speaking of something outdated, from his mouth, This is a dream that puzzles a child.",
+    "emotionScore": 0.515,
+    "contentTypes": [
+      "narrative",
+      "spiritual"
+    ],
+    "atlasRelations": []
+  },
+  {
+    "id": "river",
+    "world": "bless-you",
+    "title": "River",
+    "firstLine": "I pick up the pen Which they say this will cause the drain.",
+    "emotionScore": 0.256,
+    "contentTypes": [
+      "love",
+      "fragmented"
+    ],
+    "atlasRelations": [
+      {
+        "id": "drowned-spirit",
+        "weight": 0.92,
+        "relation": "transform",
+        "reason": [
+          "imagery",
+          "type"
+        ]
+      },
+      {
+        "id": "missing",
+        "weight": 0.74,
+        "reason": [
+          "type",
+          "mode"
+        ]
+      },
+      {
+        "id": "photo",
+        "weight": 0.71,
+        "reason": [
+          "type",
+          "imagery"
+        ]
+      },
+      {
+        "id": "sleeping-in",
+        "weight": 0.65,
+        "reason": [
+          "mode",
+          "type"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "silver-tipped-shoes",
+    "world": "bless-you",
+    "title": "Silver Tipped Shoes",
+    "firstLine": "I feel the sharp gaze from across the room, Breaking my quiet like a sudden boom.",
+    "emotionScore": 0.393,
+    "contentTypes": [
+      "love",
+      "observation",
+      "incantatory"
+    ],
+    "atlasRelations": []
+  },
+  {
+    "id": "symphony",
+    "world": "bless-you",
+    "title": "Symphony",
+    "firstLine": "Walking through the night, Listening to symphonies played by moonlight.",
+    "emotionScore": 0.383,
+    "contentTypes": [
+      "spiritual",
+      "observation"
+    ],
+    "atlasRelations": []
+  },
+  {
+    "id": "telecine",
+    "world": "bless-you",
+    "title": "Telecine",
+    "firstLine": "The shape formed by a group of cats — can tell you the dog's name.",
+    "emotionScore": 0.237,
+    "contentTypes": [
+      "fragmented",
+      "monologue"
+    ],
+    "atlasRelations": []
+  },
+  {
+    "id": "the-absurd",
+    "world": "bless-you",
+    "title": "The Absurd",
+    "firstLine": "Dancing, she dances, is the absurd, the absurd and more, Like clouds your polished mind changes shape forevermore.",
+    "emotionScore": 0.649,
+    "contentTypes": [
+      "incantatory",
+      "political",
+      "fragmented"
+    ],
+    "atlasRelations": []
+  },
+  {
+    "id": "the-only",
+    "world": "bless-you",
+    "title": "The Only",
+    "firstLine": "Eyes, Not turning away from the phone, Waiting for each word to appear on the screen.",
+    "emotionScore": 0.404,
+    "contentTypes": [
+      "observation",
+      "monologue"
+    ],
+    "atlasRelations": []
+  },
+  {
+    "id": "today",
+    "world": "bless-you",
+    "title": "Today",
+    "firstLine": "The moon flips, open a day, ripples and metal kneaded into a cup, quiet drum from my soul has delayed, by the bed's edge, push me to a drop, Everyone sleeps at the stop.",
+    "emotionScore": 0.404,
+    "contentTypes": [
+      "fragmented",
+      "monologue"
+    ],
+    "atlasRelations": []
+  },
+  {
+    "id": "traces-of-healing",
+    "world": "bless-you",
+    "title": "Traces Of Healing",
+    "firstLine": "The statuette lies askew in the grass, The cracks in the road mended with black rubber, Forcing plants to surrender all their colors, Leaving only the yellow of the aftermath.",
+    "emotionScore": 0.514,
+    "contentTypes": [
+      "spiritual",
+      "love"
+    ],
+    "atlasRelations": [
+      {
+        "id": "hope",
+        "weight": 0.9,
+        "relation": "transform",
+        "reason": [
+          "type",
+          "imagery"
+        ]
+      },
+      {
+        "id": "missing",
+        "weight": 0.81,
+        "reason": [
+          "imagery",
+          "type"
+        ]
+      },
+      {
+        "id": "beloved",
+        "weight": 0.79,
+        "reason": [
+          "mode",
+          "type"
+        ]
+      },
+      {
+        "id": "ghost",
+        "weight": 0.71,
+        "reason": [
+          "imagery",
+          "type"
+        ]
+      },
+      {
+        "id": "shadow",
+        "weight": 0.7,
+        "reason": [
+          "mode",
+          "imagery"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unworthy",
+    "world": "bless-you",
+    "title": "Unworthy",
+    "firstLine": "People ask me, unabashedly, What value I carry, what worth I hold.",
+    "emotionScore": 0.33,
+    "contentTypes": [
+      "monologue",
+      "political"
+    ],
+    "atlasRelations": []
+  },
+  {
+    "id": "wandering",
+    "world": "bless-you",
+    "title": "Wandering",
+    "firstLine": "Don't be afraid, We're still on Earth today.",
+    "emotionScore": 0.349,
+    "contentTypes": [
+      "monologue",
+      "fragmented"
+    ],
+    "atlasRelations": []
+  },
+  {
+    "id": "young-blood",
+    "world": "bless-you",
+    "title": "Young Blood",
+    "firstLine": "You ask me to share your pain, calling it suffering.",
+    "emotionScore": 0.462,
+    "contentTypes": [
+      "political",
+      "monologue"
+    ],
+    "atlasRelations": [
+      {
+        "id": "manifesto",
+        "weight": 0.88,
+        "relation": "transform",
+        "reason": [
+          "type",
+          "mode"
+        ]
+      },
+      {
+        "id": "hope",
+        "weight": 0.76,
+        "reason": [
+          "mode",
+          "type"
+        ]
+      },
+      {
+        "id": "the-observer",
+        "weight": 0.71,
+        "reason": [
+          "type",
+          "mode"
+        ]
+      },
+      {
+        "id": "drowned-spirit",
+        "weight": 0.67,
+        "reason": [
+          "mode",
+          "type"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "after-snow",
+    "world": "still-life",
+    "title": "After Snow",
+    "firstLine": "I cannot say, as snow fell.",
+    "emotionScore": 0.243,
+    "contentTypes": [
+      "observation",
+      "fragmented"
+    ],
+    "atlasRelations": []
+  },
+  {
+    "id": "afternoon-nap",
+    "world": "still-life",
+    "title": "Afternoon Nap",
+    "firstLine": "After lunch, at Tabetomo in New York, A draft of Sapporo, a large serving of ramen.",
+    "emotionScore": 0.27,
+    "contentTypes": [
+      "narrative",
+      "love"
+    ],
+    "atlasRelations": []
+  },
+  {
+    "id": "black-paint",
+    "world": "still-life",
+    "title": "Black Paint",
+    "firstLine": "From birth, we have been wearing it, Protecting our souls, immortal yet unfading.",
+    "emotionScore": 0.523,
+    "contentTypes": [
+      "political",
+      "fragmented",
+      "monologue"
+    ],
+    "atlasRelations": []
+  },
+  {
+    "id": "boring-clouds",
+    "world": "still-life",
+    "title": "Boring Clouds",
+    "firstLine": "The train rushes past a curtain of trees, A house appears, then vanishes in seconds.",
+    "emotionScore": 0.491,
+    "contentTypes": [
+      "monologue",
+      "observation"
+    ],
+    "atlasRelations": []
+  },
+  {
+    "id": "breathe-away",
+    "world": "still-life",
+    "title": "Breathe Away",
+    "firstLine": "Sunlight enters his home, wait, Life after snow, with sparrows, start, Iron wire leaps from cars to trees, Dead woods became birds, To fly, suddenly free.",
+    "emotionScore": 0.287,
+    "contentTypes": [
+      "observation",
+      "spiritual"
+    ],
+    "atlasRelations": []
+  },
+  {
+    "id": "coin",
+    "world": "still-life",
+    "title": "Coin",
+    "firstLine": "I want to sing a song without wind, In the moment when the coin is tossed, Consciousness slips past sunlight and smile, I gaze upon your face, Until flowers bloom in the sea, the trend.",
+    "emotionScore": 0.337,
+    "contentTypes": [
+      "love",
+      "monologue"
+    ],
+    "atlasRelations": []
+  },
+  {
+    "id": "dusk",
+    "world": "still-life",
+    "title": "Dusk",
+    "firstLine": "Like tiny fine droplets, The breeze lifts delicate gauze at bedside, A blue light enters, tinged with pink and orange hues.",
+    "emotionScore": 0.417,
+    "contentTypes": [
+      "love",
+      "observation"
+    ],
+    "atlasRelations": [
+      {
+        "id": "sleeping-in",
+        "weight": 0.84,
+        "reason": [
+          "mode",
+          "type"
+        ]
+      },
+      {
+        "id": "night-light",
+        "weight": 0.74,
+        "reason": [
+          "imagery",
+          "type"
+        ]
+      },
+      {
+        "id": "beloved",
+        "weight": 0.76,
+        "reason": [
+          "imagery",
+          "type"
+        ]
+      },
+      {
+        "id": "winter",
+        "weight": 0.76,
+        "reason": [
+          "imagery",
+          "type"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "early-spring",
+    "world": "still-life",
+    "title": "Early Spring",
+    "firstLine": "I arrived at the era, to be displayed.",
+    "emotionScore": 0.244,
+    "contentTypes": [
+      "observation",
+      "fragmented"
+    ],
+    "atlasRelations": []
+  },
+  {
+    "id": "feather",
+    "world": "still-life",
+    "title": "Feather",
+    "firstLine": "I look at myself in the mirror, Teardrops sliding down my cheeks.",
+    "emotionScore": 0.469,
+    "contentTypes": [
+      "monologue",
+      "spiritual"
+    ],
+    "atlasRelations": []
+  },
+  {
+    "id": "ghost",
+    "world": "still-life",
+    "title": "Ghost",
+    "firstLine": "Upon the prairie, here, zebras bend and tear, Their breast, born from light, common and ordinary.",
+    "emotionScore": 0.244,
+    "contentTypes": [
+      "spiritual",
+      "fragmented"
+    ],
+    "atlasRelations": [
+      {
+        "id": "shadow",
+        "weight": 0.93,
+        "relation": "transform",
+        "reason": [
+          "mode",
+          "imagery"
+        ]
+      },
+      {
+        "id": "photo",
+        "weight": 0.82,
+        "reason": [
+          "imagery",
+          "type"
+        ]
+      },
+      {
+        "id": "night-light",
+        "weight": 0.75,
+        "reason": [
+          "mode",
+          "imagery"
+        ]
+      },
+      {
+        "id": "the-observer",
+        "weight": 0.73,
+        "reason": [
+          "type",
+          "mode"
+        ]
+      },
+      {
+        "id": "traces-of-healing",
+        "weight": 0.71,
+        "reason": [
+          "imagery",
+          "type"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "green-tea",
+    "world": "still-life",
+    "title": "Green Tea",
+    "firstLine": "Not until the end of the fourteenth chapter, Did I finally break free from my ruminating thoughts, And hear the conversations around me.",
+    "emotionScore": 0.295,
+    "contentTypes": [
+      "narrative",
+      "observation"
+    ],
+    "atlasRelations": []
+  },
+  {
+    "id": "iron-nails",
+    "world": "still-life",
+    "title": "Iron Nails",
+    "firstLine": "The neighborhood, digital elevators emerging from the ground, Trees jutting at angles, green palms nestled between buildings, Crevices overflowing with moss and unnamed grasses.",
+    "emotionScore": 0.262,
+    "contentTypes": [
+      "observation"
+    ],
+    "atlasRelations": []
+  },
+  {
+    "id": "just-a-sign",
+    "world": "still-life",
+    "title": "Just A Sign",
+    "firstLine": "They say, I'm nothing special.",
+    "emotionScore": 0.468,
+    "contentTypes": [
+      "monologue",
+      "political"
+    ],
+    "atlasRelations": []
+  },
+  {
+    "id": "night-light",
+    "world": "still-life",
+    "title": "Night Light",
+    "firstLine": "I close the door, turn on the night light.",
+    "emotionScore": 0.276,
+    "contentTypes": [
+      "monologue",
+      "observation"
+    ],
+    "atlasRelations": [
+      {
+        "id": "room",
+        "weight": 0.89,
+        "relation": "transform",
+        "reason": [
+          "mode",
+          "imagery"
+        ]
+      },
+      {
+        "id": "shadow",
+        "weight": 0.82,
+        "reason": [
+          "imagery",
+          "mode"
+        ]
+      },
+      {
+        "id": "sleeping-in",
+        "weight": 0.78,
+        "reason": [
+          "mode",
+          "type"
+        ]
+      },
+      {
+        "id": "dusk",
+        "weight": 0.74,
+        "reason": [
+          "imagery",
+          "type"
+        ]
+      },
+      {
+        "id": "window",
+        "weight": 0.68,
+        "reason": [
+          "imagery",
+          "mode"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "photo",
+    "world": "still-life",
+    "title": "Photo",
+    "firstLine": "Many people walk down, over the sake of my head, On the white wall ahead, I see smiling faces with urban minds.",
+    "emotionScore": 0.303,
+    "contentTypes": [
+      "observation",
+      "narrative"
+    ],
+    "atlasRelations": [
+      {
+        "id": "missing",
+        "weight": 0.89,
+        "relation": "transform",
+        "reason": [
+          "type",
+          "imagery"
+        ]
+      },
+      {
+        "id": "ghost",
+        "weight": 0.82,
+        "reason": [
+          "imagery",
+          "type"
+        ]
+      },
+      {
+        "id": "winter",
+        "weight": 0.76,
+        "reason": [
+          "type",
+          "mode"
+        ]
+      },
+      {
+        "id": "room",
+        "weight": 0.7,
+        "reason": [
+          "imagery",
+          "mode"
+        ]
+      },
+      {
+        "id": "shadow",
+        "weight": 0.74,
+        "reason": [
+          "imagery",
+          "type"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "platform",
+    "world": "still-life",
+    "title": "Platform",
+    "firstLine": "Midnight blue, Peter River, lightest and mair; Moon blurs softly, impressions, beyond aware.",
+    "emotionScore": 0.287,
+    "contentTypes": [
+      "love",
+      "fragmented"
+    ],
+    "atlasRelations": []
+  },
+  {
+    "id": "roaring",
+    "world": "still-life",
+    "title": "Roaring",
+    "firstLine": "Roaring, sneezing, sobbing.",
+    "emotionScore": 0.31,
+    "contentTypes": [
+      "observation",
+      "monologue"
+    ],
+    "atlasRelations": []
+  },
+  {
+    "id": "sleeping-in",
+    "world": "still-life",
+    "title": "Sleeping In",
+    "firstLine": "You lean against the train's side wall, Sinking deep into slumber, Glasses perched upon your face.",
+    "emotionScore": 0.449,
+    "contentTypes": [
+      "narrative",
+      "observation"
+    ],
+    "atlasRelations": [
+      {
+        "id": "the-observer",
+        "weight": 0.91,
+        "relation": "transform",
+        "reason": [
+          "mode",
+          "imagery"
+        ]
+      },
+      {
+        "id": "dusk",
+        "weight": 0.84,
+        "reason": [
+          "mode",
+          "type"
+        ]
+      },
+      {
+        "id": "room",
+        "weight": 0.76,
+        "reason": [
+          "imagery",
+          "mode"
+        ]
+      },
+      {
+        "id": "night-light",
+        "weight": 0.78,
+        "reason": [
+          "mode",
+          "type"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "snowy-county",
+    "world": "still-life",
+    "title": "Snowy County",
+    "firstLine": "Sunlight glides across the rooftop.",
+    "emotionScore": 0.466,
+    "contentTypes": [
+      "observation",
+      "incantatory"
+    ],
+    "atlasRelations": []
+  },
+  {
+    "id": "stone-frog",
+    "world": "still-life",
+    "title": "Stone Frog",
+    "firstLine": "Under the cherry blossoms, Two stone frogs, Some say they're golden toads.",
+    "emotionScore": 0.257,
+    "contentTypes": [
+      "love",
+      "observation"
+    ],
+    "atlasRelations": []
+  },
+  {
+    "id": "thermos",
+    "world": "still-life",
+    "title": "Thermos",
+    "firstLine": "Although I cannot merge into your world, I stand on the table, My hard metal interior encased in the exterior, in white.",
+    "emotionScore": 0.274,
+    "contentTypes": [
+      "monologue",
+      "observation"
+    ],
+    "atlasRelations": []
+  },
+  {
+    "id": "third-three",
+    "world": "still-life",
+    "title": "Third Three",
+    "firstLine": "I pull up winter, from bed, The air conditioner walks beyond quilts.",
+    "emotionScore": 0.443,
+    "contentTypes": [
+      "monologue",
+      "fragmented"
+    ],
+    "atlasRelations": []
+  },
+  {
+    "id": "tourist",
+    "world": "still-life",
+    "title": "Tourist",
+    "firstLine": "In time, a high wall rises, a fortress is built, Only to resist the erosion of time, the invasion of memories, Until opening that door weathered by wind, looking inside, There is nothing, no people or",
+    "emotionScore": 0.352,
+    "contentTypes": [
+      "narrative",
+      "observation"
+    ],
+    "atlasRelations": []
+  },
+  {
+    "id": "urban-monologue",
+    "world": "still-life",
+    "title": "Urban Monologue",
+    "firstLine": "Like ﬂowers on a balcony, I gaze at the wall.",
+    "emotionScore": 0.267,
+    "contentTypes": [
+      "observation",
+      "political"
+    ],
+    "atlasRelations": []
+  },
+  {
+    "id": "washing",
+    "world": "still-life",
+    "title": "Washing",
+    "firstLine": "At five, I get up from the boat, washing; Seven, washing, waking up, washing.",
+    "emotionScore": 0.386,
+    "contentTypes": [
+      "incantatory",
+      "monologue"
+    ],
+    "atlasRelations": []
+  },
+  {
+    "id": "winter",
+    "world": "still-life",
+    "title": "Winter",
+    "firstLine": "Pink, slowly tears the frosted winter free, Sugar-coated season begins to slip away.",
+    "emotionScore": 0.237,
+    "contentTypes": [
+      "love",
+      "spiritual"
+    ],
+    "atlasRelations": [
+      {
+        "id": "beloved",
+        "weight": 0.72,
+        "reason": [
+          "mode",
+          "type"
+        ]
+      },
+      {
+        "id": "drowned-spirit",
+        "weight": 0.74,
+        "reason": [
+          "mode",
+          "type"
+        ]
+      },
+      {
+        "id": "dusk",
+        "weight": 0.76,
+        "reason": [
+          "imagery",
+          "type"
+        ]
+      },
+      {
+        "id": "missing",
+        "weight": 0.7,
+        "reason": [
+          "mode",
+          "type"
+        ]
+      },
+      {
+        "id": "photo",
+        "weight": 0.76,
+        "reason": [
+          "type",
+          "mode"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "yellow",
+    "world": "still-life",
+    "title": "Yellow",
+    "firstLine": "Random ink, one night, fills the sky.",
+    "emotionScore": 0.304,
+    "contentTypes": [
+      "observation",
+      "spiritual"
+    ],
+    "atlasRelations": []
+  }
+]

@@ -1,0 +1,29 @@
+{
+  "@context": "https://schema.org",
+  "@type": "Poem",
+  "@id": "https://daipan.ink/their-world/the-barn",
+  "name": "The Barn",
+  "url": "https://daipan.ink/their-world/the-barn",
+  "mainEntityOfPage": "https://daipan.ink/their-world/the-barn",
+  "author": {
+    "@id": "https://daipan.ink/#author"
+  },
+  "isPartOf": [
+    {
+      "@id": "https://daipan.ink/#collection"
+    },
+    {
+      "@id": "https://daipan.ink/their-world#volume"
+    }
+  ],
+  "genre": "Their World; the world one is asked to enter",
+  "abstract": "Passing by a patch of land, like similar farmland, Yellow and green. Similar houses, washed away by wind and rain. The same bonfire, a dog, A tractor,",
+  "inLanguage": "en",
+  "copyrightHolder": {
+    "@id": "https://daipan.ink/#author"
+  },
+  "copyrightYear": "2025",
+  "copyrightNotice": "All poems and texts © 2024–2026 Dai Pan (潘岱). Unauthorized reproduction, redistribution, adaptation, publication, or AI training use is prohibited without written permission.",
+  "license": "All rights reserved — Dai Pan (潘岱)",
+  "position": 17
+}
