@@ -1,0 +1,207 @@
+[
+  {
+    "piece": "alpine-dawn",
+    "description": "Snow peaks catching first light above a still, misty mountain lake."
+  },
+  {
+    "piece": "amer-fort",
+    "description": "Amer fort floodlit gold on its hill, mirrored in maota lake at night."
+  },
+  {
+    "piece": "aurora-fjord",
+    "description": "Aurora curtains rippling over a still fjord, a cabin lit on the shore."
+  },
+  {
+    "piece": "black-prism",
+    "description": "The vercel triangle as a glass prism, splitting white light to a rainbow."
+  },
+  {
+    "piece": "cloud-sea",
+    "description": "The sun sinks into a drifting sea of orange cloud at dusk."
+  },
+  {
+    "piece": "command-city",
+    "description": "A night city whose boulevards trace the command key in streetlight."
+  },
+  {
+    "piece": "deep-reef",
+    "description": "Light shafts, swaying kelp and a turning school of fish over a reef."
+  },
+  {
+    "piece": "desert-night",
+    "description": "The milky way over a lone acacia on moonless dunes, meteors falling."
+  },
+  {
+    "piece": "earthrise",
+    "description": "The earth rising over a cratered lunar horizon in long low sunlight."
+  },
+  {
+    "piece": "edge-orbit",
+    "description": "The night earth from orbit, cloudflare requests arcing city to city."
+  },
+  {
+    "piece": "gangaur-ghat",
+    "description": "Udaipur at night, a lit gateway on lake pichola and diyas on the water."
+  },
+  {
+    "piece": "green-storm",
+    "description": "A thunderstorm at sea, the lightning striking in the supabase bolt."
+  },
+  {
+    "piece": "jal-mahal",
+    "description": "The jaipur water palace floating on a misty lake at sunrise."
+  },
+  {
+    "piece": "jungle-falls",
+    "description": "A tiered waterfall in a rainforest gorge, spray, a rainbow and macaws."
+  },
+  {
+    "piece": "kite-festival",
+    "description": "Sankranti kites crowding a golden sky over the pink roofs of jaipur."
+  },
+  {
+    "piece": "kyoto-dusk",
+    "description": "A pagoda at dusk behind a cherry tree lit by a stone lantern."
+  },
+  {
+    "piece": "lake-pichola",
+    "description": "Sunset on lake pichola, udaipur's palaces glowing over the water."
+  },
+  {
+    "piece": "lantern-lake",
+    "description": "Sky lanterns rising over a still mountain lake, one let go from a boat."
+  },
+  {
+    "piece": "lava-wall",
+    "description": "A wall of lava lamps under the glowing orange cloud, watched by a camera."
+  },
+  {
+    "piece": "marine-drive",
+    "description": "Mumbai's queen's necklace at night, lamps curving round the bay."
+  },
+  {
+    "piece": "misty-forest",
+    "description": "Pine ridges fading into morning fog, sunbeams slanting through."
+  },
+  {
+    "piece": "night-coast",
+    "description": "A lighthouse turning its beam under moonlit clouds over a dark sea."
+  },
+  {
+    "piece": "night-highway",
+    "description": "A desert highway at dusk, rushing toward the mountains and last light."
+  },
+  {
+    "piece": "ocean-sunset",
+    "description": "The sun sets past a pine headland, lit cloud, glitter on rolling sea."
+  },
+  {
+    "piece": "planet-scale",
+    "description": "A dark planet cut into the planetscale mark, backlit, a moon circling."
+  },
+  {
+    "piece": "prism-city",
+    "description": "A black spire and an orange cloud over a blue hour city and its river."
+  },
+  {
+    "piece": "salt-flat",
+    "description": "The vercel triangle over a mirror of salt, the sun rising behind its tip."
+  },
+  {
+    "piece": "saturn-rise",
+    "description": "Saturn and its rings hanging over the cracked ice and geysers of a moon."
+  },
+  {
+    "piece": "snow-train",
+    "description": "A lit train crossing a snowy stone viaduct at night as snow falls."
+  },
+  {
+    "piece": "storm-plains",
+    "description": "An anvil thunderhead at dusk flickering over a wheat field."
+  },
+  {
+    "piece": "taj-dawn",
+    "description": "The taj mahal at sunrise, mirrored in its pool through morning haze."
+  },
+  {
+    "piece": "tokyo-rain",
+    "description": "A tokyo side street in the rain, neon signs shining on the wet road."
+  },
+  {
+    "piece": "varanasi-ghats",
+    "description": "Dusk aarti on the ganga, lamps on the steps and diyas on the water."
+  },
+  {
+    "piece": "volcano-night",
+    "description": "A volcano erupting at night, lava rivers, an ash plume full of lightning."
+  },
+  {
+    "piece": "heart-flare",
+    "description": "A golden silhouette, with a point of light at the heart that blooms and recedes.",
+    "painting": {
+      "number": 1,
+      "label": "Heart Flare",
+      "credit": "Reference image supplied for this study",
+      "motion": "flare",
+      "crop": 0.43
+    }
+  },
+  {
+    "piece": "winter-church",
+    "description": "A white chapel under a blue sky as the grass gives way to snow.",
+    "painting": {
+      "number": 2,
+      "label": "Winter Church",
+      "credit": "Reference image supplied for this study",
+      "motion": "winter",
+      "crop": 0.62
+    }
+  },
+  {
+    "piece": "yellow-screen",
+    "description": "A rectangular yellow light brightens and fades behind a house at dusk.",
+    "painting": {
+      "number": 3,
+      "label": "Yellow Screen",
+      "credit": "Reference image supplied for this study",
+      "motion": "screen",
+      "crop": 0.5
+    }
+  },
+  {
+    "piece": "moonlit-bridge",
+    "description": "Moonlight glints on a quiet river below a stone bridge, between shadowed trees and distant houses.",
+    "painting": {
+      "label": "Moonlit Landscape with Bridge",
+      "credit": "Aert van der Neer, Moonlit Landscape with Bridge, probably 1648/1650",
+      "source": "https://www.nga.gov/artworks/71369-moonlit-landscape-bridge",
+      "crop": 0.61,
+      "motion": "moonlight",
+      "number": 7
+    }
+  },
+  {
+    "piece": "wivenhoe-park",
+    "description": "Grazing cattle, a wooden fence and a distant brick house sit beside a lake under summer clouds.",
+    "painting": {
+      "label": "Wivenhoe Park",
+      "credit": "John Constable, Wivenhoe Park, Essex, 1816",
+      "source": "https://www.nga.gov/artworks/1147-wivenhoe-park-essex",
+      "crop": 0.48,
+      "motion": "wivenhoe",
+      "number": 8
+    }
+  },
+  {
+    "piece": "mount-corcoran",
+    "description": "A forest-green lake and narrow waterfall lie under jagged snowy mountains and high clouds.",
+    "painting": {
+      "label": "Mount Corcoran",
+      "credit": "Albert Bierstadt, Mount Corcoran, c. 1876–1877",
+      "source": "https://www.nga.gov/artworks/166428-mount-corcoran",
+      "crop": 0.24,
+      "motion": "clouds",
+      "number": 9
+    }
+  }
+]

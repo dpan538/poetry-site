@@ -1,0 +1,2 @@
+# Upstream ascii.rest renderer and scenes are shipped as third-party assets.
+site/assets/manifold/** linguist-vendored

@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MANIFOLD Studies — Dai Pan</title>
+  <style>
+    :root { color: #23221f; background: #f5f1e8; font-family: Georgia, serif; }
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    main { width: min(900px, 100% - 40px); margin: clamp(28px, 7vh, 72px) auto; }
+    h1 { font-size: clamp(2rem, 7vw, 3.2rem); font-weight: 400; margin: .2em 0 .65em; }
+    .eyebrow { color: #235e93; font: 12px/1.4 system-ui, sans-serif; letter-spacing: .16em; }
+    nav { display: flex; flex-wrap: wrap; gap: .35rem 1.3rem; margin-bottom: 1rem; }
+    button { font: inherit; min-height: 44px; padding: 0; cursor: pointer; border: 0; background: none; color: #56514a; }
+    button[aria-pressed="true"] { color: #23221f; text-decoration: underline #bb392e; text-underline-offset: .4em; }
+    button:focus-visible { outline: 2px solid #286ead; outline-offset: 3px; }
+    figure { margin: 0; }
+    canvas { display: block; max-width: 100%; max-height: 64svh; width: auto; height: auto; object-fit: contain; margin-inline: auto; background: #f5f1e8; outline: 1px solid #aed4d2; }
+    figcaption { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; }
+    figcaption p { max-width: 46ch; margin: 1rem 0 0; color: #56514a; line-height: 1.5; }
+    #playback { color: #235e93; }
+    #original[hidden] { display: none; }
+    #original { display: inline-block; margin-top: .35em; color: #235e93; }
+  </style>
+</head>
+<body>
+  <main>
+    <p class="eyebrow">LIGHT STUDIES · 01–03 / 07–09</p>
+    <h1>MANIFOLD Studies</h1>
+    <nav id="study-scenes" aria-label="Animation studies"></nav>
+    <figure>
+      <canvas id="scene" width="1000" height="500" role="img" aria-labelledby="description"></canvas>
+      <figcaption>
+        <p><span id="description"></span><br><a id="original">View original at the National Gallery of Art</a></p>
+        <button id="playback" type="button">Pause</button>
+      </figcaption>
+    </figure>
+  </main>
+  <script type="module">
+    import init, { start_lab } from './paintings.js';
+    await init({ module_or_path: new URL('./paintings_bg.wasm', import.meta.url) });
+    start_lab();
+  </script>
+</body>
+</html>
