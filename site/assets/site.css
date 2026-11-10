@@ -1,4 +1,5 @@
 /* The original site chrome and reading styles live in base.css and poem.css. */
+:root { --manifold-paper: #f5f1e8; }
 :root, html[data-world="their-world"] {
   --highlight-blue: #286ead;
   --highlight-red: #bb392e;
@@ -300,7 +301,6 @@ body[data-entry-page] .site-copyright { display: none; }
 }
 .manifold-trigger:is(:hover, :focus-visible) { color: var(--color-primary); text-decoration: underline wavy var(--highlight-line); text-underline-offset: 4px; }
 .manifold {
-  --manifold-paper: #f5f1e8;
   --manifold-ink: #211f1c;
   --manifold-keyword: #36584e;
   --manifold-hover: #526e5d;
@@ -567,12 +567,15 @@ body:has(#manifold[open]) { overflow: hidden; }
   .mobile-index-sheet[data-skin-ewxlwce5] { --mobile-index-green: var(--mobile-highlight); }
   :is(.mobile-sheet, .mobile-index-sheet):is([data-mobile-sheet], [data-mobile-site-index]) {
     visibility: hidden;
-    transition: opacity .36s var(--mobile-ease), background-color .36s var(--mobile-ease), visibility 0s linear .36s;
+    transition: opacity .36s var(--mobile-ease), visibility 0s linear .36s;
   }
   :is(.mobile-sheet, .mobile-index-sheet):is([data-mobile-sheet], [data-mobile-site-index]).is-open {
     visibility: visible;
+    background: transparent;
     transition-delay: 0s;
   }
+  .mobile-sheet-open .mobile-poem-dock,
+  .mobile-site-index-open .mobile-index-float { visibility: hidden; }
   :is(.mobile-sheet, .mobile-index-sheet) > :is(.mobile-sheet-panel, .mobile-index-panel) {
     display: flex;
     flex-direction: column;
@@ -654,6 +657,9 @@ body:has(#manifold[open]) { overflow: hidden; }
   }
 
   .manifold-trigger { display: none; }
+  /* Safari may paint below the dialog's backdrop when the bottom toolbar collapses. */
+  html:has(#manifold[open]) { background-color: var(--manifold-paper); }
+  body:has(#manifold[open]) { visibility: hidden; }
   .manifold::backdrop { background: var(--manifold-paper); }
   .manifold[open]::backdrop { animation: manifold-enter .43s var(--mobile-ease) both; }
   .manifold[data-closing]::backdrop { animation: manifold-backdrop-exit .32s var(--mobile-ease) both; }
@@ -670,6 +676,7 @@ body:has(#manifold[open]) { overflow: hidden; }
     transform: none;
   }
   .manifold[open] {
+    visibility: visible;
     grid-template-rows: minmax(16px, 2fr) auto minmax(18px, 1fr) auto minmax(18px, 1fr);
     padding-block: calc(env(safe-area-inset-top) + clamp(0px, 24dvh - 100px, 70px))
       env(safe-area-inset-bottom);
