@@ -203,5 +203,73 @@
       "motion": "clouds",
       "number": 9
     }
+  },
+  {
+    "piece": "private-blue",
+    "description": "A private shopfront and a locked iron gate beneath a still, delicate blue sky; one faint cloud drifts above the public street.",
+    "original": {
+      "credit": "Original procedural scene for Private Sky"
+    }
+  },
+  {
+    "piece": "dusk-gauze",
+    "description": "Translucent gauze at a bedside window, softly moving leaves and pink-orange light falling across wooden floorboards at dusk.",
+    "original": {
+      "credit": "Original generated image and layered Rust animation for Dusk"
+    }
+  },
+  {
+    "piece": "crown-tiles",
+    "description": "Dusty antique-shop glazing, blue-green square tiles, stacked records and boxes; motes fall through light on both sides of the glass.",
+    "original": {
+      "credit": "Original generated image and layered Rust animation for Crown Antiques"
+    }
+  },
+  {
+    "piece": "drowned-water",
+    "description": "An empty riverside bench, rippling city reflections and a fading sunset; blue hour arrives as window and shore lights gradually brighten.",
+    "original": {
+      "credit": "Original generated image and layered Rust animation for Drowned Spirit"
+    }
+  },
+  {
+    "piece": "homeward-bridge",
+    "description": "A vermilion bridge lands on a stone quay beside a warm house, connected to its entrance by a short shore path.",
+    "original": {
+      "credit": "Original procedural Rust scene for Going Home",
+      "renderer": "atmospheres"
+    }
+  },
+  {
+    "piece": "observer-supper",
+    "description": "A warm candlelit dinner inside, with seven black-coated observers barely visible outside a dark night window.",
+    "original": {
+      "credit": "Original procedural Rust scene for The Observer",
+      "renderer": "atmospheres"
+    }
+  },
+  {
+    "piece": "silver-lake",
+    "description": "Silver snow ridges and one sharp ice facet rise over a dark blue mirror lake under a pale moon.",
+    "original": {
+      "credit": "Original procedural Rust scene for Silver Tipped Shoes",
+      "renderer": "atmospheres"
+    }
+  },
+  {
+    "piece": "sleeping-courtyard",
+    "description": "A white limestone arcade and courtyard pool under a bright blue sky; a few pink beads drift across blue water beside an empty boat.",
+    "original": {
+      "credit": "Original procedural Rust scene for Sleeping In",
+      "renderer": "atmospheres"
+    }
+  },
+  {
+    "piece": "iron-shrine",
+    "description": "One large foreground torii frames a smaller, lower shrine hall at the end of a stone approach, with layered snow mountains behind and no foreground trees.",
+    "original": {
+      "credit": "Original procedural Rust scene for Iron Nails",
+      "renderer": "atmospheres"
+    }
   }
 ]
