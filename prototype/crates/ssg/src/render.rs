@@ -237,6 +237,22 @@ pub struct Scene {
 struct CatalogEntry {
     piece: String,
     painting: Option<PaintingCredit>,
+    original: Option<OriginalCredit>,
+}
+
+#[derive(Deserialize)]
+struct OriginalCredit {
+    credit: String,
+    #[serde(default)]
+    renderer: OriginalRenderer,
+}
+
+#[derive(Default, Deserialize)]
+#[serde(rename_all = "lowercase")]
+enum OriginalRenderer {
+    #[default]
+    Originals,
+    Atmospheres,
 }
 
 #[derive(Deserialize)]
@@ -245,22 +261,36 @@ struct PaintingCredit {
     source: Option<String>,
 }
 
-fn manifold(scene: &Scene, title: &str, painting: Option<&PaintingCredit>) -> String {
+fn manifold(scene: &Scene, title: &str, visual: &CatalogEntry) -> String {
     let piece = escape(&scene.piece);
-    let (desc, marker) = match painting {
-        Some(painting) => (
+    let (desc, marker) = if let Some(original) = &visual.original {
+        (
             format!(
                 "{} — {}",
                 escape(&scene.description),
-                escape(&painting.credit)
+                escape(&original.credit)
             ),
-            if painting.source.is_none() {
-                " data-painting data-photo"
-            } else {
-                " data-painting"
+            match original.renderer {
+                OriginalRenderer::Originals => " data-original",
+                OriginalRenderer::Atmospheres => " data-atmosphere",
             },
-        ),
-        None => (escape(&scene.description), ""),
+        )
+    } else {
+        match &visual.painting {
+            Some(painting) => (
+                format!(
+                    "{} — {}",
+                    escape(&scene.description),
+                    escape(&painting.credit)
+                ),
+                if painting.source.is_none() {
+                    " data-painting data-photo"
+                } else {
+                    " data-painting"
+                },
+            ),
+            None => (escape(&scene.description), ""),
+        }
     };
     let excerpt = escape(&scene.excerpt);
     let keywords = scene
@@ -292,7 +322,7 @@ fn render_work(
     works: &[Work],
     work: &Work,
     scenes: &BTreeMap<String, Scene>,
-    painting: Option<&PaintingCredit>,
+    visual: &CatalogEntry,
     nav: &[Value],
     shell: &str,
 ) -> Result<String> {
@@ -397,7 +427,7 @@ fn render_work(
         ("KIND",kind.to_string()),("WORK_ID",work.id.clone()),("WORK_META",format!("{} — {}",world.replace('-'," "),work.meta.order)),
         ("COLUMN_ALIGNMENT",column_alignment),("DESKTOP_TEXT",desktop_text(work)),("MOBILE_TEXT",mobile_text(work)),
         ("MANIFOLD_TRIGGER",r#"<button class="manifold-trigger" type="button" data-manifold-open aria-label="Open Manifold" aria-haspopup="dialog" aria-controls="manifold">Manifold</button>"#.to_owned()),
-        ("MANIFOLD",manifold(scene,&title,painting)),
+        ("MANIFOLD",manifold(scene,&title,visual)),
     ] { slots.insert(key.to_owned(),value); }
     template(&set_counts(shell, works), &slots)
 }
@@ -467,7 +497,7 @@ pub fn generate(root: &Path, output: &Path, works: &[Work], nav: &[Value]) -> Re
         serde_json::from_slice(&fs::read(root.join("site/data/manifold-catalog.json"))?)?;
     let catalog: BTreeMap<_, _> = catalog
         .into_iter()
-        .map(|entry| (entry.piece, entry.painting))
+        .map(|entry| (entry.piece.clone(), entry))
         .collect();
     for scene in scenes.values() {
         let slug = &scene.piece;
@@ -475,10 +505,10 @@ pub fn generate(root: &Path, output: &Path, works: &[Work], nav: &[Value]) -> Re
             !slug.is_empty() && slug.bytes().all(|b| b.is_ascii_lowercase() || b == b'-'),
             "Invalid MANIFOLD scene slug"
         );
-        let painting = catalog
+        let visual = catalog
             .get(slug)
             .with_context(|| format!("Unknown MANIFOLD scene {slug}"))?;
-        if painting.is_none() {
+        if visual.painting.is_none() && visual.original.is_none() {
             ensure!(
                 root.join(format!("site/assets/manifold/pieces/{slug}.js"))
                     .is_file(),
@@ -519,7 +549,7 @@ pub fn generate(root: &Path, output: &Path, works: &[Work], nav: &[Value]) -> Re
             works,
             work,
             &scenes,
-            catalog[&scene.piece].as_ref(),
+            &catalog[&scene.piece],
             nav,
             &shell,
         )?;

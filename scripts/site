@@ -5,9 +5,19 @@ if [ -d "$PWD/prototype/.cache/cargo" ] && [ -z "${CARGO_HOME:-}" ]; then
     export CARGO_HOME="$PWD/prototype/.cache/cargo"
 fi
 export CARGO_TARGET_DIR="$PWD/prototype/target"
+if [ "${1:-}" = studies ]; then
+    cargo build --locked --manifest-path prototype/Cargo.toml --release -p daipan-studies --target wasm32-unknown-unknown
+    exec cargo run --locked --manifest-path prototype/Cargo.toml -p daipan-site -- "$@"
+fi
+if [ "${1:-}" = originals ]; then
+    cargo build --locked --manifest-path prototype/Cargo.toml --release -p daipan-originals --target wasm32-unknown-unknown
+    exec cargo run --locked --manifest-path prototype/Cargo.toml -p daipan-site -- "$@"
+fi
 cargo build --locked --manifest-path prototype/Cargo.toml --release -p daipan-lab --target wasm32-unknown-unknown
 if [ "${1:-}" = lab ]; then
     exec cargo run --locked --manifest-path prototype/Cargo.toml -p daipan-site -- "$@"
 fi
+cargo build --locked --manifest-path prototype/Cargo.toml --release -p daipan-originals --target wasm32-unknown-unknown
+cargo build --locked --manifest-path prototype/Cargo.toml --release -p daipan-studies --target wasm32-unknown-unknown
 cargo build --locked --manifest-path prototype/Cargo.toml --release -p daipan-browser --target wasm32-unknown-unknown
 exec cargo run --locked --manifest-path prototype/Cargo.toml -p daipan-site -- "$@"

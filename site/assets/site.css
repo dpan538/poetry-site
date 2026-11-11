@@ -345,7 +345,7 @@ body[data-entry-page] .site-copyright { display: none; }
   --manifold-edge: #aed4d2;
 }
 .manifold[data-piece="night-coast"] { --manifold-edge: #16151a; }
-.manifold[data-photo] { --scene-ratio: 1.7; }
+.manifold:is([data-photo], [data-original], [data-atmosphere]) { --scene-ratio: 1.7; }
 body:has(#poem-page[data-work="platform"]) .manifold { --manifold-edge: #aed4d2; }
 .manifold[open] {
   display: grid;

@@ -1,6 +1,8 @@
 const active = new WeakMap();
 const moduleRetries = new Map();
 let paintingModule;
+let originalModule;
+let atmosphereModule;
 
 async function importScene(path) {
     for (let attempt = 0; ; attempt++) {
@@ -32,6 +34,70 @@ function loadPaintings() {
     });
 }
 
+function loadOriginals() {
+    return originalModule ??= importScene("/assets/manifold/originals.js").then(async (originals) => {
+        const path = "/assets/manifold/originals_bg.wasm";
+        let response = await fetch(path).catch(() => null);
+        if (!response?.ok) {
+            await new Promise(resolve => setTimeout(resolve, 180));
+            response = await fetch(path, { cache: "reload" });
+        }
+        if (!response.ok) throw new Error("Original renderer unavailable");
+        await originals.default({ module_or_path: response });
+        return originals;
+    }).catch((error) => {
+        originalModule = undefined;
+        throw error;
+    });
+}
+
+function loadAtmospheres() {
+    return atmosphereModule ??= importScene("/assets/manifold/atmospheres.js").then(async (module) => {
+        const path = "/assets/manifold/atmospheres_bg.wasm";
+        let response = await fetch(path).catch(() => null);
+        if (!response?.ok) {
+            await new Promise(resolve => setTimeout(resolve, 180));
+            response = await fetch(path, { cache: "reload" });
+        }
+        if (!response.ok) throw new Error("Atmospheric renderer unavailable");
+        await module.default({ module_or_path: response });
+        return module;
+    }).catch(error => {
+        atmosphereModule = undefined;
+        throw error;
+    });
+}
+
+function mountAtmosphere(module, dialog) {
+    const canvas = dialog.querySelector("canvas");
+    const reduced = matchMedia("(prefers-reduced-motion: reduce)");
+    let animation = module.mount_atmosphere(canvas, dialog.dataset.piece);
+    let width = canvas.clientWidth, dpr = devicePixelRatio, resizeTask;
+    const resize = new ResizeObserver(() => {
+        if (Math.abs(canvas.clientWidth - width) < 0.5 && devicePixelRatio === dpr) return;
+        clearTimeout(resizeTask);
+        resizeTask = setTimeout(() => {
+            const time = animation.elapsed();
+            animation.free();
+            animation = module.mount_atmosphere(canvas, dialog.dataset.piece);
+            animation.seek(time);
+            if (document.hidden || reduced.matches) animation.pause();
+            width = canvas.clientWidth;
+            dpr = devicePixelRatio;
+        }, 100);
+    });
+    const visibility = () => document.hidden || reduced.matches ? animation.pause() : animation.play();
+    resize.observe(canvas.parentElement);
+    document.addEventListener("visibilitychange", visibility);
+    visibility();
+    return () => {
+        clearTimeout(resizeTask);
+        resize.disconnect();
+        document.removeEventListener("visibilitychange", visibility);
+        animation.free();
+    };
+}
+
 export function stopManifold(dialog) {
     const playback = active.get(dialog);
     active.delete(dialog);
@@ -43,6 +109,22 @@ export async function playManifold(dialog) {
     const playback = {};
     active.set(dialog, playback);
     try {
+        if (dialog.hasAttribute("data-atmosphere")) {
+            const module = await loadAtmospheres();
+            if (!dialog.open || active.get(dialog) !== playback) return;
+            playback.unmount = mountAtmosphere(module, dialog);
+            dialog.setAttribute("data-scene-ready", "");
+            return;
+        }
+        if (dialog.hasAttribute("data-original")) {
+            const originals = await loadOriginals();
+            if (!dialog.open || active.get(dialog) !== playback) return;
+
+            const animation = originals.mount_original(dialog.querySelector("canvas"), dialog.dataset.piece);
+            playback.unmount = () => animation.free();
+            dialog.setAttribute("data-scene-ready", "");
+            return;
+        }
         if (dialog.hasAttribute("data-painting")) {
             const paintings = await loadPaintings();
             if (!dialog.open || active.get(dialog) !== playback) return;

@@ -43,6 +43,8 @@ fn build(root: &Path, output: &Path, wasm: &Path) -> Result<()> {
         .generate(&assets)
         .with_context(|| format!("Compile browser WASM first: {}", wasm.display()))?;
     build_paintings(&root.join("prototype/target"), &assets.join("manifold"))?;
+    build_originals(&root.join("prototype/target"), &assets.join("manifold"))?;
+    build_atmospheres(&root.join("prototype/target"), &assets.join("manifold"))?;
     fs::write(
         assets.join("start.js"),
         r#"import init from './browser.js';
@@ -185,12 +187,85 @@ fn serve_lab(root: &Path, port: u16) -> Result<()> {
     serve(&output, port)
 }
 
+fn build_originals(target: &Path, output: &Path) -> Result<()> {
+    Bindgen::new()
+        .web(true)?
+        .input_path(target.join("wasm32-unknown-unknown/release/daipan_originals.wasm"))
+        .out_name("originals")
+        .typescript(false)
+        .generate(output)
+        .context("Compile original MANIFOLD WASM first")
+}
+
+fn build_atmospheres(target: &Path, output: &Path) -> Result<()> {
+    Bindgen::new()
+        .web(true)?
+        .input_path(target.join("wasm32-unknown-unknown/release/daipan_studies.wasm"))
+        .out_name("atmospheres")
+        .typescript(false)
+        .generate(output)
+        .context("Compile atmospheric MANIFOLD WASM first")
+}
+
+fn serve_originals(root: &Path, port: u16) -> Result<()> {
+    let target = root.join("prototype/target");
+    let output = target.join("original-manifold");
+    let source = root.join("prototype/crates/originals");
+    fs::create_dir_all(&output)?;
+    for file in ["index.html", "studies.json", "prompts.json"] {
+        fs::copy(source.join(file), output.join(file))?;
+    }
+    copy_tree(&source.join("sources"), &output.join("sources"))?;
+    build_originals(&target, &output)?;
+    serve(&output, port)
+}
+
 fn main() -> Result<()> {
     let root = Path::new(env!("CARGO_MANIFEST_DIR"))
         .join("../../..")
         .canonicalize()?;
     let mut args = std::env::args().skip(1);
     let command = args.next().unwrap_or_else(|| "build".into());
+    if command == "studies" {
+        let output = root.join("prototype/target/scene-studies");
+        fs::create_dir_all(&output)?;
+        for file in ["index.html", "studies.json"] {
+            fs::copy(
+                root.join("prototype/crates/studies").join(file),
+                output.join(file),
+            )?;
+        }
+        Bindgen::new()
+            .web(true)?
+            .input_path(
+                root.join("prototype/target/wasm32-unknown-unknown/release/daipan_studies.wasm"),
+            )
+            .out_name("studies")
+            .typescript(false)
+            .generate(&output)?;
+        // Publish the version last so an open local gallery reloads only after
+        // both JS bindings and WASM are completely generated.
+        let revision = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)?
+            .as_millis()
+            .to_string();
+        let html =
+            fs::read_to_string(output.join("index.html"))?.replace("__STUDY_BUILD__", &revision);
+        fs::write(output.join("index.html"), html)?;
+        fs::write(
+            output.join("build.json"),
+            format!("{{\"revision\":\"{revision}\"}}"),
+        )?;
+        let address = args.next().unwrap_or_else(|| "4381".into());
+        if address == "--build" {
+            println!("Built local scene studies in {}", output.display());
+            return Ok(());
+        }
+        return serve(&output, address.parse()?);
+    }
+    if command == "originals" {
+        return serve_originals(&root, args.next().as_deref().unwrap_or("4380").parse()?);
+    }
     if command == "lab" {
         return serve_lab(&root, args.next().as_deref().unwrap_or("4376").parse()?);
     }
