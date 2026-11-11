@@ -15,7 +15,9 @@ Verified locally on 11 November 2026 for the nine approved originals described i
 
 The five newly bound works retain their established source excerpts and keywords. The other 78 assignments are unchanged from the preceding local integration. The full-corpus editorial ranking has been refreshed for all 49 catalogue entries.
 
-Sleeping In was sampled at 4, 24 and 48 seconds on desktop and mobile. Water remains blue, stone remains white/ivory, and pink appears only as small drifting beads and their local reflections. The revised pool also has a continuous playback recording; the other five-scene recordings from the prior accepted geometry revision run beyond 48 seconds without a forced timeline restart.
+Sleeping In was sampled at 4, 24 and 48 seconds on desktop and mobile. Water remains blue, stone remains white/ivory, and pink appears only as small drifting beads and their local reflections. The revised pool also has a continuous 26-second playback recording; the other five-scene recordings from the prior accepted geometry revision run beyond 48 seconds without a forced timeline restart.
+
+The review gallery exposed a post-close callback into a freed Rust player. Its display/build timers and visibility listener are now removed before disposal. Six targeted shutdown checks pass: close, navigation and reduced-motion shutdown in Chrome and WebKit. The initial failed close report is retained locally as `pool-playback-before-gallery-cleanup.json`; `gallery-disposal.json` records the passing correction.
 
 Reproduce the catalogue/build boundary check with:
 
