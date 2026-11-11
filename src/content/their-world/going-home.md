@@ -1,5 +1,6 @@
 ---
 title: "Going Home"
+manifoldScene: "homeward-bridge"
 world: "their-world"
 order: 6
 firstLine: "More than once, I told my father, I was afraid to go home."

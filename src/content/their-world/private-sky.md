@@ -1,5 +1,6 @@
 ---
 title: "Private Sky"
+manifoldScene: "private-blue"
 world: "their-world"
 order: 15
 firstLine: "A voice comes down from the cloud, I listen quietly, the gate closes behind."

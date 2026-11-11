@@ -1,5 +1,6 @@
 ---
 title: "The Observer"
+manifoldScene: "observer-supper"
 world: "their-world"
 order: 5
 firstLine: "Every morning, lunchtime, afternoon, and evening, I stand behind the window watching my neighbors, my subjects of observation."

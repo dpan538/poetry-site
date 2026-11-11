@@ -640,14 +640,14 @@
     "piece": "night-highway"
   },
   "their-world/going-home": {
-    "description": "The milky way over a lone acacia on moonless dunes, meteors falling.",
+    "description": "A vermilion bridge lands on a stone quay beside a warm house, connected to its entrance by a short shore path.",
     "excerpt": "They seem to stand in the forest,\nWatching me go home, go to school,",
     "keywords": [
       "forest",
       "trees",
       "fallen"
     ],
-    "piece": "desert-night"
+    "piece": "homeward-bridge"
   },
   "their-world/hope": {
     "description": "Sky lanterns rising over a still mountain lake, one let go from a boat.",
@@ -690,14 +690,14 @@
     "piece": "planet-scale"
   },
   "their-world/private-sky": {
-    "description": "A thunderstorm at sea, the lightning striking in the supabase bolt.",
-    "excerpt": "Standing there, watching the running clouds",
+    "piece": "private-blue",
+    "description": "A private shopfront and a locked iron gate beneath a still, delicate blue sky; one faint cloud drifts above the public street.",
+    "excerpt": "I listen quietly, the gate closes behind.\nStanding here, watching the still, delicate blue sky.",
     "keywords": [
-      "clouds",
-      "standing",
-      "sky"
-    ],
-    "piece": "green-storm"
+      "sky",
+      "quietly",
+      "gate"
+    ]
   },
   "their-world/room": {
     "description": "A night city whose boulevards trace the command key in streetlight.",
@@ -770,14 +770,14 @@
     ]
   },
   "their-world/the-observer": {
-    "description": "A wall of lava lamps under the glowing orange cloud, watched by a camera.",
+    "description": "A warm candlelit dinner inside, with seven black-coated observers barely visible outside a dark night window.",
     "excerpt": "I am the observer, I watch all this happen.\nWe stand outside the window,",
     "keywords": [
       "observer",
       "observed",
       "observation"
     ],
-    "piece": "lava-wall"
+    "piece": "observer-supper"
   },
   "their-world/the-white-tree": {
     "description": "The earth rising over a cratered lunar horizon in long low sunlight.",
