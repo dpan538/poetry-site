@@ -1,5 +1,6 @@
 ---
 title: "Iron Nails"
+manifoldScene: "iron-shrine"
 world: "still-life"
 order: 5
 firstLine: "The neighborhood, digital elevators emerging from the ground, Trees jutting at angles, green palms nestled between buildings, Crevices overflowing with moss and unnamed grasses."

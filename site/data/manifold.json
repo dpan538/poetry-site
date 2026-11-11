@@ -360,13 +360,13 @@
     "piece": "cloud-sea"
   },
   "still-life/dusk": {
-    "piece": "misty-forest",
-    "description": "Pine ridges fading into morning fog, sunbeams slanting through.",
-    "excerpt": "Wrapped in azure shadows after sunset.\nIn that fleeting moment,",
+    "piece": "dusk-gauze",
+    "description": "Translucent gauze at a bedside window, softly moving leaves and pink-orange light falling across wooden floorboards at dusk.",
+    "excerpt": "The breeze lifts delicate gauze at bedside,\nA blue light enters, tinged with pink and orange hues.",
     "keywords": [
-      "shadows",
-      "sunset",
-      "grasses"
+      "gauze",
+      "bedside",
+      "linen"
     ]
   },
   "still-life/early-spring": {
@@ -420,14 +420,14 @@
     "piece": "salt-flat"
   },
   "still-life/iron-nails": {
-    "description": "A pagoda at dusk behind a cherry tree lit by a stone lantern.",
+    "description": "One large foreground torii frames a smaller, lower shrine hall at the end of a stone approach, with layered snow mountains behind and no foreground trees.",
     "excerpt": "Trees jutting at angles, green palms nestled between buildings,",
     "keywords": [
       "trees",
       "buildings",
       "palms"
     ],
-    "piece": "kyoto-dusk"
+    "piece": "iron-shrine"
   },
   "still-life/just-a-sign": {
     "description": "A tokyo side street in the rain, neon signs shining on the wet road.",
@@ -480,14 +480,14 @@
     "piece": "volcano-night"
   },
   "still-life/sleeping-in": {
-    "description": "A lit train crossing a snowy stone viaduct at night as snow falls.",
+    "description": "A white limestone arcade and courtyard pool under a bright blue sky; a few pink beads drift across blue water beside an empty boat.",
     "excerpt": "In lethargy all seems asleep.\nThe train dormant at its station,",
     "keywords": [
       "train",
       "station",
       "asleep"
     ],
-    "piece": "snow-train"
+    "piece": "sleeping-courtyard"
   },
   "still-life/snowy-county": {
     "description": "Snow peaks catching first light above a still, misty mountain lake.",

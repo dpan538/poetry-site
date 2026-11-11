@@ -1,5 +1,6 @@
 ---
 title: "Sleeping In"
+manifoldScene: "sleeping-courtyard"
 world: "still-life"
 order: 3
 firstLine: "You lean against the train's side wall, Sinking deep into slumber, Glasses perched upon your face."

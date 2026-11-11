@@ -1,5 +1,6 @@
 ---
 title: "Dusk"
+manifoldScene: "dusk-gauze"
 world: "still-life"
 order: 1
 firstLine: "Like tiny fine droplets, The breeze lifts delicate gauze at bedside, A blue light enters, tinged with pink and orange hues."
