@@ -1,0 +1,17 @@
+[package]
+name = "daipan-originals"
+edition.workspace = true
+version.workspace = true
+
+[lib]
+crate-type = ["cdylib"]
+
+[build-dependencies]
+image = { version = "0.25", default-features = false, features = ["png"] }
+
+[dependencies]
+wasm-bindgen = "0.2"
+web-sys = { version = "0.3", features = [
+  "CanvasRenderingContext2d", "Document", "Element", "HtmlCanvasElement", "ImageData",
+  "MediaQueryList", "Performance", "Window",
+] }

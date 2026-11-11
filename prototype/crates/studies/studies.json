@@ -1,0 +1,47 @@
+[
+  {
+    "id": "going-home",
+    "poem": "Going Home",
+    "work": "/their-world/going-home",
+    "quote": "This road is extremely long.",
+    "scene": "A vermilion bridge lands on a stone quay beside a warm house, connected to its entrance by a short shore path.",
+    "motion": "桥面、栏杆与桥墩共用同一条透视轴，远端落在房屋侧面的石岸平台，再由步道接到入口。整片晚霞缓慢移动，水灯漂流，水面倒影随波纹变化。",
+    "kind": 0
+  },
+  {
+    "id": "the-observer",
+    "poem": "The Observer",
+    "work": "/their-world/the-observer",
+    "quote": "We are here, there, everywhere.",
+    "scene": "A warm candlelit dinner inside, with seven black-coated observers barely visible outside a dark night window.",
+    "motion": "窗外保持黑色夜景与静止黑衣人。室内细化米白桌布、盘沿、刀叉、玻璃杯和汤碗，采用子格面积采样减轻生硬边缘。烛焰、投影与玻璃映光联动，热气上升，窗外雨滴落下。",
+    "kind": 1
+  },
+  {
+    "id": "silver-tipped-shoes",
+    "poem": "Silver Tipped Shoes",
+    "work": "/bless-you/silver-tipped-shoes",
+    "quote": "Silver reflections, yours and mine.",
+    "scene": "Silver snow ridges and one sharp ice facet rise over a dark blue mirror lake under a pale moon.",
+    "motion": "中景岸线有前后起伏，山脚按法线与距离分层；湖面沿真实镜面方向计算山体倒影，不再复用屏幕图像行。云层平移、水波传播，山体固定。",
+    "kind": 3
+  },
+  {
+    "id": "sleeping-in",
+    "poem": "Sleeping In",
+    "work": "/still-life/sleeping-in",
+    "quote": "like drifting on water, defenseless in sleep.",
+    "scene": "A white limestone arcade and courtyard pool under a bright blue sky; a few pink beads drift across blue water beside an empty boat.",
+    "motion": "池水始终保持蓝色，少量粉色小球随水流缓慢漂动、轻微起伏，各自带局部映光。明亮蓝天、白色拱廊、空舟、尾波和倒影持续保留，不再对整片池水进行蓝粉切换。",
+    "kind": 4
+  },
+  {
+    "id": "iron-nails",
+    "poem": "Iron Nails",
+    "work": "/still-life/iron-nails",
+    "quote": "The trees, visitors, homes, hills, urban landscape —\nUpon close inspection, blur into the background.",
+    "scene": "One large foreground torii frames a smaller, lower shrine hall at the end of a stone approach, with layered snow mountains behind and no foreground trees.",
+    "motion": "前景大鸟居与远端小神宫按统一地面接点组织透视。柱脚落在石基上，无底部红点或前景树木；神宫下移至台地，远山按距离降低反差并呈现空气透视。只有云层缓慢移动，建筑与山体固定。",
+    "kind": 5
+  }
+]

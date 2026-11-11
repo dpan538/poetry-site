@@ -1,0 +1,14 @@
+[package]
+name = "daipan-studies"
+edition.workspace = true
+version.workspace = true
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+wasm-bindgen = "0.2"
+web-sys = { version = "0.3", features = [
+  "CanvasRenderingContext2d", "Document", "Element", "HtmlCanvasElement",
+  "MediaQueryList", "Performance", "Window",
+] }

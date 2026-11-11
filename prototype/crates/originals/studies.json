@@ -1,0 +1,104 @@
+[
+  {
+    "id": "red-current",
+    "poem": "Flying Away",
+    "work": "/bless-you/flying-away",
+    "previous": "cloud-sea",
+    "method": "Rust drawing",
+    "source": null,
+    "quote": "On the power line outside, a bird rests still,\nI think it must be a sparrow,",
+    "keywords": [
+      "sparrow",
+      "power line",
+      "sunlight"
+    ],
+    "reason": "The original wire, bird and changing view are more specific than the existing cloud landscape.",
+    "motion": "电线杆和田地固定。麻雀离开电线、飞行、返回，天空的微光缓慢变化。",
+    "period": 20
+  },
+  {
+    "id": "private-blue",
+    "poem": "Private Sky",
+    "work": "/their-world/private-sky",
+    "previous": "green-storm",
+    "method": "Rust drawing",
+    "source": null,
+    "quote": "Standing there, watching the running clouds\nAnd the flowing, lazy people, the street.",
+    "keywords": [
+      "clouds",
+      "gate",
+      "private"
+    ],
+    "reason": "The contrast between open sky and a locked boundary belongs to this poem.",
+    "motion": "大面积的纯蓝天空，只留一缕缓慢漂移、逐渐消散的薄云。细节集中在店面玻璃、砖缝、铁门锈迹、金属边缘、黄铜锁和地面投影。",
+    "period": 20
+  },
+  {
+    "id": "dusk-gauze",
+    "poem": "Dusk",
+    "work": "/still-life/dusk",
+    "previous": "misty-forest",
+    "method": "Imagegen + Rust",
+    "source": "sources/dusk-gauze.png",
+    "quote": "The breeze lifts delicate gauze at bedside,\nA blue light enters, tinged with pink and orange hues.",
+    "keywords": [
+      "gauze",
+      "blue light",
+      "dusk"
+    ],
+    "reason": "The bedside gauze and colored window light are absent from the existing forest scene.",
+    "motion": "枝叶、地板光斑和少量悬浮光点保持现有节奏；纱帘减小摆幅与上扬，床边增加柔和的光影跳动。床与窗框的位置固定。",
+    "period": 20
+  },
+  {
+    "id": "crown-tiles",
+    "poem": "Crown Antiques",
+    "work": "/bless-you/crown-antiques",
+    "previous": "marine-drive",
+    "method": "Imagegen + Rust",
+    "source": "sources/crown-tiles.png",
+    "quote": "The glass is sealed with dust,\nThe color of latex mattresses.",
+    "keywords": [
+      "glass",
+      "dust",
+      "antiques"
+    ],
+    "reason": "Blue-green tiles, dusty glass and records are specific images that the existing waterfront cannot represent.",
+    "motion": "玻璃前后两层尘点缓慢向下飘落，落到地面、箱子或唱片堆后短暂停留并淡出；光点在空气中闪动，落定后不再上下往返。",
+    "period": 20
+  },
+  {
+    "id": "night-room",
+    "poem": "Night Light",
+    "work": "/still-life/night-light",
+    "previous": "night-coast",
+    "method": "Rust drawing",
+    "source": null,
+    "quote": "I close the door, turn on the night light.\nThe night is too dark, the window's glare too bright,",
+    "keywords": [
+      "night light",
+      "window",
+      "blackness"
+    ],
+    "reason": "An enclosed room and one source of light better preserve the poem's spatial focus.",
+    "motion": "夜灯逐渐亮起、停留、熄灭。墙面与地面的受光同步变化，房间结构固定。",
+    "period": 20
+  },
+  {
+    "id": "drowned-water",
+    "poem": "Drowned Spirit",
+    "work": "/bless-you/drowned-spirit",
+    "previous": "lantern-lake",
+    "method": "Imagegen + Rust",
+    "source": "sources/drowned-water.png",
+    "quote": "It seems you too forgot the depth of the river,\nSurrendering beneath the rippling waves,",
+    "keywords": [
+      "river",
+      "rippling",
+      "spirit"
+    ],
+    "reason": "The unoccupied bank and broken city-light reflections keep the poem's loneliness in a concrete place.",
+    "motion": "晚霞缓慢漂移后消散，天空、水面、长椅和近岸受光同步进入蓝调。约 10 秒后增加 80 处窗灯与岸线灯光，保留真实灯位的暖色倒影。修正了枝叶旁天空补色偏青与椅子缝隙残留霞光；物体轮廓不位移。",
+    "period": 20
+  }
+]

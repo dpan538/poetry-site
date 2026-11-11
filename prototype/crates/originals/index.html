@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex">
+  <title>Original MANIFOLD Studies — Dai Pan</title>
+  <style>
+    :root { color: #24231f; background: #f5f1e8; font-family: Georgia, serif; }
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    main { width: min(1100px, 100% - 48px); margin: clamp(28px, 6vh, 64px) auto 70px; }
+    .eyebrow { color: #235e93; font: 11px/1.5 system-ui, sans-serif; letter-spacing: .14em; }
+    h1 { font-weight: 400; font-size: clamp(32px, 6vw, 54px); margin: 9px 0 23px; }
+    nav { display: flex; flex-wrap: wrap; gap: 8px 25px; border-bottom: 1px solid #ded9cd; padding-bottom: 18px; }
+    button, input { font: inherit; }
+    button { color: #6d685f; background: transparent; border: none; cursor: pointer; min-height: 40px; padding: 0; }
+    button[aria-pressed="true"] { color: #24231f; text-decoration: underline #bc3d2b; text-underline-offset: 6px; }
+    button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid #286ead; outline-offset: 4px; }
+    #workspace { padding-top: 30px; }
+    #workspace[aria-busy="true"] { opacity: .6; }
+    .bar { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+    .bar h2 { font-size: 24px; font-weight: 400; margin: 0 0 18px; }
+    .method { font: 11px/1.5 system-ui, sans-serif; color: #6d685f; }
+    figure { margin: 0 auto; width: min(850px, 100%); }
+    #animation { display: block; width: 100%; aspect-ratio: 1.7; outline: 1px solid #9ac6c4; }
+    .controls { display: flex; align-items: center; gap: 22px; margin-block: 10px 15px; }
+    .controls button { color: #235e93; flex: none; }
+    input[type="range"] { width: 100%; min-width: 30px; accent-color: #286ead; cursor: pointer; }
+    output { min-width: 75px; font: 11px/1.5 system-ui, sans-serif; white-space: nowrap; color: #6d685f; }
+    .keywords { text-align: center; color: #306951; font-size: 17px; letter-spacing: .09em; margin: 20px 0; }
+    blockquote { white-space: pre-line; text-align: center; font-size: clamp(17px, 2.1vw, 22px); color: #635e56; line-height: 1.5; margin: 0 auto 25px; max-width: 42ch; text-wrap: pretty; }
+    .notes { border-top: 1px solid #ded9cd; margin-top: 34px; padding-top: 23px; display: grid; grid-template-columns: 1fr 1fr; gap: 35px; }
+    .notes h3 { margin: 0 0 10px; font: 11px/1.5 system-ui, sans-serif; color: #235e93; letter-spacing: .12em; text-transform: uppercase; }
+    .notes p { margin: 0 0 12px; font-size: 15px; line-height: 1.7; color: #635e56; }
+    a { color: inherit; text-decoration-color: #ca582a; text-underline-offset: 3px; }
+    .source { margin-top: 25px; }
+    .source summary { cursor: pointer; min-height: 44px; color: #235e93; font-size: 15px; }
+    .source img, .source canvas { width: 100%; max-width: 850px; display: block; margin: 0 auto; }
+    [hidden] { display: none !important; }
+    #error { color: #a33a28; }
+    @media (max-width: 600px) {
+      main { width: calc(100% - 30px); margin-top: 32px; }
+      nav { gap: 3px 18px; }
+      nav button { font-size: 14px; }
+      .bar { align-items: flex-start; }
+      .bar h2 { font-size: 22px; }
+      .method { max-width: 130px; text-align: right; }
+      .controls { gap: 14px; }
+      .notes { grid-template-columns: 1fr; gap: 12px; }
+      blockquote { max-width: 92%; }
+    }
+    @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto; } }
+  </style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">DAI PAN · SIX ORIGINAL SCENE STUDIES · LOCAL REVIEW</p>
+  <h1>Original MANIFOLD</h1>
+  <nav aria-label="Six original scene candidates" id="scenes"></nav>
+  <p id="error" role="alert" hidden>Unable to load the local study. Reload to retry.</p>
+  <section id="workspace" aria-busy="true">
+    <div class="bar"><h2 id="title"></h2><span class="method" id="method"></span></div>
+    <figure>
+      <canvas id="animation" role="img" aria-labelledby="title" aria-describedby="motion"></canvas>
+      <div class="controls">
+        <button id="play" type="button">Pause</button>
+        <button id="restart" type="button">Replay</button>
+        <input id="time" aria-label="Animation time in the twenty-second loop" type="range" min="0" max="20" step=".05" value="0">
+        <output id="clock" for="time">0.0 / 20 s</output>
+      </div>
+      <figcaption><p class="keywords" id="keywords"></p><blockquote id="quote"></blockquote></figcaption>
+    </figure>
+    <div class="notes">
+      <div><h3>Poem &amp; scene</h3><p id="reason"></p><p id="mapping"></p></div>
+      <div><h3>What moves</h3><p id="motion" lang="zh"></p><p id="resolution"></p></div>
+    </div>
+    <details class="source" id="source">
+      <summary>View the original image / Rust drawing</summary>
+      <img id="original-image" alt="" hidden>
+      <canvas id="original-drawing" role="img" aria-label="Original Rust drawing before dot sampling" hidden></canvas>
+    </details>
+  </section>
+</main>
+<script type="module">
+  import init, { OriginalStudy } from "./originals.js";
+  const element = id => document.getElementById(id);
+  let study, selected = 0, playing = false;
+  const narrow = matchMedia("(max-width: 600px)");
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)");
+  try {
+    await init({ module_or_path: new URL("./originals_bg.wasm", import.meta.url) });
+    const response = await fetch("./studies.json");
+    if (!response.ok) throw new Error("Study catalogue unavailable");
+    const scenes = await response.json();
+    const buttons = scenes.map((scene, i) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = String(i + 1).padStart(2, "0") + " · " + scene.poem;
+      button.addEventListener("click", () => select(i));
+      element("scenes").append(button);
+      return button;
+    });
+    function select(index) {
+      study?.free();
+      selected = index;
+      const scene = scenes[index];
+      study = new OriginalStudy(element("animation"), index, narrow.matches);
+      playing = !reduced.matches;
+      if (playing) study.play();
+      element("play").textContent = playing ? "Pause" : "Play";
+      buttons.forEach((button, i) => button.setAttribute("aria-pressed", String(i === index)));
+      for (const id of ["quote", "reason", "motion"]) element(id).textContent = scene[id];
+      element("title").textContent = scene.poem;
+      element("method").textContent = scene.method + " · 20-second loop";
+      element("keywords").textContent = scene.keywords.join(" · ");
+      element("mapping").textContent = "Current scene " + scene.previous + " → proposed " + scene.id;
+      element("resolution").textContent = narrow.matches ? "102 × 60 cells · 15 fps · 1.7:1" : "170 × 100 cells · 15 fps · 1.7:1";
+      element("original-image").hidden = !scene.source;
+      element("original-drawing").hidden = !!scene.source;
+      if (scene.source) {
+        element("original-image").src = scene.source;
+        element("original-image").alt = "Original generated scene for " + scene.poem;
+      } else {
+        study.source(element("original-drawing"));
+      }
+      element("workspace").setAttribute("aria-busy", "false");
+      history.replaceState(null, "", "#" + scene.id);
+      window.currentStudy = study;
+    }
+    element("play").addEventListener("click", () => {
+      playing = !playing;
+      if (playing) study.play(); else study.pause();
+      element("play").textContent = playing ? "Pause" : "Play";
+    });
+    element("restart").addEventListener("click", () => {
+      study.seek(0);
+      if (!reduced.matches) { playing = true; study.play(); element("play").textContent = "Pause"; }
+    });
+    element("time").addEventListener("input", event => {
+      playing = false;
+      study.pause();
+      study.seek(Number(event.target.value));
+      element("play").textContent = "Play";
+    });
+    narrow.addEventListener("change", () => select(selected));
+    reduced.addEventListener("change", () => {
+      if (reduced.matches) { playing = false; study.pause(); element("play").textContent = "Play"; }
+    });
+    const hash = scenes.findIndex(scene => "#" + scene.id === location.hash);
+    select(Math.max(0, hash));
+    setInterval(() => {
+      if (!study) return;
+      const time = study.elapsed();
+      element("clock").textContent = time.toFixed(1) + " / 20 s";
+      if (document.activeElement !== element("time")) element("time").value = String(time);
+    }, 100);
+  } catch (error) {
+    element("error").hidden = false;
+    element("workspace").hidden = true;
+    console.error(error);
+  }
+</script>
+</body>
+</html>

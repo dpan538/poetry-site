@@ -511,6 +511,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "daipan-originals"
+version = "0.1.0"
+dependencies = [
+ "image",
+ "wasm-bindgen",
+ "web-sys",
+]
+
+[[package]]
 name = "daipan-site"
 version = "0.1.0"
 dependencies = [
@@ -520,6 +529,14 @@ dependencies = [
  "serde_yaml",
  "tiny_http",
  "wasm-bindgen-cli-support",
+]
+
+[[package]]
+name = "daipan-studies"
+version = "0.1.0"
+dependencies = [
+ "wasm-bindgen",
+ "web-sys",
 ]
 
 [[package]]
