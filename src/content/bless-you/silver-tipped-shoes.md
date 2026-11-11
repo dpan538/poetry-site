@@ -1,5 +1,6 @@
 ---
 title: "Silver Tipped Shoes"
+manifoldScene: "silver-lake"
 world: "bless-you"
 order: 8
 firstLine: "I feel the sharp gaze from across the room, Breaking my quiet like a sudden boom."

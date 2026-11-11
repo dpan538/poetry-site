@@ -30,14 +30,14 @@
     ]
   },
   "bless-you/crown-antiques": {
-    "description": "Mumbai's queen's necklace at night, lamps curving round the bay.",
-    "excerpt": "Crown Antiques,\nAt 1018 Fifth Ave,",
+    "piece": "crown-tiles",
+    "description": "Dusty antique-shop glazing, blue-green square tiles, stacked records and boxes; motes fall through light on both sides of the glass.",
+    "excerpt": "Photos. Glass.\nToys. Posters.",
     "keywords": [
+      "glass",
       "antiques",
-      "crown",
-      "glass"
-    ],
-    "piece": "marine-drive"
+      "posters"
+    ]
   },
   "bless-you/cube": {
     "description": "The vercel triangle as a glass prism, splitting white light to a rainbow.",
@@ -60,14 +60,14 @@
     "piece": "varanasi-ghats"
   },
   "bless-you/drowned-spirit": {
-    "description": "Sky lanterns rising over a still mountain lake, one let go from a boat.",
+    "piece": "drowned-water",
+    "description": "An empty riverside bench, rippling city reflections and a fading sunset; blue hour arrives as window and shore lights gradually brighten.",
     "excerpt": "At the bottom of the river, you,\nWere replaced by someone's spirit.",
     "keywords": [
       "river",
       "spirit",
       "drowned"
-    ],
-    "piece": "lantern-lake"
+    ]
   },
   "bless-you/ears": {
     "description": "A tokyo side street in the rain, neon signs shining on the wet road.",
@@ -180,14 +180,14 @@
     "piece": "taj-dawn"
   },
   "bless-you/silver-tipped-shoes": {
-    "description": "A thunderstorm at sea, the lightning striking in the supabase bolt.",
+    "description": "Silver snow ridges and one sharp ice facet rise over a dark blue mirror lake under a pale moon.",
     "excerpt": "Silver-tipped shoes, shiny and bright,\nCatch my eyes with their gleaming light.",
     "keywords": [
       "shoes",
       "gleaming",
       "silver-tipped"
     ],
-    "piece": "green-storm"
+    "piece": "silver-lake"
   },
   "bless-you/symphony": {
     "piece": "moonlit-bridge",

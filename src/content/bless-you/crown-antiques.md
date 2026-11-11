@@ -1,5 +1,6 @@
 ---
 title: "Crown Antiques"
+manifoldScene: "crown-tiles"
 world: "bless-you"
 order: 21
 firstLine: "Crown Antiques, At 1018 Fifth Ave, Near Duquesne University."
