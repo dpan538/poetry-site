@@ -43,6 +43,7 @@ fn layer(overlay: Element, open: Vec<Element>, close: &str, body_class: &'static
             button.clone(),
         );
         on(button.as_ref(), "click", move |_| {
+            crate::navigation::populate_index(&overlay);
             *last.borrow_mut() = Some(trigger.clone());
             let _ = overlay.remove_attribute("inert");
             toggle(&overlay, "is-open", true);

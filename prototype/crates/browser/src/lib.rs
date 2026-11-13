@@ -113,8 +113,9 @@ fn world() -> String {
         .unwrap_or_else(|| "their-world".into())
 }
 
-#[wasm_bindgen(start)]
-pub fn start() {
+#[wasm_bindgen]
+pub fn start(catalog: &str) -> Result<(), JsValue> {
+    navigation::install_catalog(catalog)?;
     if let Some(root) = document().document_element() {
         let pointer_root = root.clone();
         on(document().as_ref(), "pointerdown", move |_| {
@@ -133,4 +134,5 @@ pub fn start() {
     if let Some(body) = query("body") {
         set(&body, "data-rust-ready", "");
     }
+    Ok(())
 }

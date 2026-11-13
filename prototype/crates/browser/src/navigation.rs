@@ -5,7 +5,7 @@ use crate::{
 use serde::{Deserialize, Serialize};
 use std::{
     cell::{Cell, RefCell},
-    collections::BTreeSet,
+    collections::{BTreeMap, BTreeSet},
 };
 use wasm_bindgen::{JsCast, JsValue, closure::Closure, prelude::wasm_bindgen};
 use web_sys::{
@@ -36,7 +36,11 @@ struct Candidate {
     world: String,
     score: f64,
     types: Vec<String>,
-    affinity: f64,
+    title: String,
+    order: usize,
+    #[serde(rename = "firstLine")]
+    first_line: String,
+    affinities: BTreeMap<String, f64>,
     scene: Option<String>,
 }
 
@@ -44,7 +48,22 @@ struct Candidate {
 struct Reading {
     current: String,
     world: String,
+}
+
+#[derive(Deserialize)]
+struct Catalog {
     works: Vec<Candidate>,
+}
+
+thread_local! {
+    static CATALOG: RefCell<Vec<Candidate>> = const { RefCell::new(Vec::new()) };
+}
+
+pub fn install_catalog(json: &str) -> Result<(), JsValue> {
+    let catalog: Catalog = serde_json::from_str(json)
+        .map_err(|error| JsValue::from_str(&format!("Invalid reading catalogue: {error}")))?;
+    CATALOG.with_borrow_mut(|rows| *rows = catalog.works);
+    Ok(())
 }
 
 pub fn storage() -> Option<Storage> {
@@ -63,7 +82,15 @@ fn parse<T: serde::de::DeserializeOwned>(selector: &str) -> Option<T> {
     serde_json::from_str(&data).ok()
 }
 
-fn entry_path(entries: Vec<Entry>) -> Option<String> {
+fn entry_path() -> Option<String> {
+    let entries: Vec<_> = CATALOG.with_borrow(|rows| {
+        rows.iter()
+            .map(|row| Entry {
+                id: row.id.clone(),
+                world: row.world.clone(),
+            })
+            .collect()
+    });
     let recent = history();
     let last = storage().and_then(|s| s.get_item(LAST).ok().flatten());
     let mut pool: Vec<_> = entries
@@ -87,7 +114,9 @@ fn entry_path(entries: Vec<Entry>) -> Option<String> {
 }
 
 fn enter(action: TurnAction) {
-    if let Some(path) = parse("#entry-data").and_then(entry_path) {
+    if query("#entry-data").is_some()
+        && let Some(path) = entry_path()
+    {
         turn_to(path, action, 0);
     }
 }
@@ -115,8 +144,11 @@ fn content(a: &[String], b: &[String]) -> f64 {
 }
 
 fn read_navigation(data: Reading) {
-    let Some(current) = data
-        .works
+    CATALOG.with_borrow(|works| update_navigation(data, works));
+}
+
+fn update_navigation(data: Reading, works: &[Candidate]) {
+    let Some(current) = works
         .iter()
         .find(|w| w.id == data.current && w.world == data.world)
     else {
@@ -158,14 +190,13 @@ fn read_navigation(data: Reading) {
         .iter()
         .take(3)
         .filter_map(|visit| {
-            data.works
+            works
                 .iter()
                 .find(|work| work.id == visit.id && work.world == visit.world)
                 .and_then(|work| work.scene.as_deref())
         })
         .collect();
-    let mut candidates: Vec<_> = data
-        .works
+    let mut candidates: Vec<_> = works
         .iter()
         .filter(|c| {
             !visits
@@ -205,7 +236,12 @@ fn read_navigation(data: Reading) {
             };
             (
                 c,
-                (0.35 * c.affinity
+                (0.35
+                    * current
+                        .affinities
+                        .get(&format!("{}/{}", c.world, c.id))
+                        .copied()
+                        .unwrap_or(0.0)
                     + 0.25 * arc
                     + 0.25 * content(&current.types, &c.types)
                     + 0.1 * world
@@ -219,14 +255,100 @@ fn read_navigation(data: Reading) {
         .get((js_sys::Math::random() * candidates.len().min(5) as f64) as usize)
         .map(|(c, _)| format!("/{}/{}", c.world, c.id));
     let previous = prev
-        .filter(|v| {
-            data.works
-                .iter()
-                .any(|w| w.world == v.world && w.id == v.id)
-        })
+        .filter(|v| works.iter().any(|w| w.world == v.world && w.id == v.id))
         .map(|v| format!("/{}/{}", v.world, v.id));
     set_links("next", next.as_deref());
     set_links("prev", previous.as_deref());
+}
+
+fn index_span(class: &str, text: &str, skin: Option<&str>) -> Element {
+    let span = crate::element("span", class);
+    if let Some(skin) = skin {
+        set(&span, skin, "");
+    }
+    span.set_text_content(Some(text));
+    span
+}
+
+fn index_item(work: &Candidate, selected: bool, index: usize, skin: Option<&str>) -> Element {
+    let prefix = if skin.is_some() {
+        "mobile-index"
+    } else {
+        "poem"
+    };
+    let item = crate::element(
+        "li",
+        &format!("{prefix}-item{}", if selected { " is-current" } else { "" }),
+    );
+    let link = crate::element("a", &format!("{prefix}-link"));
+    set(&link, "href", &format!("/{}/{}", work.world, work.id));
+    if selected {
+        set(&link, "aria-current", "page");
+    }
+    if let Some(skin) = skin {
+        set(&item, skin, "");
+        set(&link, skin, "");
+    } else {
+        style(&item, "--item-i", &index.to_string());
+    }
+    let number = index_span(
+        &format!("{prefix}-order"),
+        &format!("{:02}", work.order),
+        skin,
+    );
+    let title = index_span(&format!("{prefix}-title"), &work.title, skin);
+    let first = index_span(
+        if skin.is_some() {
+            "mobile-index-line"
+        } else {
+            "poem-first-line"
+        },
+        &work.first_line,
+        skin,
+    );
+    let _ = link.append_child(&number);
+    let copy = if skin.is_some() {
+        index_span("mobile-index-copy", "", skin)
+    } else {
+        link.clone()
+    };
+    let _ = copy.append_child(&title);
+    if !work.first_line.is_empty() {
+        let _ = copy.append_child(&first);
+    }
+    if skin.is_some() {
+        let _ = link.append_child(&copy);
+    }
+    let _ = item.append_child(&link);
+    item
+}
+
+pub fn populate_index(overlay: &Element) {
+    if overlay.has_attribute("data-catalog-ready") {
+        return;
+    }
+    let current: Option<Reading> = parse("#reading-data");
+    CATALOG.with_borrow(|works| {
+        if works.is_empty() {
+            // Preserve the server-rendered volume links on a network failure.
+            return;
+        }
+        for world in ["their-world", "bless-you", "still-life"] {
+            let mut rows: Vec<_> = works.iter().filter(|work| work.world == world).collect();
+            rows.sort_by_key(|work| work.order);
+            let desktop = crate::elements(overlay, &format!(".world-panel[data-panel='{world}'] .poem-list"));
+            let mobile = crate::elements(overlay, &format!("[data-mobile-world-panel='{world}'] .mobile-index-list, [data-mobile-site-world-panel='{world}'] .mobile-index-list"));
+            for (list, is_mobile) in desktop.into_iter().map(|list| (list, false)).chain(mobile.into_iter().map(|list| (list, true))) {
+                list.set_text_content(None);
+                let skin = is_mobile.then_some(if list.has_attribute("data-skin-htlfczsh") { "data-skin-htlfczsh" } else { "data-skin-ewxlwce5" });
+                for (index, work) in rows.iter().enumerate() {
+                    let selected = current.as_ref().is_some_and(|current| current.world == work.world && current.current == work.id);
+                    let _ = list.append_child(&index_item(work, selected, index, skin));
+                }
+            }
+        }
+        set(overlay, "data-catalog-ready", "");
+    });
 }
 
 fn reading_keyboard() {
@@ -294,7 +416,7 @@ fn reading_turns() {
             .and_then(|target| target.dyn_into::<Element>().ok())
             .and_then(|element| {
                 element
-                    .closest("[data-poem-nav], .mobile-index-link, .site-nav a")
+                    .closest("[data-poem-nav], .poem-link, .poem-index-link, .mobile-index-link, .site-nav a")
                     .ok()
                     .flatten()
             })
@@ -313,7 +435,7 @@ fn reading_turns() {
         };
         if DISPLAYED.with_borrow(|shown| shown == &path) {
             if let Some(close) = query(
-                ".mobile-sheet.is-open [data-mobile-close], .mobile-index-sheet.is-open [data-mobile-site-index-close]",
+                ".index-overlay.is-open #index-close, .mobile-sheet.is-open [data-mobile-close], .mobile-index-sheet.is-open [data-mobile-site-index-close]",
             ) {
                 html(&close).click();
             }
@@ -413,9 +535,7 @@ fn turn_to(path: String, action: TurnAction, direction: i8) {
         if target == "/" && !mobile() {
             let entry = next
                 .get_element_by_id("entry-data")
-                .and_then(|element| element.text_content())
-                .and_then(|data| serde_json::from_str(&data).ok())
-                .and_then(entry_path);
+                .and_then(|_| entry_path());
             if let Some(path) = entry {
                 turn_to(path, action, 0);
             }

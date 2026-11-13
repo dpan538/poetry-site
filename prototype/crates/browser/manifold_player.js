@@ -4,6 +4,10 @@ let paintingModule;
 let originalModule;
 let atmosphereModule;
 
+// wasm-bindgen emits this module inside assets/snippets/<crate>/.
+// Resolve every scene inside the same immutable asset bundle as the reader.
+const sceneAsset = path => new URL(`../../manifold/${path}`, import.meta.url).href;
+
 async function importScene(path) {
     for (let attempt = 0; ; attempt++) {
         const retry = moduleRetries.get(path) ?? 0;
@@ -18,8 +22,8 @@ async function importScene(path) {
 }
 
 function loadPaintings() {
-    return paintingModule ??= importScene("/assets/manifold/paintings.js").then(async (paintings) => {
-        const path = "/assets/manifold/paintings_bg.wasm";
+    return paintingModule ??= importScene(sceneAsset("paintings.js")).then(async (paintings) => {
+        const path = sceneAsset("paintings_bg.wasm");
         let response = await fetch(path).catch(() => null);
         if (!response?.ok) {
             await new Promise(resolve => setTimeout(resolve, 180));
@@ -35,8 +39,8 @@ function loadPaintings() {
 }
 
 function loadOriginals() {
-    return originalModule ??= importScene("/assets/manifold/originals.js").then(async (originals) => {
-        const path = "/assets/manifold/originals_bg.wasm";
+    return originalModule ??= importScene(sceneAsset("originals.js")).then(async (originals) => {
+        const path = sceneAsset("originals_bg.wasm");
         let response = await fetch(path).catch(() => null);
         if (!response?.ok) {
             await new Promise(resolve => setTimeout(resolve, 180));
@@ -52,8 +56,8 @@ function loadOriginals() {
 }
 
 function loadAtmospheres() {
-    return atmosphereModule ??= importScene("/assets/manifold/atmospheres.js").then(async (module) => {
-        const path = "/assets/manifold/atmospheres_bg.wasm";
+    return atmosphereModule ??= importScene(sceneAsset("atmospheres.js")).then(async (module) => {
+        const path = sceneAsset("atmospheres_bg.wasm");
         let response = await fetch(path).catch(() => null);
         if (!response?.ok) {
             await new Promise(resolve => setTimeout(resolve, 180));
@@ -135,8 +139,8 @@ export async function playManifold(dialog) {
             return;
         }
         const [player, piece] = await Promise.all([
-            importScene("/assets/manifold/mount.js"),
-            importScene(`/assets/manifold/pieces/${dialog.dataset.piece}.js`),
+            importScene(sceneAsset("mount.js")),
+            importScene(sceneAsset(`pieces/${dialog.dataset.piece}.js`)),
         ]);
         if (!dialog.open || active.get(dialog) !== playback) return;
 

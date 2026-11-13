@@ -17,7 +17,7 @@ async function loadStyles(page) {
         link.remove();
         reject(new Error("Reader stylesheet unavailable"));
       }, { once: true });
-      document.head.insertBefore(link, document.head.querySelector('link[href="/assets/site.css"]'));
+      document.head.insertBefore(link, document.head.querySelector('link[data-reader-overrides]'));
     }).finally(() => loadingStyles.delete(href));
     loadingStyles.set(href, ready);
     return ready;
@@ -36,6 +36,8 @@ export async function readWork(path, done) {
       if (!response.ok || new URL(response.url).origin !== location.origin) break;
       const next = new DOMParser().parseFromString(await response.text(), "text/html");
       if (!next.querySelector(".site-body-stack")) break;
+      const runtime = page => page.querySelector('script[type="module"][src$="/start.js"]')?.getAttribute('src');
+      if (runtime(next) !== runtime(document)) break;
       await loadStyles(next);
       page = next;
       break;
@@ -54,7 +56,7 @@ export function applyReaderStyles(page) {
   }
   for (const style of inlineStyles(document)) style.remove();
   for (const style of inlineStyles(page)) {
-    document.head.insertBefore(document.importNode(style, true), document.head.querySelector('link[href="/assets/site.css"]'));
+    document.head.insertBefore(document.importNode(style, true), document.head.querySelector('link[data-reader-overrides]'));
   }
 }
 

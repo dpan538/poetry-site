@@ -7,6 +7,7 @@ version.workspace = true
 anyhow = "1"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
+sha2 = "0.10"
 serde_yaml = "0.9"
 tiny_http = "0.12"
 wasm-bindgen-cli-support = "0.2"

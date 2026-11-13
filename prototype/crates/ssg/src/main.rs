@@ -1,3 +1,4 @@
+mod assets;
 mod corpus;
 mod render;
 
@@ -40,6 +41,7 @@ fn build(root: &Path, output: &Path, wasm: &Path) -> Result<()> {
         .input_path(wasm)
         .out_name("browser")
         .typescript(false)
+        .remove_name_section(true)
         .generate(&assets)
         .with_context(|| format!("Compile browser WASM first: {}", wasm.display()))?;
     build_paintings(&root.join("prototype/target"), &assets.join("manifold"))?;
@@ -47,13 +49,34 @@ fn build(root: &Path, output: &Path, wasm: &Path) -> Result<()> {
     build_atmospheres(&root.join("prototype/target"), &assets.join("manifold"))?;
     fs::write(
         assets.join("start.js"),
-        r#"import init from './browser.js';
+        r#"import init, { start } from './browser.js';
 
-await init({ module_or_path: new URL('./browser_bg.wasm', import.meta.url) });
+async function catalog() {
+    const url = new URL('./reading.json', import.meta.url);
+    for (let attempt = 0; attempt < 2; attempt++) {
+        try {
+            const response = await fetch(url, { cache: attempt ? 'reload' : 'default' });
+            if (!response.ok) throw new Error('Reading catalogue unavailable');
+            const text = await response.text();
+            if (!Array.isArray(JSON.parse(text).works)) throw new Error('Invalid reading catalogue');
+            return text;
+        } catch (error) {
+            if (attempt) console.warn('Using the static reading links', error);
+        }
+    }
+    return '{"works":[]}';
+}
+
+const [reading] = await Promise.all([
+    catalog(),
+    init({ module_or_path: new URL('./browser_bg.wasm', import.meta.url) }),
+]);
+start(reading);
 "#,
     )?;
     render::generate(root, output, &works, &nav)?;
     render::indexes(root, output, &works, &nav)?;
+    assets::fingerprint(output)?;
     fs::write(output.join(".daipan-build"), "")?;
     let (poems, prose) = corpus::counts(works.iter());
     println!(
@@ -156,7 +179,17 @@ fn serve(output: &Path, port: u16) -> Result<()> {
         if let Ok(file) = fs::File::open(&path) {
             let header =
                 Header::from_bytes("Content-Type", media(&path)).expect("valid content type");
-            let _ = request.respond(Response::from_file(file).with_header(header));
+            let cache = if request.url().starts_with("/assets/immutable/") {
+                "public, max-age=31536000, immutable"
+            } else {
+                "public, max-age=0, must-revalidate"
+            };
+            let cache = Header::from_bytes("Cache-Control", cache).expect("valid cache policy");
+            let _ = request.respond(
+                Response::from_file(file)
+                    .with_header(header)
+                    .with_header(cache),
+            );
         } else {
             let _ = request
                 .respond(Response::from_string("Unable to open resource").with_status_code(500));
@@ -171,6 +204,7 @@ fn build_paintings(target: &Path, output: &Path) -> Result<()> {
         .input_path(target.join("wasm32-unknown-unknown/release/daipan_lab.wasm"))
         .out_name("paintings")
         .typescript(false)
+        .remove_name_section(true)
         .generate(output)
         .context("Compile painting WASM first")
 }
@@ -193,6 +227,7 @@ fn build_originals(target: &Path, output: &Path) -> Result<()> {
         .input_path(target.join("wasm32-unknown-unknown/release/daipan_originals.wasm"))
         .out_name("originals")
         .typescript(false)
+        .remove_name_section(true)
         .generate(output)
         .context("Compile original MANIFOLD WASM first")
 }
@@ -203,6 +238,7 @@ fn build_atmospheres(target: &Path, output: &Path) -> Result<()> {
         .input_path(target.join("wasm32-unknown-unknown/release/daipan_studies.wasm"))
         .out_name("atmospheres")
         .typescript(false)
+        .remove_name_section(true)
         .generate(output)
         .context("Compile atmospheric MANIFOLD WASM first")
 }
@@ -242,6 +278,7 @@ fn main() -> Result<()> {
             )
             .out_name("studies")
             .typescript(false)
+            .remove_name_section(true)
             .generate(&output)?;
         // Publish the version last so an open local gallery reloads only after
         // both JS bindings and WASM are completely generated.

@@ -82,42 +82,72 @@ fn first_line(work: &Work, class: &str, skin: &str) -> String {
     format!("<span class=\"{class}\" {skin}>{}</span>", escape(line))
 }
 
-fn menus(works: &[Work], current: Option<&Work>) -> BTreeMap<String, String> {
+// The complete index lives in reading.json. Keep ordinary volume links as a
+// readable fallback when the browser cannot load the shared catalogue.
+fn menus(_works: &[Work], current: Option<&Work>) -> BTreeMap<String, String> {
     let mut slots = BTreeMap::new();
     let skin = if current.is_some() {
         DOCK_SKIN
     } else {
         SITE_INDEX_SKIN
     };
-    for (i, (world, ..)) in WORLDS.iter().enumerate() {
-        let mut mobile = String::new();
-        let mut desktop = String::new();
-        for (idx, w) in works.iter().filter(|w| w.meta.world == *world).enumerate() {
-            let path = w.path();
-            let title = escape(&w.meta.title);
-            let order = format!("{:02}", w.meta.order);
-            let active = current.is_some_and(|v| v.id == w.id && v.meta.world == w.meta.world);
-            let class = if active { " is-current" } else { "" };
-            let selected = if active {
-                r#" aria-current="page""#
-            } else {
-                ""
-            };
-            let _ = write!(
-                mobile,
-                r#"<li class="mobile-index-item{class}" {skin}><a class="mobile-index-link" {skin} href="{path}"{selected}><span class="mobile-index-order" {skin}>{order}</span> <span class="mobile-index-copy" {skin}><span class="mobile-index-title" {skin}>{title}</span> {}</span></a></li>"#,
-                first_line(w, "mobile-index-line", skin)
-            );
-            let _ = write!(
-                desktop,
-                r#"<li class="poem-item{class}" style="--item-i: {idx}"><a class="poem-link" href="{path}"{selected}><span class="poem-order">{order}</span> <span class="poem-title">{title}</span> {}</a></li>"#,
-                first_line(w, "poem-first-line", "")
-            );
-        }
-        slots.insert(format!("MOBILE_{i}"), mobile);
-        slots.insert(format!("DESKTOP_{i}"), desktop);
+    for (i, (world, label, ..)) in WORLDS.iter().enumerate() {
+        slots.insert(format!("MOBILE_{i}"), format!(
+            r#"<li class="mobile-index-item" {skin}><a class="mobile-index-link" {skin} href="/{world}">Browse {label}</a></li>"#
+        ));
+        slots.insert(format!("DESKTOP_{i}"), format!(
+            r#"<li class="poem-item"><a class="poem-link" href="/{world}">Browse {label}</a></li>"#
+        ));
     }
     slots
+}
+
+fn relation(source: &Value, target: &Value) -> f64 {
+    source["atlasRelations"]
+        .as_array()
+        .and_then(|relations| {
+            relations
+                .iter()
+                .find(|relation| relation["id"] == target["id"])
+        })
+        .and_then(|relation| relation["weight"].as_f64())
+        .unwrap_or(0.0)
+}
+
+fn reading_catalog(works: &[Work], nav: &[Value], scenes: &BTreeMap<String, Scene>) -> Value {
+    let rows: Vec<_> = nav
+        .iter()
+        .map(|row| {
+            let work = works
+                .iter()
+                .find(|work| {
+                    Some(work.id.as_str()) == row["id"].as_str()
+                        && Some(work.meta.world.as_str()) == row["world"].as_str()
+                })
+                .expect("navigation entry belongs to the publication");
+            let affinities: BTreeMap<_, _> = nav
+                .iter()
+                .filter_map(|target| {
+                    let weight = relation(row, target).max(0.82 * relation(target, row));
+                    (weight > 0.0).then(|| {
+                        (
+                            format!(
+                                "{}/{}",
+                                target["world"].as_str().unwrap_or_default(),
+                                target["id"].as_str().unwrap_or_default()
+                            ),
+                            weight,
+                        )
+                    })
+                })
+                .collect();
+            json!({"id":work.id,"world":work.meta.world,"title":work.meta.title,
+            "order":work.meta.order,"firstLine":work.opening(),
+            "score":row["emotionScore"],"types":row["contentTypes"],"affinities":affinities,
+            "scene":scenes.get(&work.path()[1..]).map(|scene| scene.piece.as_str())})
+        })
+        .collect();
+    json!({"works":rows})
 }
 
 fn world_rows(works: &[Work], world: &str) -> String {
@@ -314,8 +344,8 @@ fn manifold(scene: &Scene, title: &str, visual: &CatalogEntry) -> String {
     )
 }
 
-const LOADER: &str = r#"<link rel="stylesheet" href="/assets/site.css"><script type="module" src="/assets/start.js"></script>"#;
-const WORK_LOADER: &str = r#"<link rel="stylesheet" href="/assets/site.css"><script type="module" blocking="render" src="/assets/start.js"></script>"#;
+const LOADER: &str = r#"<link rel="stylesheet" data-reader-overrides href="/assets/site.css"><script type="module" src="/assets/start.js"></script>"#;
+const WORK_LOADER: &str = r#"<link rel="stylesheet" data-reader-overrides href="/assets/site.css"><script type="module" blocking="render" src="/assets/start.js"></script>"#;
 
 fn render_work(
     root: &Path,
@@ -323,7 +353,6 @@ fn render_work(
     work: &Work,
     scenes: &BTreeMap<String, Scene>,
     visual: &CatalogEntry,
-    nav: &[Value],
     shell: &str,
 ) -> Result<String> {
     let (_, volume, _, _) = WORLDS
@@ -378,19 +407,9 @@ fn render_work(
         {"@type":"ListItem","position":2,"name":volume,"item":format!("{DOMAIN}/{world}")},
         {"@type":"ListItem","position":3,"name":work.meta.title,"item":url}
     ]});
-    let current = nav
-        .iter()
-        .find(|row| row["world"].as_str() == Some(world) && row["id"].as_str() == Some(&work.id));
-    let candidates: Vec<_> = nav.iter().map(|row| {
-        let relation = |source: &Value, target: &Value| source["atlasRelations"].as_array().and_then(|r|
-            r.iter().find(|p| p["id"]==target["id"])).and_then(|r| r["weight"].as_f64()).unwrap_or(0.0);
-        let weight = current.map(|cur| relation(cur,row).max(0.82*relation(row,cur))).unwrap_or(0.0);
-        let key = format!("{}/{}", row["world"].as_str().unwrap_or_default(), row["id"].as_str().unwrap_or_default());
-        json!({"id":row["id"],"world":row["world"],"score":row["emotionScore"],"types":row["contentTypes"],"affinity":weight,"scene":scenes.get(&key).map(|scene| scene.piece.as_str())})
-    }).collect();
     let data = format!(
         r#"<script type="application/json" id="reading-data">{}</script>"#,
-        safe_json(&json!({"current":work.id,"world":world,"works":candidates}))
+        safe_json(&json!({"current":work.id,"world":world}))
     );
     let column_alignment = if let Some(alignment) = &work.meta.column_alignment {
         let right = work
@@ -413,7 +432,15 @@ fn render_work(
     } else {
         String::new()
     };
+    let position = works
+        .iter()
+        .position(|item| item.path() == path)
+        .context("Work is in the publication")?;
+    let previous = &works[(position + works.len() - 1) % works.len()];
+    let next = &works[(position + 1) % works.len()];
     let mut slots = menus(works, Some(work));
+    slots.insert("PREVIOUS".into(), previous.path());
+    slots.insert("NEXT".into(), next.path());
     for (key,value) in [
         ("LOADER",format!("{WORK_LOADER}{data}")),("WORLD",world.to_owned()),
         ("PAGE_TITLE",format!("{title} — Dai Pan")),
@@ -452,15 +479,7 @@ pub fn generate(root: &Path, output: &Path, works: &[Work], nav: &[Value]) -> Re
         let mut slots = menus(works, None);
         let mut loader = LOADER.to_string();
         if route == "home" {
-            let entries: Vec<_> = works
-                .iter()
-                .map(|w| json!({"id":w.id,"world":w.meta.world}))
-                .collect();
-            let _ = write!(
-                loader,
-                r#"<script type="application/json" id="entry-data">{}</script>"#,
-                safe_json(&json!(entries))
-            );
+            loader.push_str(r#"<script type="application/json" id="entry-data">true</script>"#);
         }
         slots.insert("LOADER".into(), loader);
         if matches!(route, "collection" | "about") {
@@ -499,6 +518,10 @@ pub fn generate(root: &Path, output: &Path, works: &[Work], nav: &[Value]) -> Re
         .into_iter()
         .map(|entry| (entry.piece.clone(), entry))
         .collect();
+    fs::write(
+        output.join("assets/reading.json"),
+        safe_json(&reading_catalog(works, nav, &scenes)),
+    )?;
     for scene in scenes.values() {
         let slug = &scene.piece;
         ensure!(
@@ -544,15 +567,7 @@ pub fn generate(root: &Path, output: &Path, works: &[Work], nav: &[Value]) -> Re
             }),
             "Scene excerpt is out of date for {path}. Rebuild editorial assets."
         );
-        let page = render_work(
-            root,
-            works,
-            work,
-            &scenes,
-            &catalog[&scene.piece],
-            nav,
-            &shell,
-        )?;
+        let page = render_work(root, works, work, &scenes, &catalog[&scene.piece], &shell)?;
         write_page(output, &path[1..], &page)?;
     }
     Ok(())
