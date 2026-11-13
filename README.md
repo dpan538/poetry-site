@@ -29,6 +29,8 @@ Cargo generates the WebAssembly bindings and module entry point. MANIFOLD loads 
 
 Vercel builds production from `main` using `sh scripts/build-vercel`, which installs the pinned Rust toolchain when needed and publishes `dist/`. The production build uses the checked-in scene manifest and requires no model weights or service credentials.
 
+The compiler emits one shared reading catalogue and creates content-fingerprinted URLs for CSS, JavaScript, JSON and WASM. Vercel caches these immutable assets in the browser for one year; changed files get new URLs, while HTML remains revalidated. The Rust reader reuses the catalogue during navigation and constructs the full Index only when opened. See the [performance audit](docs/performance-audit-2026-11-13.md) for measurements and verification.
+
 Run `sh scripts/site lab 4376` to preview the six earlier custom MANIFOLD animations and their source credits at [localhost:4376](http://localhost:4376/). Run `sh scripts/site originals 4380` for the original-scene review gallery. Four approved originals now replace the previous scene on Private Sky, Dusk, Crown Antiques and Drowned Spirit; the two other studies remain outside the publication catalogue.
 
 Run `sh scripts/site studies 4381` for the five approved atmospheric originals (01, 02, 04, 05 and 06) at [localhost:4381](http://localhost:4381/). They use a calibrated four-character atlas, explicit neutral tones and material palettes. Together with the previous four approved originals, they form nine independently made MANIFOLD scenes; the withdrawn study 03 is excluded.
