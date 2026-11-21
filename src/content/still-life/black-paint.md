@@ -1,5 +1,6 @@
 ---
 title: "Black Paint"
+manifoldScene: "black-paint"
 world: "still-life"
 order: 22
 firstLine: "From birth, we have been wearing it, Protecting our souls, immortal yet unfading."

@@ -1,5 +1,6 @@
 ---
 title: "Shadow"
+manifoldScene: "shadow"
 world: "their-world"
 order: 3
 firstLine: "All night, I lie in bed, Staring at the shadows on the snow-white wall."

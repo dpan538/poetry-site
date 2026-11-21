@@ -20,6 +20,7 @@ pub struct Encoder {
     lookup: Vec<u8>,
     columns: usize,
     tone: Vec<f32>,
+    dither_strength: f64,
 }
 impl Encoder {
     pub fn new(palette: &[Color], columns: usize) -> Self {
@@ -27,6 +28,7 @@ impl Encoder {
             palette: palette.to_vec(),
             lookup: vec![255; 32768],
             columns,
+            dither_strength: 1.,
             tone: (0..=1024)
                 .map(|i| {
                     let v = i as f64 / 256.;
@@ -38,6 +40,10 @@ impl Encoder {
                 })
                 .collect(),
         }
+    }
+    pub fn with_dither_strength(mut self, strength: f64) -> Self {
+        self.dither_strength = strength;
+        self
     }
     fn nearest(&mut self, color: Color) -> u8 {
         let peak = color.into_iter().fold(0.0_f32, f32::max);
@@ -97,7 +103,9 @@ impl Encoder {
         let ordered = BAYER[(y & 3) * 4 + (x & 3)] as f64 / 16. - 0.47;
         // Upstream stores the combined threshold in a Float32Array.
         let dither = (ordered * 0.4 + (h - 0.5) * 0.5) as f32;
-        let step = (level * 3. + dither as f64).round().clamp(0., 3.) as usize;
+        let step = (level * 3. + dither as f64 * self.dither_strength)
+            .round()
+            .clamp(0., 3.) as usize;
         if step == 0 {
             return (0, [0.; 3]);
         }

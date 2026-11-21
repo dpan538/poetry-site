@@ -77,6 +77,12 @@ function mountAtmosphere(module, dialog) {
     const reduced = matchMedia("(prefers-reduced-motion: reduce)");
     let animation = module.mount_atmosphere(canvas, dialog.dataset.piece);
     let width = canvas.clientWidth, dpr = devicePixelRatio, resizeTask;
+    const duration = animation.duration();
+    const completion = duration == null || reduced.matches ? null : setInterval(() => {
+        if (animation.elapsed() < duration) return;
+        clearInterval(completion);
+        dialog.dispatchEvent(new Event("manifold-ended"));
+    }, 100);
     const resize = new ResizeObserver(() => {
         if (Math.abs(canvas.clientWidth - width) < 0.5 && devicePixelRatio === dpr) return;
         clearTimeout(resizeTask);
@@ -96,6 +102,7 @@ function mountAtmosphere(module, dialog) {
     visibility();
     return () => {
         clearTimeout(resizeTask);
+        clearInterval(completion);
         resize.disconnect();
         document.removeEventListener("visibilitychange", visibility);
         animation.free();

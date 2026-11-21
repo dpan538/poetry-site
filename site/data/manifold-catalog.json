@@ -271,5 +271,69 @@
       "credit": "Original procedural Rust scene for Iron Nails",
       "renderer": "atmospheres"
     }
+  },
+  {
+    "piece": "shadow",
+    "description": "A person pauses at a stair landing. Two profiles on the warm plaster drift together and resolve into one while the open door holds the blue winter twilight.",
+    "original": {
+      "credit": "Original generated imagery and Rust animation for Shadow",
+      "renderer": "atmospheres"
+    }
+  },
+  {
+    "piece": "cube",
+    "description": "A matte grayscale cube turns with a few tiny coloured flecks fixed to its faces. Near the midpoint, the triangular cut catches white light.",
+    "original": {
+      "credit": "Original procedural Rust scene for Cube",
+      "renderer": "atmospheres"
+    }
+  },
+  {
+    "piece": "thermos",
+    "description": "A worn enamel thermos on a table by a rainy window tilts and pours hot water into the red mug. Steam stays over the cup after the bottle returns to its place.",
+    "original": {
+      "credit": "Original generated imagery and Rust animation for Thermos",
+      "renderer": "atmospheres"
+    }
+  },
+  {
+    "piece": "manifesto",
+    "description": "An ivory CRT on a writing desk. Letters slip inside the glass, gather into a white flame and cast light on the wall.",
+    "original": {
+      "credit": "Original generated imagery and Rust animation for Manifesto",
+      "renderer": "atmospheres"
+    }
+  },
+  {
+    "piece": "the-white-tree",
+    "description": "A white trunk rapidly grows a crown. The crown falls as white grains, and a gust carries the finer grains across the yellow grass.",
+    "original": {
+      "credit": "Original generated imagery and Rust animation for The White Tree",
+      "renderer": "atmospheres"
+    }
+  },
+  {
+    "piece": "dancing-children",
+    "description": "The three painted children and skateboard sit on a modernist ceramic facade. A soft daylight reflection travels across the glazed wall.",
+    "original": {
+      "credit": "Original generated imagery and Rust animation for Dancing Children",
+      "renderer": "atmospheres"
+    }
+  },
+  {
+    "piece": "feather",
+    "description": "A white feather falls beside a puddle, settles in wet mud and darkens from the point of contact.",
+    "original": {
+      "credit": "Original generated imagery and Rust animation for Feather",
+      "renderer": "atmospheres"
+    }
+  },
+  {
+    "piece": "black-paint",
+    "description": "A dark painted mask rests on stretched white canvas. Raking light reveals raised cracks, translucent flakes and dark-brown paint.",
+    "original": {
+      "credit": "Original generated imagery and Rust animation for Black Paint",
+      "renderer": "atmospheres"
+    }
   }
 ]

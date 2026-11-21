@@ -33,7 +33,7 @@ The compiler emits one shared reading catalogue and creates content-fingerprinte
 
 Run `sh scripts/site lab 4376` to preview the six earlier custom MANIFOLD animations and their source credits at [localhost:4376](http://localhost:4376/). Run `sh scripts/site originals 4380` for the original-scene review gallery. Four approved originals now replace the previous scene on Private Sky, Dusk, Crown Antiques and Drowned Spirit; the two other studies remain outside the publication catalogue.
 
-Run `sh scripts/site studies 4381` for the five approved atmospheric originals (01, 02, 04, 05 and 06) at [localhost:4381](http://localhost:4381/). They use a calibrated four-character atlas, explicit neutral tones and material palettes. Together with the previous four approved originals, they form nine independently made MANIFOLD scenes; the withdrawn study 03 is excluded.
+Run `sh scripts/site studies 4381` for the [five atmospheric originals](http://localhost:4381/) or the [eight individual poem animations](http://localhost:4381/?batch=third). Both galleries use a calibrated four-character atlas. The approved scenes play from MANIFOLD on their respective poem pages.
 
 ## Edit the publication
 
@@ -46,6 +46,6 @@ The scene manifest is a checked-in editorial asset. To update semantic rankings 
 
 ## Credits and rights
 
-Thank you to [ascii.rest](https://ascii.rest/) and its open-source contributors. MANIFOLD includes 34 of its scenes alongside fifteen Rust-rendered scenes: six earlier scenes and nine newly approved originals, for a catalogue of 49. The bundled ascii.rest player and scenes retain their [MIT license](site/assets/manifold/ascii.rest-LICENSE.txt). Image-generation prompts and motion notes are recorded in [the first original batch](prototype/crates/originals/README.md); procedural scene construction and character rendering are documented in [the atmospheric batch](prototype/crates/studies/README.md).
+Thank you to [ascii.rest](https://ascii.rest/) and its open-source contributors. MANIFOLD includes 34 of its scenes, six earlier Rust-rendered scenes and 17 independent originals, for a catalogue of 57. The bundled ascii.rest player and scenes retain their [MIT license](site/assets/manifold/ascii.rest-LICENSE.txt). See the [first original batch](prototype/crates/originals/README.md) and the [scene studies](prototype/crates/studies/README.md) for image sources, motion notes and renderer details.
 
 The poems, prose and other original literary text are by Dai Pan (潘岱). All rights reserved. See the [repository rights notice](LICENSE.md) for copying and reuse terms.

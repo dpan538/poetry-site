@@ -1,5 +1,6 @@
 ---
 title: "Feather"
+manifoldScene: "feather"
 world: "still-life"
 order: 26
 firstLine: "I look at myself in the mirror, Teardrops sliding down my cheeks."

@@ -43,5 +43,97 @@
     "scene": "One large foreground torii frames a smaller, lower shrine hall at the end of a stone approach, with layered snow mountains behind and no foreground trees.",
     "motion": "前景大鸟居与远端小神宫按统一地面接点组织透视。柱脚落在石基上，无底部红点或前景树木；神宫下移至台地，远山按距离降低反差并呈现空气透视。只有云层缓慢移动，建筑与山体固定。",
     "kind": 5
+  },
+  {
+    "id": "shadow",
+    "poem": "Shadow",
+    "work": "/their-world/shadow",
+    "quote": "I look at the shadows' faces, which reflect like mirrors,\nand see only my reflection, staring back at me.",
+    "scene": "A person pauses at a stair landing. Two profiles on the warm plaster drift together and resolve into one while the open door holds the blue winter twilight.",
+    "motion": "站在门边的人望着白墙。两道侧影原本朝向不同，逐渐靠拢，约 17 秒只剩一道。",
+    "kind": 6,
+    "moment": 14,
+    "batch": "third"
+  },
+  {
+    "id": "cube",
+    "poem": "Cube",
+    "work": "/bless-you/cube",
+    "quote": "I've told you more than once,\nyou will never become a ball.",
+    "scene": "A matte grayscale cube turns with a few tiny coloured flecks fixed to its faces. Near the midpoint, the triangular cut catches white light.",
+    "motion": "黑白灰立方体缓慢转动，几粒淡青、浅紫和暖色颗粒随表面转过。约 18 秒，削角处的三角面亮成白色。",
+    "kind": 7,
+    "moment": 18,
+    "batch": "third"
+  },
+  {
+    "id": "thermos",
+    "poem": "Thermos",
+    "work": "/still-life/thermos",
+    "quote": "But I have no choice, I still need to protect, preserve all their warmth.",
+    "scene": "A worn enamel thermos on a table by a rainy window tilts and pours hot water into the red mug. Steam stays over the cup after the bottle returns to its place.",
+    "motion": "约 6 秒，保温瓶倾稳，水流落进红杯，杯面荡开一圈亮纹。约 14 秒瓶子回到桌面，杯口还留着热气。",
+    "kind": 8,
+    "moment": 8,
+    "still": 2,
+    "batch": "third"
+  },
+  {
+    "id": "manifesto",
+    "poem": "Manifesto",
+    "work": "/their-world/manifesto",
+    "quote": "A white flame within the black noise, jumping up and down,",
+    "scene": "An ivory CRT on a writing desk. Letters slip inside the glass, gather into a white flame and cast light on the wall.",
+    "motion": "约 8 秒，错位的字母和噪点聚成一簇白焰。墙面随屏幕亮起来。",
+    "kind": 9,
+    "moment": 11,
+    "still": 4,
+    "batch": "third"
+  },
+  {
+    "id": "the-white-tree",
+    "poem": "The White Tree",
+    "work": "/their-world/the-white-tree",
+    "quote": "On the yellow fields, alone, stands a white tree.\nLeaning against the black mountains,",
+    "scene": "A white trunk rapidly grows a crown. The crown falls as white grains, and a gust carries the finer grains across the yellow grass.",
+    "motion": "白树迅速长出枝杈。5.5 秒时，整个树冠化成白色颗粒一起落下，细屑被阵风带得更远。落定后，草地上留着树干和白屑。",
+    "kind": 10,
+    "moment": 6,
+    "still": 5,
+    "batch": "third"
+  },
+  {
+    "id": "dancing-children",
+    "poem": "Dancing Children",
+    "work": "/bless-you/dancing-children",
+    "quote": "I only saw children dancing,\nNo children dance. Until I leave.",
+    "scene": "The three painted children and skateboard sit on a modernist ceramic facade. A soft daylight reflection travels across the glazed wall.",
+    "motion": "看悬挑檐下的壁画。日光缓慢扫过瓷砖釉面，檐影和人物稳在原处。",
+    "kind": 11,
+    "moment": 8,
+    "batch": "third"
+  },
+  {
+    "id": "feather",
+    "poem": "Feather",
+    "work": "/still-life/feather",
+    "quote": "Gently falling, then mud-stained,\nTurning to a dull yellow, at the end,",
+    "scene": "A white feather falls beside a puddle, settles in wet mud and darkens from the point of contact.",
+    "motion": "白羽先下沉侧漂，约 4 秒由羽轴末端触地，随后铺平。泥色从接触处扩开，一轮约 13 秒。",
+    "kind": 12,
+    "moment": 7,
+    "still": 5,
+    "batch": "third"
+  },
+  {
+    "id": "black-paint",
+    "poem": "Black Paint",
+    "work": "/still-life/black-paint",
+    "quote": "I observe the cracks where paint has dried upon the mask,",
+    "scene": "A dark painted mask rests on stretched white canvas. Raking light reveals raised cracks, translucent flakes and dark-brown paint.",
+    "motion": "开场侧光就从左边擦过面具。约 7 秒，右颊薄片、裂纹和深褐漆底被照出来。",
+    "kind": 13,
+    "moment": 7,
+    "batch": "third"
   }
 ]

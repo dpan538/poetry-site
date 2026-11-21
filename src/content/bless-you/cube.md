@@ -1,5 +1,6 @@
 ---
 title: "Cube"
+manifoldScene: "cube"
 world: "bless-you"
 order: 26
 firstLine: "Cube, I've told you more than once, you will never become a ball."

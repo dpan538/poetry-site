@@ -40,14 +40,29 @@ struct Renderer {
 }
 impl Renderer {
     fn new(canvas: HtmlCanvasElement, kind: u8, narrow: bool) -> Result<Self, JsValue> {
-        let (cols, rows) = match (kind == 5, narrow) {
-            (true, true) => (119, 70),
-            (true, false) => (204, 120),
-            (false, true) => (136, 80),
-            (false, false) => (255, 150),
+        let (cols, rows) = match (kind, narrow) {
+            (scene::SHADOW, true) => (68, 40),
+            (scene::SHADOW, false) => (102, 60),
+            (scene::MANIFESTO | scene::DANCING_CHILDREN, true) => (102, 60),
+            (scene::MANIFESTO | scene::DANCING_CHILDREN, false) => (136, 80),
+            (scene::THERMOS | scene::WHITE_TREE | scene::FEATHER | scene::BLACK_PAINT, true) => {
+                (85, 50)
+            }
+            (scene::THERMOS | scene::WHITE_TREE | scene::FEATHER | scene::BLACK_PAINT, false) => {
+                (119, 70)
+            }
+            (5, true) => (119, 70),
+            (5, false) => (204, 120),
+            (_, true) => (136, 80),
+            (_, false) => (255, 150),
         };
         let scene = Scene::new(kind, cols, rows);
-        let encoder = Encoder::new(&scene.palette, cols);
+        let mut encoder = Encoder::new(&scene.palette, cols);
+        if scene::is_poem_study(kind) && kind != scene::CUBE {
+            // A full-size dot is conspicuous on these coarser grids. Leave
+            // enough dither for gradients without breaking up thin edges.
+            encoder = encoder.with_dither_strength(0.48);
+        }
         let dpr = web_sys::window()
             .map(|w| w.device_pixel_ratio())
             .unwrap_or(1.);
@@ -127,7 +142,7 @@ impl Renderer {
             ],
             frame: vec![Cell::default(); cols * rows],
             counts: [0; 4],
-            entrance: true,
+            entrance: kind != scene::WHITE_TREE,
             x_edges,
             y_edges,
             slot_w,
@@ -187,12 +202,19 @@ type Frame = Closure<dyn FnMut(f64)>;
 struct Player {
     renderer: RefCell<Renderer>,
     elapsed: Flag<f32>,
+    duration: Option<f32>,
     paused: Flag<bool>,
     last: Flag<Option<f64>>,
     pending: Flag<Option<i32>>,
     callback: RefCell<Option<Frame>>,
 }
 impl Player {
+    fn limit(&self, seconds: f32) -> f32 {
+        seconds.clamp(0., self.duration.unwrap_or(f32::INFINITY))
+    }
+    fn finished(&self) -> bool {
+        self.duration.is_some_and(|end| self.elapsed.get() >= end)
+    }
     fn request(&self) {
         if self.paused.get() || self.pending.get().is_some() {
             return;
@@ -222,11 +244,16 @@ impl Player {
         if dt >= 1000. / 15. {
             self.last.set(Some(now));
             if dt < 500. {
-                self.elapsed.set(self.elapsed.get() + dt as f32 / 1000.);
+                self.elapsed
+                    .set(self.limit(self.elapsed.get() + dt as f32 / 1000.));
             }
             let _ = self.renderer.borrow_mut().draw(self.elapsed.get());
         }
-        self.request();
+        if self.finished() {
+            self.pause();
+        } else {
+            self.request();
+        }
     }
 }
 #[wasm_bindgen]
@@ -237,12 +264,13 @@ pub struct SceneStudy {
 impl SceneStudy {
     #[wasm_bindgen(constructor)]
     pub fn new(canvas: HtmlCanvasElement, kind: u8, narrow: bool) -> Result<Self, JsValue> {
-        if kind >= 6 || kind == 2 {
+        if !scene::is_study(kind) {
             return Err(JsValue::from_str("Unknown study"));
         }
         let player = Rc::new(Player {
             renderer: RefCell::new(Renderer::new(canvas, kind, narrow)?),
             elapsed: Flag::new(0.),
+            duration: (kind == scene::WHITE_TREE).then_some(scene::WHITE_TREE_DURATION),
             paused: Flag::new(true),
             last: Flag::new(None),
             pending: Flag::new(None),
@@ -258,6 +286,9 @@ impl SceneStudy {
         Ok(Self { player })
     }
     pub fn play(&self) {
+        if self.player.finished() {
+            return;
+        }
         self.player.paused.set(false);
         self.player.last.set(None);
         self.player.request();
@@ -269,7 +300,7 @@ impl SceneStudy {
         if !t.is_finite() {
             return Err(JsValue::from_str("Invalid time"));
         }
-        self.player.elapsed.set(t.max(0.));
+        self.player.elapsed.set(self.player.limit(t));
         self.player.last.set(None);
         let mut r = self.player.renderer.borrow_mut();
         r.entrance = false;
@@ -277,6 +308,9 @@ impl SceneStudy {
     }
     pub fn elapsed(&self) -> f32 {
         self.player.elapsed.get()
+    }
+    pub fn duration(&self) -> Option<f32> {
+        self.player.duration
     }
     pub fn stats(&self) -> String {
         format!("{:?}", self.player.renderer.borrow().counts)
@@ -326,6 +360,14 @@ fn published_kind(slug: &str) -> Option<u8> {
         "silver-lake" => Some(3),
         "sleeping-courtyard" => Some(4),
         "iron-shrine" => Some(5),
+        "shadow" => Some(scene::SHADOW),
+        "cube" => Some(scene::CUBE),
+        "thermos" => Some(scene::THERMOS),
+        "manifesto" => Some(scene::MANIFESTO),
+        "the-white-tree" => Some(scene::WHITE_TREE),
+        "dancing-children" => Some(scene::DANCING_CHILDREN),
+        "feather" => Some(scene::FEATHER),
+        "black-paint" => Some(scene::BLACK_PAINT),
         _ => None,
     }
 }
@@ -344,7 +386,17 @@ pub fn mount_atmosphere(canvas: HtmlCanvasElement, slug: &str) -> Result<SceneSt
         .is_some_and(|m| m.matches());
     let animation = SceneStudy::new(canvas, kind, narrow)?;
     if reduced {
-        animation.seek(0.)?;
+        let still = match kind {
+            scene::SHADOW => 14.,
+            scene::CUBE => 18.,
+            scene::THERMOS => 2.,
+            scene::MANIFESTO => 4.,
+            scene::WHITE_TREE | scene::FEATHER => 5.,
+            scene::DANCING_CHILDREN => 8.,
+            scene::BLACK_PAINT => 7.,
+            _ => 0.,
+        };
+        animation.seek(still)?;
     } else {
         animation.play();
     }
@@ -353,16 +405,24 @@ pub fn mount_atmosphere(canvas: HtmlCanvasElement, slug: &str) -> Result<SceneSt
 
 #[cfg(test)]
 mod publication_tests {
-    use super::published_kind;
+    use super::{published_kind, scene};
 
     #[test]
-    fn only_the_five_approved_atmospheres_have_publication_ids() {
+    fn only_approved_studies_have_publication_ids() {
         for (slug, kind) in [
             ("homeward-bridge", 0),
             ("observer-supper", 1),
             ("silver-lake", 3),
             ("sleeping-courtyard", 4),
             ("iron-shrine", 5),
+            ("shadow", scene::SHADOW),
+            ("cube", scene::CUBE),
+            ("thermos", scene::THERMOS),
+            ("manifesto", scene::MANIFESTO),
+            ("the-white-tree", scene::WHITE_TREE),
+            ("dancing-children", scene::DANCING_CHILDREN),
+            ("feather", scene::FEATHER),
+            ("black-paint", scene::BLACK_PAINT),
         ] {
             assert_eq!(published_kind(slug), Some(kind));
         }

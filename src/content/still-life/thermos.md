@@ -1,5 +1,6 @@
 ---
 title: "Thermos"
+manifoldScene: "thermos"
 world: "still-life"
 order: 8
 firstLine: "Although I cannot merge into your world, I stand on the table, My hard metal interior encased in the exterior, in white."

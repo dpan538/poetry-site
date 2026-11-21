@@ -436,7 +436,12 @@ fn manifold() {
     }
 
     {
-        let (dialog, start, playback) = (dialog.clone(), start.clone(), playback.clone());
+        let (dialog, start, playback, playing) = (
+            dialog.clone(),
+            start.clone(),
+            playback.clone(),
+            playing.clone(),
+        );
         on(playback.clone().as_ref(), "click", move |_| {
             if !dialog.has_attribute("data-scene-ready") || dialog.has_attribute("data-closing") {
                 return;
@@ -448,6 +453,14 @@ fn manifold() {
             } else {
                 start();
             }
+        });
+    }
+    {
+        let (playing, playback) = (playing.clone(), playback.clone());
+        on(dialog.as_ref(), "manifold-ended", move |_| {
+            playing.set(false);
+            set(&playback, "aria-label", "Replay animation");
+            set(&playback, "data-paused", "");
         });
     }
     if let Some(retry) = query("[data-manifold-retry]") {

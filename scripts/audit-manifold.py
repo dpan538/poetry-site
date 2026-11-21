@@ -56,9 +56,20 @@ def audit(build_dir=None, expected_originals=None):
             if manifest[a]['piece'] == manifest[b]['piece']:
                 adjacent.append([a, b])
     if build_dir:
+        snippets = list(build_dir.glob('assets/immutable/*/snippets/*/manifold_player.js'))
+        assert len(snippets) <= 1, 'Multiple generated MANIFOLD player snippets'
+        player_source = snippets[0].read_text() if snippets else ''
         for player in ['originals', 'atmospheres']:
-            assert (build_dir / f'assets/manifold/{player}.js').is_file(), f'Missing {player} bindings'
-            wasm = build_dir / f'assets/manifold/{player}_bg.wasm'
+            if snippets:
+                bindings = snippets[0].parents[2] / f'manifold/{player}.js'
+                fingerprint = re.search(rf'"/(assets/immutable/[a-f0-9]+/manifold/{player}_bg\.wasm)"',
+                                        player_source)
+                assert fingerprint, f'Missing fingerprinted {player} WASM URL'
+                wasm = build_dir / fingerprint[1]
+            else:
+                bindings = build_dir / f'assets/manifold/{player}.js'
+                wasm = build_dir / f'assets/manifold/{player}_bg.wasm'
+            assert bindings.is_file(), f'Missing {player} bindings'
             assert wasm.read_bytes()[:4] == b'\0asm', f'Missing or invalid {player} WASM'
     return {'catalogue': len(catalogue), 'asciiRest': sum('painting' not in row and 'original' not in row for row in catalogue),
             'earlierRustScenes': sum('painting' in row for row in catalogue), 'newIndependentOriginals': len(originals),

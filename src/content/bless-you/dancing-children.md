@@ -1,5 +1,6 @@
 ---
 title: "Dancing Children"
+manifoldScene: "dancing-children"
 world: "bless-you"
 order: 17
 firstLine: "Blue light streams through clouds of yellow hue, Shining on glass untouched by time's decay, Casting shadows where power lines cut through."

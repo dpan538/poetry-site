@@ -1,5 +1,6 @@
 ---
 title: "Manifesto"
+manifoldScene: "manifesto"
 world: "their-world"
 order: 11
 firstLine: "The world begins to tremble unevenly, In my eyes, vision falls upon the screen, up and down, White noise, black ink spots, and spaces — Between characters in Roman type, pristine."

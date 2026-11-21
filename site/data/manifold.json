@@ -40,24 +40,24 @@
     ]
   },
   "bless-you/cube": {
-    "description": "The vercel triangle as a glass prism, splitting white light to a rainbow.",
-    "excerpt": "Your faltering faith.\nYou preach self-sacrifice, for others to change to triangles.",
+    "description": "A matte grayscale cube turns with a few tiny coloured flecks fixed to its faces. Near the midpoint, the triangular cut catches white light.",
+    "excerpt": "I've told you more than once,\nyou will never become a ball.",
     "keywords": [
       "triangles",
       "self-sacrifice",
       "faith"
     ],
-    "piece": "black-prism"
+    "piece": "cube"
   },
   "bless-you/dancing-children": {
-    "description": "Dusk aarti on the ganga, lamps on the steps and diyas on the water.",
-    "excerpt": "Squares, tiles, branches, broken leaves,\nDancing between lines,",
+    "description": "The three painted children and skateboard sit on a modernist ceramic facade. A soft daylight reflection travels across the glazed wall.",
+    "excerpt": "I only saw children dancing,\nNo children dance. Until I leave.",
     "keywords": [
       "leaves",
       "dusk",
       "tiles"
     ],
-    "piece": "varanasi-ghats"
+    "piece": "dancing-children"
   },
   "bless-you/drowned-spirit": {
     "piece": "drowned-water",
@@ -310,14 +310,14 @@
     "piece": "gangaur-ghat"
   },
   "still-life/black-paint": {
-    "description": "The vercel triangle as a glass prism, splitting white light to a rainbow.",
-    "excerpt": "Yet the shadow between mask and body remains covered,\nWhich is called white in meaning,",
+    "description": "A dark painted mask rests on stretched white canvas. Raking light reveals raised cracks, translucent flakes and dark-brown paint.",
+    "excerpt": "I observe the cracks where paint has dried upon the mask,",
     "keywords": [
       "mask",
       "shadow",
       "whiteness"
     ],
-    "piece": "black-prism"
+    "piece": "black-paint"
   },
   "still-life/boring-clouds": {
     "description": "The sun sets past a pine headland, lit cloud, glitter on rolling sea.",
@@ -380,14 +380,14 @@
     "piece": "deep-reef"
   },
   "still-life/feather": {
-    "description": "The earth rising over a cratered lunar horizon in long low sunlight.",
-    "excerpt": "White feathers descend from the sky.\nI know they will soon change,",
+    "description": "A white feather falls beside a puddle, settles in wet mud and darkens from the point of contact.",
+    "excerpt": "Gently falling, then mud-stained,\nTurning to a dull yellow, at the end,",
     "keywords": [
       "feathers",
       "descend",
       "sky"
     ],
-    "piece": "earthrise"
+    "piece": "feather"
   },
   "still-life/ghost": {
     "description": "A dark planet cut into the planetscale mark, backlit, a moon circling.",
@@ -510,14 +510,14 @@
     "piece": "lantern-lake"
   },
   "still-life/thermos": {
-    "description": "Saturn and its rings hanging over the cracked ice and geysers of a moon.",
-    "excerpt": "Although I cannot merge into your world, I stand on the table,\nMy hard metal interior encased in the exterior, in white.",
+    "description": "A worn enamel thermos on a table by a rainy window tilts and pours hot water into the red mug. Steam stays over the cup after the bottle returns to its place.",
+    "excerpt": "But I have no choice, I still need to protect, preserve all their warmth.",
     "keywords": [
       "encased",
       "exterior",
       "interior"
     ],
-    "piece": "saturn-rise"
+    "piece": "thermos"
   },
   "still-life/third-three": {
     "description": "The night earth from orbit, cloudflare requests arcing city to city.",
@@ -670,14 +670,14 @@
     "piece": "tokyo-rain"
   },
   "their-world/manifesto": {
-    "description": "The vercel triangle as a glass prism, splitting white light to a rainbow.",
-    "excerpt": "The firelight illuminates you and my face, just quietly watching,\nThen chaos occurs in everything that happens,",
+    "description": "An ivory CRT on a writing desk. Letters slip inside the glass, gather into a white flame and cast light on the wall.",
+    "excerpt": "A white flame within the black noise, jumping up and down,",
     "keywords": [
       "illuminates",
       "firelight",
       "light"
     ],
-    "piece": "black-prism"
+    "piece": "manifesto"
   },
   "their-world/pockets": {
     "description": "A dark planet cut into the planetscale mark, backlit, a moon circling.",
@@ -710,14 +710,14 @@
     "piece": "command-city"
   },
   "their-world/shadow": {
-    "description": "Mumbai's queen's necklace at night, lamps curving round the bay.",
-    "excerpt": "The shadows just stood by my bed, unwavering in purpose.\nThey formed a circle around me, a tight circle.",
+    "description": "A person pauses at a stair landing. Two profiles on the warm plaster drift together and resolve into one while the open door holds the blue winter twilight.",
+    "excerpt": "I look at the shadows' faces, which reflect like mirrors,\nand see only my reflection, staring back at me.",
     "keywords": [
       "shadows",
       "ghosts",
       "darkness"
     ],
-    "piece": "marine-drive"
+    "piece": "shadow"
   },
   "their-world/side": {
     "description": "Sunset on lake pichola, udaipur's palaces glowing over the water.",
@@ -780,14 +780,14 @@
     "piece": "observer-supper"
   },
   "their-world/the-white-tree": {
-    "description": "The earth rising over a cratered lunar horizon in long low sunlight.",
-    "excerpt": "Floating from afar,\nTalking of the white tree like a distant star.",
+    "description": "A white trunk rapidly grows a crown. The crown falls as white grains, and a gust carries the finer grains across the yellow grass.",
+    "excerpt": "On the yellow fields, alone, stands a white tree.\nLeaning against the black mountains,",
     "keywords": [
       "tree",
       "afar",
       "sky"
     ],
-    "piece": "earthrise"
+    "piece": "the-white-tree"
   },
   "their-world/the-wrapper": {
     "description": "Pine ridges fading into morning fog, sunbeams slanting through.",

@@ -1,5 +1,6 @@
 ---
 title: "The White Tree"
+manifoldScene: "the-white-tree"
 world: "their-world"
 order: 20
 firstLine: "(1) On the yellow fields, alone, stands a white tree."
