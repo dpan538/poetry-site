@@ -1,5 +1,6 @@
 ---
 title: "Boring Clouds"
+manifoldScene: "boring-clouds"
 world: "still-life"
 order: 14
 firstLine: "The train rushes past a curtain of trees, A house appears, then vanishes in seconds."

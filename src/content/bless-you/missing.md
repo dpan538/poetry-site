@@ -1,5 +1,6 @@
 ---
 title: "Missing"
+manifoldScene: "missing"
 world: "bless-you"
 order: 10
 firstLine: "White wings, dark hands, Halos, fresh flowers, blue lotus robes, Only a face, missing."

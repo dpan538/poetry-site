@@ -1,5 +1,5 @@
 //! Original photographic plates with time-dependent lighting and sprite layers.
-use super::{plate_pixel, rgba};
+use crate::scene::plate_pixels::{plate_pixel, rgba};
 use crate::scene::{
     Color, DANCING_CHILDREN, FEATHER, MANIFESTO, WHITE_TREE, ellipse, gain, hash, line, luminance,
     mix, noise, smooth,

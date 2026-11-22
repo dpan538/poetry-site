@@ -1,5 +1,6 @@
 ---
 title: "Stone Frog"
+manifoldScene: "stone-frog"
 world: "still-life"
 order: 17
 firstLine: "Under the cherry blossoms, Two stone frogs, Some say they're golden toads."

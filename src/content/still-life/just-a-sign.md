@@ -1,5 +1,6 @@
 ---
 title: "Just A Sign"
+manifoldScene: "just-a-sign"
 world: "still-life"
 order: 7
 firstLine: "They say, I'm nothing special."

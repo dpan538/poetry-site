@@ -29,7 +29,7 @@ Time is **continuous** in the atmospheric batch. The first-minute ruler lets vie
 
 ## Publication runtime
 
-The static build generates `atmospheres.js` and `atmospheres_bg.wasm` from this crate. A catalogue entry with `original.renderer: atmospheres` puts `data-atmosphere` on the poem dialog. Opening MANIFOLD imports the module on demand. `mount_atmosphere` resolves the 13 approved slugs and selects the desktop or mobile grid. The player preserves elapsed time while resizing, pauses in hidden tabs, renders a still for reduced motion, and releases the frame callback on close. The local gallery provides inspection controls.
+The static build generates `atmospheres.js` and `atmospheres_bg.wasm` from this crate. A catalogue entry with `original.renderer: atmospheres` puts `data-atmosphere` on the poem dialog. Opening MANIFOLD imports the module on demand. `mount_atmosphere` resolves the 25 approved slugs and selects the desktop or mobile grid. The player preserves elapsed time while resizing, pauses in hidden tabs, renders a still for reduced motion, and releases the frame callback on close. The local gallery provides inspection controls.
 
 ## Character renderer
 

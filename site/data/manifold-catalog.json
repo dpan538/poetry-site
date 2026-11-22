@@ -335,5 +335,101 @@
       "credit": "Original generated imagery and Rust animation for Black Paint",
       "renderer": "atmospheres"
     }
+  },
+  {
+    "piece": "boring-clouds",
+    "description": "Tree trunks race across a dark railway window. Distant cumulus holds its shape while a thinner veil and sunlit mist grains drift across the undersides.",
+    "original": {
+      "credit": "Original generated imagery and Rust animation for Boring Clouds",
+      "renderer": "atmospheres"
+    }
+  },
+  {
+    "piece": "umbrella",
+    "description": "The café and rainy street begin in black and white. Yellow drops pass down the café window, leaving wet tracks that gradually join together.",
+    "original": {
+      "credit": "Original generated imagery and Rust animation for Umbrella",
+      "renderer": "atmospheres"
+    }
+  },
+  {
+    "piece": "cottage",
+    "description": "One unbroken view of a timber cottage as afternoon turns to dusk. Wind carries a few leaves across the path. Warmth appears and fades in the two windows while the house remains.",
+    "original": {
+      "credit": "Original generated imagery and Rust animation for Cottage",
+      "renderer": "atmospheres"
+    }
+  },
+  {
+    "piece": "coin",
+    "description": "An embossed brass coin bounces once on the paving, rolls on its rim and tips onto its face.",
+    "original": {
+      "credit": "Original procedural Rust scene for Coin",
+      "renderer": "atmospheres"
+    }
+  },
+  {
+    "piece": "flying-away",
+    "description": "A sparrow grips a sagging wire in the blue morning. It crouches, pushes off and flies behind the edge of the café window.",
+    "original": {
+      "credit": "Original procedural Rust scene for Flying Away",
+      "renderer": "atmospheres"
+    }
+  },
+  {
+    "piece": "stone-frog",
+    "description": "Two green stone frogs are seen in profile under cherry blossoms. A loose petal turns and settles between their plinths.",
+    "original": {
+      "credit": "Original procedural Rust scene for Stone Frog",
+      "renderer": "atmospheres"
+    }
+  },
+  {
+    "piece": "milk-cow-cat",
+    "description": "A black-and-white cat sleeps on a four-pane windowsill as city lights flicker and a plane passes behind the window frame.",
+    "original": {
+      "credit": "Original procedural Rust scene for Milk Cow Cat",
+      "renderer": "atmospheres"
+    }
+  },
+  {
+    "piece": "missing",
+    "description": "Two cups stand across a table. A sheer curtain falls back toward an ordinary window, revealing a blue coat on the empty chair.",
+    "original": {
+      "credit": "Original procedural Rust scene for Missing",
+      "renderer": "atmospheres"
+    }
+  },
+  {
+    "piece": "after-snow",
+    "description": "Snow drifts past a blue mountain valley. Mist pulls away from the rooftops and warm windows appear on the hillside.",
+    "original": {
+      "credit": "Original procedural Rust scene for After Snow",
+      "renderer": "atmospheres"
+    }
+  },
+  {
+    "piece": "just-a-sign",
+    "description": "A clear yellow dashed centerline separates the two directions of traffic at dusk. The two white edge lines stay continuous.",
+    "original": {
+      "credit": "Original procedural Rust scene for Just A Sign",
+      "renderer": "atmospheres"
+    }
+  },
+  {
+    "piece": "ears",
+    "description": "Braided threads form an ear. The outer helix and inner folds expand and draw together in a paired heartbeat.",
+    "original": {
+      "credit": "Original procedural Rust scene for Ears",
+      "renderer": "atmospheres"
+    }
+  },
+  {
+    "piece": "candle",
+    "description": "A candle burns close to the viewer on a dark wooden table. Its small pool of light falls on a charcoal wall, with moonlit water visible in the far window.",
+    "original": {
+      "credit": "Original procedural Rust scene for Candle",
+      "renderer": "atmospheres"
+    }
   }
 ]

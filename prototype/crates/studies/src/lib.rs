@@ -43,14 +43,19 @@ impl Renderer {
         let (cols, rows) = match (kind, narrow) {
             (scene::SHADOW, true) => (68, 40),
             (scene::SHADOW, false) => (102, 60),
-            (scene::MANIFESTO | scene::DANCING_CHILDREN, true) => (102, 60),
-            (scene::MANIFESTO | scene::DANCING_CHILDREN, false) => (136, 80),
+            (scene::BORING_CLOUDS, true) => (102, 60),
+            (scene::BORING_CLOUDS | scene::COTTAGE, false) => (153, 90),
+            (scene::COTTAGE, true) => (119, 70),
+            (scene::MANIFESTO | scene::DANCING_CHILDREN | scene::UMBRELLA, true) => (102, 60),
+            (scene::MANIFESTO | scene::DANCING_CHILDREN | scene::UMBRELLA, false) => (136, 80),
             (scene::THERMOS | scene::WHITE_TREE | scene::FEATHER | scene::BLACK_PAINT, true) => {
                 (85, 50)
             }
             (scene::THERMOS | scene::WHITE_TREE | scene::FEATHER | scene::BLACK_PAINT, false) => {
                 (119, 70)
             }
+            (_, true) if scene::is_fourth_batch(kind) => (102, 60),
+            (_, false) if scene::is_fourth_batch(kind) => (136, 80),
             (5, true) => (119, 70),
             (5, false) => (204, 120),
             (_, true) => (136, 80),
@@ -58,7 +63,11 @@ impl Renderer {
         };
         let scene = Scene::new(kind, cols, rows);
         let mut encoder = Encoder::new(&scene.palette, cols);
-        if scene::is_poem_study(kind) && kind != scene::CUBE {
+        if scene::is_illustration(kind) {
+            encoder = encoder.with_illustration_inks();
+        } else if (scene::is_poem_study(kind) && kind != scene::CUBE)
+            || scene::is_fourth_batch(kind)
+        {
             // A full-size dot is conspicuous on these coarser grids. Leave
             // enough dither for gradients without breaking up thin edges.
             encoder = encoder.with_dither_strength(0.48);
@@ -142,7 +151,7 @@ impl Renderer {
             ],
             frame: vec![Cell::default(); cols * rows],
             counts: [0; 4],
-            entrance: kind != scene::WHITE_TREE,
+            entrance: kind != scene::WHITE_TREE && !scene::is_fourth_batch(kind),
             x_edges,
             y_edges,
             slot_w,
@@ -270,7 +279,7 @@ impl SceneStudy {
         let player = Rc::new(Player {
             renderer: RefCell::new(Renderer::new(canvas, kind, narrow)?),
             elapsed: Flag::new(0.),
-            duration: (kind == scene::WHITE_TREE).then_some(scene::WHITE_TREE_DURATION),
+            duration: scene::duration(kind),
             paused: Flag::new(true),
             last: Flag::new(None),
             pending: Flag::new(None),
@@ -368,6 +377,18 @@ fn published_kind(slug: &str) -> Option<u8> {
         "dancing-children" => Some(scene::DANCING_CHILDREN),
         "feather" => Some(scene::FEATHER),
         "black-paint" => Some(scene::BLACK_PAINT),
+        "boring-clouds" => Some(scene::BORING_CLOUDS),
+        "umbrella" => Some(scene::UMBRELLA),
+        "cottage" => Some(scene::COTTAGE),
+        "coin" => Some(scene::COIN),
+        "flying-away" => Some(scene::FLYING_AWAY),
+        "stone-frog" => Some(scene::STONE_FROG),
+        "milk-cow-cat" => Some(scene::MILK_COW_CAT),
+        "missing" => Some(scene::MISSING),
+        "after-snow" => Some(scene::AFTER_SNOW),
+        "just-a-sign" => Some(scene::JUST_A_SIGN),
+        "ears" => Some(scene::EARS),
+        "candle" => Some(scene::CANDLE),
         _ => None,
     }
 }
@@ -394,6 +415,15 @@ pub fn mount_atmosphere(canvas: HtmlCanvasElement, slug: &str) -> Result<SceneSt
             scene::WHITE_TREE | scene::FEATHER => 5.,
             scene::DANCING_CHILDREN => 8.,
             scene::BLACK_PAINT => 7.,
+            scene::BORING_CLOUDS | scene::FLYING_AWAY => 2.,
+            scene::UMBRELLA => 8.,
+            scene::COTTAGE => 6.,
+            scene::COIN => 0.3,
+            scene::STONE_FROG | scene::CANDLE => 5.,
+            scene::MILK_COW_CAT => 5.1,
+            scene::MISSING => 5.3,
+            scene::AFTER_SNOW => 9.5,
+            scene::JUST_A_SIGN | scene::EARS => 5.4,
             _ => 0.,
         };
         animation.seek(still)?;
@@ -423,6 +453,18 @@ mod publication_tests {
             ("dancing-children", scene::DANCING_CHILDREN),
             ("feather", scene::FEATHER),
             ("black-paint", scene::BLACK_PAINT),
+            ("boring-clouds", scene::BORING_CLOUDS),
+            ("umbrella", scene::UMBRELLA),
+            ("cottage", scene::COTTAGE),
+            ("coin", scene::COIN),
+            ("flying-away", scene::FLYING_AWAY),
+            ("stone-frog", scene::STONE_FROG),
+            ("milk-cow-cat", scene::MILK_COW_CAT),
+            ("missing", scene::MISSING),
+            ("after-snow", scene::AFTER_SNOW),
+            ("just-a-sign", scene::JUST_A_SIGN),
+            ("ears", scene::EARS),
+            ("candle", scene::CANDLE),
         ] {
             assert_eq!(published_kind(slug), Some(kind));
         }

@@ -1,5 +1,6 @@
 ---
 title: "Candle"
+manifoldScene: "candle"
 world: "their-world"
 order: 4
 firstLine: "Flicker, candle, dance and glow, How you move like waves that flow."

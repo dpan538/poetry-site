@@ -5,26 +5,32 @@ import init,{SceneStudy}from './studies.js?v=__STUDY_BUILD__';
 const $=s=>document.querySelector(s),media=matchMedia('(prefers-reduced-motion: reduce)');
 const buildRevision='__STUDY_BUILD__';
 const buildPoll=setInterval(async()=>{try{const next=await(await fetch('./build.json?check='+Date.now(),{cache:'no-store'})).json();if(next.revision!==buildRevision)location.reload();}catch{}},2500);
-let player,items=[],selected=-1,playing=false,showText=false,renderedWidth=0,renderedDpr=1,resizeTask,thirdBatch=false;
+let player,items=[],selected=-1,playing=false,showText=false,renderedWidth=0,renderedDpr=1,resizeTask,batch='';
 function setBatch(all){
-  const thirdBatchLink=all.some(item=>item.batch==='third'&&'#'+item.id===location.hash);
-  thirdBatch=new URLSearchParams(location.search).get('batch')==='third'||thirdBatchLink;
-  items=all.filter(item=>(item.batch==='third')===thirdBatch);
-  if(!thirdBatch)return;
+  const requested=new URLSearchParams(location.search).get('batch');
+  batch=all.some(item=>item.batch===requested)?requested:(all.find(item=>'#'+item.id===location.hash)?.batch??'');
+  items=all.filter(item=>(item.batch??'')===batch);
+  if(!batch)return;
+  const fourth=batch==='fourth';
+  const title=fourth?items.length+' 首诗动画样片':'八首诗动画样片';
   document.documentElement.lang='zh-CN';
-  document.title='MANIFOLD · 八首诗动画样片';
-  $('#batch-label').textContent='MANIFOLD · 第三批';
-  $('#batch-title').textContent='八首诗动画样片';
+  document.title='MANIFOLD · '+title;
+  $('#batch-label').textContent=fourth?'MANIFOLD · 第四批':'MANIFOLD · 第三批';
+  $('#batch-title').textContent=title;
   $('#batch-intro').textContent='选择一首诗播放，或拖动时间轴看细节。';
-  $('#batch-status').textContent='第三批本地样片。';
-  $('#scenes').setAttribute('aria-label','八首诗动画样片');
+  $('#batch-status').textContent=fourth?'第四批本地样片。':'第三批本地样片。';
+  $('#scenes').setAttribute('aria-label',title);
   $('#time').setAttribute('aria-label','动画时间');
 }
-function label(item,index){return String(thirdBatch?index+1:item.kind+1).padStart(2,'0')+' · '+item.poem;}
+function label(item,index){return String(batch?index+1:item.kind+1).padStart(2,'0')+' · '+item.poem;}
 function still(item){return item.still??item.moment??0;}
+function selectFromHash(){
+  const i=items.findIndex(item=>'#'+item.id===location.hash);
+  if(i>=0)select(i);
+}
 function finished(){const end=player.duration();return end!=null&&player.elapsed()>=end;}
 function playbackLabel(){
-  $('#play').textContent=thirdBatch?(playing?'暂停':finished()?'重播':'播放'):(playing?'Pause':finished()?'Replay':'Play');
+  $('#play').textContent=batch?(playing?'暂停':finished()?'重播':'播放'):(playing?'Pause':finished()?'Replay':'Play');
 }
 function display(){
   if(!player)return;
@@ -50,5 +56,7 @@ function select(i){if(i===selected)return;selected=i;player?.free();const it=ite
 if(media.matches){player.seek(still(it));toggle(false)}else toggle(true);display();}
 function fitCanvas(){if(!player)return;const width=$('figure').getBoundingClientRect().width;if(Math.abs(width-renderedWidth)<.5&&devicePixelRatio===renderedDpr)return;clearTimeout(resizeTask);resizeTask=setTimeout(()=>{const i=selected,t=player.elapsed(),resume=playing;selected=-1;select(i);player.pause();player.seek(t);toggle(resume&&!media.matches);display();},100);}
 addEventListener('resize',fitCanvas);const sizeObserver=new ResizeObserver(fitCanvas);sizeObserver.observe($('figure'));
+addEventListener('hashchange',selectFromHash);
+addEventListener('pagehide',()=>removeEventListener('hashchange',selectFromHash),{once:true});
 try{await init({module_or_path:new URL("./studies_bg.wasm?v=__STUDY_BUILD__",import.meta.url)});setBatch(await(await fetch('./studies.json?v=__STUDY_BUILD__')).json());$('#legend').replaceChildren(...['□','·','•','●'].map(ch=>{const s=document.createElement('span'),b=document.createElement('b');b.textContent=ch;s.append(b,document.createTextNode(''));return s}));items.forEach((item,i)=>{const b=document.createElement('button');b.textContent=label(item,i);b.onclick=()=>select(i);$('#scenes').append(b)});select(Math.max(0,items.findIndex(it=>'#'+it.id===location.hash)));$('#workspace').setAttribute('aria-busy','false');$('#play').onclick=toggleFromButton;$('#time').oninput=e=>{toggle(false);player.seek(Number(e.target.value));display()};$('#text-toggle').onclick=()=>{showText=!showText;$('#scene').hidden=showText;$('#frame-text').hidden=!showText;$('#text-toggle').textContent=showText?'Canvas view':'Text view';display()};media.onchange=()=>{toggle(!media.matches);if(media.matches){player.seek(still(items[selected]));display()}};const syncVisibility=()=>{if(!player)return;if(document.hidden)player.pause();else if(playing)player.play()};document.addEventListener('visibilitychange',syncVisibility);const displayTimer=setInterval(()=>{if(playing)display()},150);addEventListener('pagehide',()=>{clearInterval(displayTimer);clearInterval(buildPoll);clearTimeout(resizeTask);document.removeEventListener('visibilitychange',syncVisibility);media.onchange=null;playing=false;sizeObserver.disconnect();const disposed=player;player=undefined;window.currentStudy=undefined;disposed?.free()});}catch(e){$('#error').hidden=false;$('#error').textContent=e.message;console.error(e);}
 </script></body></html>

@@ -1,5 +1,6 @@
 ---
 title: "After Snow"
+manifoldScene: "after-snow"
 world: "still-life"
 order: 11
 firstLine: "I cannot say, as snow fell."

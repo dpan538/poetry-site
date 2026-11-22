@@ -1,5 +1,6 @@
 ---
 title: "Flying Away"
+manifoldScene: "flying-away"
 world: "bless-you"
 order: 19
 firstLine: "On the power line outside, a bird rests still, I think it must be a sparrow, as I sit at the restaurant's long-legged chair, Spread butter and blueberry jam by my hand, Upon the bread, for the share."

@@ -1,13 +1,40 @@
 //! The halftone is a character field, not a source bitmap under a dot overlay.
 //! Coverage/ink compensation and Bayer thresholds adapted from ascii.rest.
 //! Copyright (c) 2026 bas3line; see ../ascii.rest-LICENSE.txt.
-use crate::scene::{Color, Sample, luminance};
+use crate::scene::{Color, NEUTRAL_INKS, Sample, hash, luminance, tint};
 
 pub const CHARS: [char; 4] = [' ', '·', '•', '●'];
 const COVER: [f32; 4] = [0.0, 0.30, 0.60, 1.0];
 const BAYER: [f32; 16] = [
     0., 8., 2., 10., 12., 4., 14., 6., 3., 11., 1., 9., 15., 7., 13., 5.,
 ];
+const HUES: usize = 20;
+const SATURATIONS: [f32; 4] = [0.18, 0.42, 0.69, 1.];
+const VALUES: [f32; 3] = [0.60, 0.80, 1.];
+
+pub fn illustration_palette() -> Vec<Color> {
+    let mut palette: Vec<_> = NEUTRAL_INKS.into_iter().map(tint).collect();
+    for i in 0..HUES {
+        let hue = i as f32 / HUES as f32;
+        for saturation in SATURATIONS {
+            for value in VALUES {
+                palette.push(std::array::from_fn(|channel| {
+                    let phase = (hue * 6. + [0., 4., 2.][channel]).rem_euclid(6.);
+                    let ramp = (phase.min(6. - phase) - 1.).clamp(0., 1.);
+                    value * (1. - saturation * ramp)
+                }));
+            }
+        }
+    }
+    palette
+}
+
+fn tone_slot(values: &[f32], value: f32, threshold: f32) -> usize {
+    values
+        .windows(2)
+        .take_while(|pair| value >= pair[0] + (pair[1] - pair[0]) * threshold)
+        .count()
+}
 
 #[derive(Clone, Copy, Default, PartialEq)]
 pub struct Cell {
@@ -21,6 +48,7 @@ pub struct Encoder {
     columns: usize,
     tone: Vec<f32>,
     dither_strength: f64,
+    illustration: bool,
 }
 impl Encoder {
     pub fn new(palette: &[Color], columns: usize) -> Self {
@@ -29,6 +57,7 @@ impl Encoder {
             lookup: vec![255; 32768],
             columns,
             dither_strength: 1.,
+            illustration: false,
             tone: (0..=1024)
                 .map(|i| {
                     let v = i as f64 / 256.;
@@ -43,6 +72,10 @@ impl Encoder {
     }
     pub fn with_dither_strength(mut self, strength: f64) -> Self {
         self.dither_strength = strength;
+        self
+    }
+    pub fn with_illustration_inks(mut self) -> Self {
+        self.illustration = true;
         self
     }
     fn nearest(&mut self, color: Color) -> u8 {
@@ -114,6 +147,9 @@ impl Encoder {
         (step as u8, color.map(|v| (v * scale).clamp(0., 1.) as f32))
     }
     pub fn encode(&mut self, sample: Sample, x: usize, y: usize) -> Cell {
+        if self.illustration {
+            return self.illustration_cell(sample, x, y);
+        }
         let (glyph, color) = self.transfer(sample, x, y);
         if glyph == 0 {
             return Cell::default();
@@ -123,12 +159,72 @@ impl Encoder {
             ink: self.nearest(color),
         }
     }
+
+    fn illustration_cell(&mut self, sample: Sample, x: usize, y: usize) -> Cell {
+        let [r, g, b] = sample.color;
+        let peak = r.max(g).max(b);
+        let low = r.min(g).min(b);
+        let chroma = peak - low;
+        let level = peak.clamp(0., 1.).powf(0.78) * sample.opacity;
+        let threshold = BAYER[(y & 3) * 4 + (x & 3)] * 0.0625;
+        let glyph = (level * 3. + 0.35 * (threshold - 0.47)).round() as usize;
+        if glyph == 0 {
+            return Cell::default();
+        }
+        let brightness = (0.62 + 0.38 * (level / COVER[glyph] as f32)).min(1.);
+        let saturation = chroma / peak;
+        let threshold = |seed| 0.20 + 0.60 * hash(x as i32 + seed, y as i32 - seed);
+        if saturation < SATURATIONS[0] * threshold(73) {
+            return Cell {
+                glyph: glyph as u8,
+                ink: self.nearest([brightness; 3]),
+            };
+        }
+        let hue = if r >= g.max(b) {
+            (g - b) / chroma
+        } else if g >= b {
+            2. + (b - r) / chroma
+        } else {
+            4. + (r - g) / chroma
+        };
+        let sector = hue.rem_euclid(6.) * HUES as f32 / 6.;
+        // Screen-anchored thresholds mix neighboring inks spatially. Seeking
+        // to the same frame always selects the same ink, regardless of history.
+        let hue_index = ((sector + 1. - threshold(13)).floor() as usize) % HUES;
+        let sat = tone_slot(&SATURATIONS, saturation, threshold(29));
+        let val = tone_slot(&VALUES, brightness, threshold(53));
+        let ink = NEUTRAL_INKS.len() + (hue_index * SATURATIONS.len() + sat) * VALUES.len() + val;
+        Cell {
+            glyph: glyph as u8,
+            ink: ink as u8,
+        }
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
     include!("reference_tone_cases.rs");
+
+    #[test]
+    fn illustrated_inks_keep_primary_colors_and_seek_stably() {
+        let palette = illustration_palette();
+        assert!(palette.len() < 255);
+        let mut encoder = Encoder::new(&palette, 136).with_illustration_inks();
+        let ink = |encoder: &mut Encoder, color| {
+            let cell = encoder.encode(Sample::new(color, crate::scene::Material::Solid), 29, 41);
+            assert!(cell.glyph >= 2);
+            palette[cell.ink as usize]
+        };
+        let red = ink(&mut encoder, [0.82, 0.24, 0.16]);
+        let blue = ink(&mut encoder, [0.22, 0.44, 0.84]);
+        let neutral = ink(&mut encoder, [0.47; 3]);
+        assert!(red[0] - red[1] > 0.37 && red[0] - red[2] > 0.47);
+        assert!(blue[2] - blue[0] > 0.37 && blue[2] - blue[1] > 0.26);
+        assert_eq!(neutral, [neutral[0]; 3]);
+        assert_eq!(ink(&mut encoder, [0.82, 0.24, 0.16]), red);
+    }
+
     #[test]
     fn matches_upstream_kyoto_reference_glyphs_and_compensated_ink() {
         let encoder = Encoder::new(&[[0.; 3], [1.; 3]], 200);

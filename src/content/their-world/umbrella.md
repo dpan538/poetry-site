@@ -1,5 +1,6 @@
 ---
 title: "Umbrella"
+manifoldScene: "umbrella"
 world: "their-world"
 order: 16
 firstLine: "Repeatedly remind me to bring an umbrella, You say it often rains here."

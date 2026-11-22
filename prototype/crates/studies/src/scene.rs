@@ -1,5 +1,14 @@
+#[path = "additional_studies/mod.rs"]
+mod additional_studies;
+pub(crate) use additional_studies::{
+    AFTER_SNOW, CANDLE, COIN, EARS, FLYING_AWAY, JUST_A_SIGN, MILK_COW_CAT, MISSING, STONE_FROG,
+};
 #[path = "artwork.rs"]
 mod artwork;
+#[path = "fourth_batch.rs"]
+mod fourth_batch;
+#[path = "plate_pixels.rs"]
+mod plate_pixels;
 #[path = "third_batch.rs"]
 mod third_batch;
 use std::f32::consts::PI;
@@ -12,6 +21,9 @@ pub const WHITE_TREE: u8 = 10;
 pub const DANCING_CHILDREN: u8 = 11;
 pub const FEATHER: u8 = 12;
 pub const BLACK_PAINT: u8 = 13;
+pub const BORING_CLOUDS: u8 = 14;
+pub const UMBRELLA: u8 = 15;
+pub const COTTAGE: u8 = 16;
 pub const WHITE_TREE_DURATION: f32 = 8.;
 
 pub fn is_poem_study(kind: u8) -> bool {
@@ -19,7 +31,25 @@ pub fn is_poem_study(kind: u8) -> bool {
 }
 
 pub fn is_study(kind: u8) -> bool {
-    matches!(kind, 0 | 1 | 3 | 4 | 5) || is_poem_study(kind)
+    matches!(kind, 0 | 1 | 3 | 4 | 5) || is_poem_study(kind) || is_fourth_batch(kind)
+}
+
+pub fn is_illustration(kind: u8) -> bool {
+    (COIN..=CANDLE).contains(&kind)
+}
+
+pub fn is_fourth_batch(kind: u8) -> bool {
+    (BORING_CLOUDS..=CANDLE).contains(&kind)
+}
+
+pub fn duration(kind: u8) -> Option<f32> {
+    match kind {
+        WHITE_TREE => Some(WHITE_TREE_DURATION),
+        UMBRELLA => Some(13.),
+        BORING_CLOUDS => Some(12.),
+        COTTAGE => Some(14.),
+        _ => additional_studies::duration(kind),
+    }
 }
 const SHRINE_AXIS: f32 = 0.535;
 const GATE_TOP: f32 = 0.430;
@@ -112,7 +142,7 @@ fn smooth(a: f32, b: f32, x: f32) -> f32 {
     let q = ((x - a) / (b - a)).clamp(0., 1.);
     q * q * (3. - 2. * q)
 }
-fn hash(x: i32, y: i32) -> f32 {
+pub(crate) fn hash(x: i32, y: i32) -> f32 {
     let n = (x as u32).wrapping_mul(374761393) ^ (y as u32).wrapping_mul(668265263);
     let n = (n ^ (n >> 13)).wrapping_mul(1274126177);
     (n ^ (n >> 16)) as f32 / u32::MAX as f32
@@ -155,7 +185,7 @@ fn polygon(x: f32, y: f32, v: &[[f32; 2]]) -> f32 {
     }
     if inside { 1. } else { 0. }
 }
-fn tint(hex: u32) -> Color {
+pub(crate) fn tint(hex: u32) -> Color {
     [
         (hex >> 16) as f32 / 255.,
         ((hex >> 8) & 255) as f32 / 255.,
@@ -174,6 +204,8 @@ pub struct Scene {
 enum Artwork {
     Atmosphere(artwork::Artwork),
     ThirdBatch(third_batch::Artwork),
+    FourthBatch(fourth_batch::Artwork),
+    Additional(additional_studies::Artwork),
 }
 impl Scene {
     pub fn new(kind: u8, cols: usize, rows: usize) -> Self {
@@ -244,18 +276,36 @@ impl Scene {
                 0x382521, 0x563B30, 0x754E39, 0xA47049, 0xBE8A57, 0xD9A46C, 0xEBC18F, 0xFFDEAA,
                 0xFDF4D0, 0xFFF9EA, 0x867264, 0xB7A291, 0xD9C7B5,
             ],
+            BORING_CLOUDS => &[
+                0x121C27, 0x354653, 0x425A54, 0x68784E, 0x9CA56D, 0x42699F, 0x4D80BD, 0x5797DA,
+                0x72ACE5, 0x95BDE5, 0xADC9E7, 0xC3CFDF, 0xE0E4EA, 0xF0EDE2, 0x3A2D25, 0x5D4835,
+                0x8B6842, 0xAC8949, 0xAC4E32, 0xC77751, 0xD5B57B, 0xE4CBA0, 0xFFECC7,
+            ],
+            UMBRELLA => &[
+                0x332B21, 0x5B482E, 0x78613A, 0x9B783E, 0xC79C4D, 0xE1B24A, 0xEEC759, 0xF5D775,
+                0xFFE8AE,
+            ],
+            COTTAGE => &[
+                0x263842, 0x40626C, 0x587574, 0x68785D, 0x8D965E, 0x4975AC, 0x6190C8, 0x76AAE1,
+                0x9DBCE0, 0xB7C8E5, 0xD9E5F2, 0x604537, 0x866149, 0xAC6747, 0xC28762, 0xD3A581,
+                0xD4964F, 0xEBB772, 0xF8CF9D, 0xFFE1A5, 0xFFEDCA,
+            ],
             _ => &[
                 0x182635, 0x304B68, 0x4F7CA1, 0x80A8C4, 0xB9CFDC, 0xE2EAF0, 0x1D2920, 0x354735,
                 0x58654D, 0x4D211A, 0x8D291D, 0xC52D1D, 0xED4A25, 0xFF9B50, 0xFFE1AE, 0xE6DEC9,
                 0xB9AE96, 0x584338, 0x8B5C3B,
             ],
         };
-        let palette = NEUTRAL_INKS
-            .iter()
-            .chain(colors)
-            .copied()
-            .map(tint)
-            .collect::<Vec<_>>();
+        let palette = if is_illustration(kind) {
+            crate::glyph::illustration_palette()
+        } else {
+            NEUTRAL_INKS
+                .iter()
+                .chain(colors)
+                .copied()
+                .map(tint)
+                .collect::<Vec<_>>()
+        };
         Self {
             cols,
             rows,
@@ -265,6 +315,12 @@ impl Scene {
                 SHADOW..=BLACK_PAINT => {
                     Artwork::ThirdBatch(third_batch::Artwork::new(kind, cols, rows))
                 }
+                BORING_CLOUDS..=COTTAGE => {
+                    Artwork::FourthBatch(fourth_batch::Artwork::new(kind, cols, rows))
+                }
+                COIN..=CANDLE => {
+                    Artwork::Additional(additional_studies::Artwork::new(kind, cols, rows))
+                }
                 _ => Artwork::Atmosphere(artwork::Artwork::new(kind, cols, rows)),
             },
         }
@@ -273,12 +329,16 @@ impl Scene {
         match &mut self.artwork {
             Artwork::Atmosphere(scene) => scene.update(seconds),
             Artwork::ThirdBatch(scene) => scene.update(seconds),
+            Artwork::FourthBatch(scene) => scene.update(seconds),
+            Artwork::Additional(scene) => scene.update(seconds),
         }
     }
     pub fn sample(&self, x: usize, y: usize, _seconds: f32) -> Sample {
         match &self.artwork {
             Artwork::Atmosphere(scene) => scene.sample(x, y),
             Artwork::ThirdBatch(scene) => scene.sample(x, y),
+            Artwork::FourthBatch(scene) => scene.sample(x, y),
+            Artwork::Additional(scene) => scene.sample(x, y),
         }
     }
 }

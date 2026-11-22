@@ -1,5 +1,6 @@
 ---
 title: "Ears"
+manifoldScene: "ears"
 world: "bless-you"
 order: 1
 firstLine: "Skin brushing against plastic, then the luminous floor, Gray spots pulsing, dancing along familiar streets, across length."

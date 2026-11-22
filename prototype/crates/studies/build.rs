@@ -3,7 +3,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     use std::{env, fs, path::PathBuf};
 
     let output = PathBuf::from(env::var_os("OUT_DIR").expect("Cargo output directory"));
-    for name in [
+    let plates = [
         "shadow-landing",
         "thermos-table",
         "manifesto-crt",
@@ -12,7 +12,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         "dancing-facade",
         "feather-ground",
         "black-paint-canvas",
-    ] {
+        "boring-clouds-distance",
+        "umbrella-cafe",
+        "cottage-afternoon",
+    ];
+    for name in plates {
         let path = format!("sources/{name}.png");
         println!("cargo:rerun-if-changed={path}");
         let source = image::open(path)?.into_rgb8();

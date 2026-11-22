@@ -1,5 +1,6 @@
 ---
 title: "Coin"
+manifoldScene: "coin"
 world: "still-life"
 order: 16
 firstLine: "I want to sing a song without wind, In the moment when the coin is tossed, Consciousness slips past sunlight and smile, I gaze upon your face, Until flowers bloom in the sea, the trend."

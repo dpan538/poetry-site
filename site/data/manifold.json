@@ -70,14 +70,14 @@
     ]
   },
   "bless-you/ears": {
-    "description": "A tokyo side street in the rain, neon signs shining on the wet road.",
-    "excerpt": "Skin brushing against plastic, then the luminous floor,\nGray spots pulsing, dancing along familiar streets, across length.",
+    "description": "Braided threads form an ear. The outer helix and inner folds expand and draw together in a paired heartbeat.",
+    "excerpt": "Oh, young ears, what sounds can you perceive that I cannot?",
     "keywords": [
-      "streets",
-      "luminous",
+      "ears",
+      "rhythm",
       "pulsing"
     ],
-    "piece": "tokyo-rain"
+    "piece": "ears"
   },
   "bless-you/feet": {
     "description": "Snow peaks catching first light above a still, misty mountain lake.",
@@ -90,14 +90,14 @@
     "piece": "alpine-dawn"
   },
   "bless-you/flying-away": {
-    "description": "The sun sinks into a drifting sea of orange cloud at dusk.",
-    "excerpt": "While we remain, on earth by day and night,",
+    "description": "A sparrow grips a sagging wire in the blue morning. It crouches, pushes off and flies behind the edge of the café window.",
+    "excerpt": "On the power line outside, a bird rests still,",
     "keywords": [
+      "sparrow",
       "sunlight",
-      "night",
-      "earth"
+      "condensation"
     ],
-    "piece": "cloud-sea"
+    "piece": "flying-away"
   },
   "bless-you/gentleness": {
     "description": "Dusk aarti on the ganga, lamps on the steps and diyas on the water.",
@@ -140,24 +140,24 @@
     "piece": "misty-forest"
   },
   "bless-you/milk-cow-cat": {
-    "description": "The sun sets past a pine headland, lit cloud, glitter on rolling sea.",
-    "excerpt": "Is it the wild wind that whispers verse and rhyme,\nOr earth's rich soil that clothes you through all time?",
+    "description": "A black-and-white cat sleeps on a four-pane windowsill as city lights flicker and a plane passes behind the window frame.",
+    "excerpt": "Beneath night's smell,\nthrough window walls, four squares,\nMy mind painted a bright cow standing there.",
     "keywords": [
-      "rhyme",
-      "verse",
-      "wind"
+      "window",
+      "cat",
+      "night"
     ],
-    "piece": "ocean-sunset"
+    "piece": "milk-cow-cat"
   },
   "bless-you/missing": {
-    "description": "Saturn and its rings hanging over the cracked ice and geysers of a moon.",
-    "excerpt": "Round domes, Roman style,\nSurrounded by rock, infused with faith,",
+    "description": "Two cups stand across a table. A sheer curtain falls back toward an ordinary window, revealing a blue coat on the empty chair.",
+    "excerpt": "Dedicated to the clearest eyes under the sun,",
     "keywords": [
-      "domes",
-      "rock",
-      "roman"
+      "eyes",
+      "voice",
+      "missing"
     ],
-    "piece": "saturn-rise"
+    "piece": "missing"
   },
   "bless-you/perplexity": {
     "piece": "mount-corcoran",
@@ -290,14 +290,14 @@
     "piece": "desert-night"
   },
   "still-life/after-snow": {
-    "description": "Pine ridges fading into morning fog, sunbeams slanting through.",
-    "excerpt": "Cotton filling in the quilt trash can,\nAnd snow beyond the window's frosted pane.",
+    "description": "Snow drifts past a blue mountain valley. Mist pulls away from the rooftops and warm windows appear on the hillside.",
+    "excerpt": "I watch the city shrouded in the mist,\nFrom mountains. Lights dance and persist.",
     "keywords": [
       "snow",
-      "frosted",
-      "cotton"
+      "mountains",
+      "mist"
     ],
-    "piece": "misty-forest"
+    "piece": "after-snow"
   },
   "still-life/afternoon-nap": {
     "description": "Udaipur at night, a lit gateway on lake pichola and diyas on the water.",
@@ -320,14 +320,14 @@
     "piece": "black-paint"
   },
   "still-life/boring-clouds": {
-    "description": "The sun sets past a pine headland, lit cloud, glitter on rolling sea.",
-    "excerpt": "Clouds drift overhead, laden with boredom,",
+    "description": "Tree trunks race across a dark railway window. Distant cumulus holds its shape while a thinner veil and sunlit mist grains drift across the undersides.",
+    "excerpt": "The train rushes past a curtain of trees,\nA house appears, then vanishes in seconds.",
     "keywords": [
       "clouds",
       "boredom",
       "drift"
     ],
-    "piece": "ocean-sunset"
+    "piece": "boring-clouds"
   },
   "still-life/breathe-away": {
     "description": "A black spire and an orange cloud over a blue hour city and its river.",
@@ -350,14 +350,14 @@
     ]
   },
   "still-life/coin": {
-    "description": "The sun sinks into a drifting sea of orange cloud at dusk.",
-    "excerpt": "Consciousness slips past sunlight and smile,\nI gaze upon your face,",
+    "description": "An embossed brass coin bounces once on the paving, rolls on its rim and tips onto its face.",
+    "excerpt": "In the moment when the coin is tossed,",
     "keywords": [
       "sunlight",
       "consciousness",
       "gaze"
     ],
-    "piece": "cloud-sea"
+    "piece": "coin"
   },
   "still-life/dusk": {
     "piece": "dusk-gauze",
@@ -430,14 +430,14 @@
     "piece": "iron-shrine"
   },
   "still-life/just-a-sign": {
-    "description": "A tokyo side street in the rain, neon signs shining on the wet road.",
-    "excerpt": "Fading in the sunlight,\nWashed away in the rain.",
+    "description": "A clear yellow dashed centerline separates the two directions of traffic at dusk. The two white edge lines stay continuous.",
+    "excerpt": "A silent metal witness to the traffic every day",
     "keywords": [
-      "fading",
-      "rain",
-      "sunlight"
+      "metal",
+      "traffic",
+      "fading"
     ],
-    "piece": "tokyo-rain"
+    "piece": "just-a-sign"
   },
   "still-life/night-light": {
     "description": "A lighthouse turning its beam under moonlit clouds over a dark sea.",
@@ -500,14 +500,14 @@
     "piece": "alpine-dawn"
   },
   "still-life/stone-frog": {
-    "description": "Sky lanterns rising over a still mountain lake, one let go from a boat.",
-    "excerpt": "Following the patterns in books, seeking dreams.\nUntil my tears stopped the smile,",
+    "description": "Two green stone frogs are seen in profile under cherry blossoms. A loose petal turns and settles between their plinths.",
+    "excerpt": "Under the cherry blossoms,\nTwo stone frogs,",
     "keywords": [
-      "dreams",
-      "tears",
-      "journey"
+      "blossoms",
+      "green",
+      "silence"
     ],
-    "piece": "lantern-lake"
+    "piece": "stone-frog"
   },
   "still-life/thermos": {
     "description": "A worn enamel thermos on a table by a rainy window tilts and pours hot water into the red mug. Steam stays over the cup after the bottle returns to its place.",
@@ -600,24 +600,24 @@
     "piece": "deep-reef"
   },
   "their-world/candle": {
-    "description": "A lighthouse turning its beam under moonlit clouds over a dark sea.",
-    "excerpt": "Candle bright, I cannot hear,\nFriends for him should not appear.",
+    "description": "A candle burns close to the viewer on a dark wooden table. Its small pool of light falls on a charcoal wall, with moonlit water visible in the far window.",
+    "excerpt": "(A cry—) The candle dies.",
     "keywords": [
       "candle",
       "moonlight",
-      "bright"
+      "darkness"
     ],
-    "piece": "night-coast"
+    "piece": "candle"
   },
   "their-world/cottage": {
-    "description": "Aurora curtains rippling over a still fjord, a cabin lit on the shore.",
-    "excerpt": "I tell grandfather it's time to sleep.\nHe strokes my head. Tell me,",
+    "description": "One unbroken view of a timber cottage as afternoon turns to dusk. Wind carries a few leaves across the path. Warmth appears and fades in the two windows while the house remains.",
+    "excerpt": "Grandfather is gone. The cottage remains.",
     "keywords": [
-      "sleep",
       "grandfather",
-      "asleep"
+      "cottage",
+      "remains"
     ],
-    "piece": "aurora-fjord"
+    "piece": "cottage"
   },
   "their-world/end-for-the-end": {
     "description": "The sun sets past a pine headland, lit cloud, glitter on rolling sea.",
@@ -810,14 +810,14 @@
     "piece": "cloud-sea"
   },
   "their-world/umbrella": {
-    "description": "A tokyo side street in the rain, neon signs shining on the wet road.",
-    "excerpt": "Walking in the rain,",
+    "description": "The café and rainy street begin in black and white. Yellow drops pass down the café window, leaving wet tracks that gradually join together.",
+    "excerpt": "You say, what you want to do is protect, not harm.",
     "keywords": [
       "rain",
-      "umbrella",
-      "walking"
+      "protection",
+      "gift"
     ],
-    "piece": "tokyo-rain"
+    "piece": "umbrella"
   },
   "their-world/window": {
     "description": "A wall of lava lamps under the glowing orange cloud, watched by a camera.",

@@ -1,5 +1,6 @@
 ---
 title: "Cottage"
+manifoldScene: "cottage"
 world: "their-world"
 order: 2
 firstLine: "I watch my grandfather, sitting in his rocking chair, In the hunter's cottage, the fire dances, cooking hot tea, He fumbles with the wooden ball in his hand, Turning it round and round."

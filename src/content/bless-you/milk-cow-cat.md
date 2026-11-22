@@ -1,5 +1,6 @@
 ---
 title: "Milk Cow Cat"
+manifoldScene: "milk-cow-cat"
 world: "bless-you"
 order: 14
 firstLine: "Beneath night's smell, through window walls, four squares, My mind painted a bright cow standing there."
