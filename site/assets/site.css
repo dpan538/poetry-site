@@ -162,8 +162,28 @@ body[data-entry-page] .site-copyright { display: none; }
   text-underline-offset: .17em;
 }
 .about-group .about-links { display: flex; flex-wrap: wrap; gap: .45rem 1.25rem; }
-.about-links a { text-decoration: underline; text-underline-offset: .2em; }
+.about-links a, .about-download a, .edition-citation a, .citation-actions button {
+  text-decoration: underline;
+  text-underline-offset: .2em;
+}
 .about-links a:hover { color: var(--color-accent); }
+.about-download { margin: var(--space-lg) 0 0; }
+.about-download a:is(:hover, :focus-visible),
+.edition-citation a:is(:hover, :focus-visible),
+.citation-actions button:is(:hover, :focus-visible) { color: var(--color-accent); }
+.edition-citation { margin-bottom: var(--space-md); }
+.edition-citation .citation-format { margin-bottom: 0; }
+.citation-isbn { white-space: nowrap; }
+.citation-actions {
+  display: none;
+  align-items: baseline;
+  gap: .6rem;
+  margin-top: .3rem;
+  color: var(--color-meta);
+  font-size: 14px;
+}
+html[data-citation-copy] .citation-actions { display: flex; }
+.citation-actions button { min-height: 24px; cursor: pointer; }
 .about-record {
   margin-top: var(--space-lg);
   padding-top: var(--space-lg);

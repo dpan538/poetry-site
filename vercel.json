@@ -21,6 +21,19 @@
   ],
   "headers": [
     {
+      "source": "/editions/Three-Worlds-2026-Digital-Edition.pdf",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/pdf"
+        },
+        {
+          "key": "Content-Disposition",
+          "value": "inline; filename=\"Three-Worlds-2026-Digital-Edition.pdf\""
+        }
+      ]
+    },
+    {
       "source": "/assets/immutable/:path*",
       "headers": [
         {

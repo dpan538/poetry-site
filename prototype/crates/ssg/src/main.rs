@@ -51,6 +51,25 @@ fn build(root: &Path, output: &Path, wasm: &Path) -> Result<()> {
         assets.join("start.js"),
         r#"import init, { start } from './browser.js';
 
+if (navigator.clipboard?.writeText) {
+    document.documentElement.setAttribute('data-citation-copy', '');
+    document.addEventListener('click', async (event) => {
+        const button = event.target?.closest?.('[data-copy-citation]');
+        if (!button) return;
+
+        const edition = button.closest('.edition-citation');
+        const citation = edition.querySelector('[data-edition-citation]');
+        const status = edition.querySelector('[role="status"]');
+        try {
+            await navigator.clipboard.writeText(citation.textContent.trim().replace(/\s+/g, ' '));
+            status.textContent = 'Copied';
+        } catch {
+            window.getSelection()?.selectAllChildren(citation);
+            status.textContent = 'Citation selected';
+        }
+    });
+}
+
 async function catalog() {
     const url = new URL('./reading.json', import.meta.url);
     for (let attempt = 0; attempt < 2; attempt++) {
@@ -158,6 +177,7 @@ fn media(path: &Path) -> &'static str {
         Some("wasm") => "application/wasm",
         Some("png") => "image/png",
         Some("ico") => "image/x-icon",
+        Some("pdf") => "application/pdf",
         Some("webmanifest") => "application/manifest+json",
         _ => "application/octet-stream",
     }

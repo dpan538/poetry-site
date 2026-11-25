@@ -9,6 +9,7 @@ const MOBILE_SKIN: &str = "data-skin-iwd45nhr";
 const WORLD_SKIN: &str = "data-skin-zkyqgzqi";
 const DOCK_SKIN: &str = "data-skin-htlfczsh";
 const SITE_INDEX_SKIN: &str = "data-skin-ewxlwce5";
+const PDF_EDITION_PATH: &str = "/editions/Three-Worlds-2026-Digital-Edition.pdf";
 
 pub fn escape(value: &str) -> String {
     value
@@ -461,6 +462,13 @@ fn render_work(
 
 pub fn generate(root: &Path, output: &Path, works: &[Work], nav: &[Value]) -> Result<()> {
     let templates = root.join("site/templates");
+    let edition_citation = template(
+        &fs::read_to_string(templates.join("edition-citation.html"))?,
+        &BTreeMap::from([
+            ("PDF_EDITION_PATH".into(), PDF_EDITION_PATH.into()),
+            ("PDF_EDITION_URL".into(), format!("{DOMAIN}{PDF_EDITION_PATH}")),
+        ]),
+    )?;
     let collection_record = set_counts(
         &fs::read_to_string(templates.join("collection-record.html"))?,
         works,
@@ -495,9 +503,14 @@ pub fn generate(root: &Path, output: &Path, works: &[Work], nav: &[Value]) -> Re
                     &BTreeMap::from([
                         ("RECORD_TITLE".into(), title.into()),
                         ("RECORD_SUBHEADING".into(), subheading.into()),
+                        ("PDF_EDITION_CITATION".into(), edition_citation.clone()),
                     ]),
                 )?,
             );
+        }
+        if route == "about" {
+            slots.insert("PDF_EDITION_CITATION".into(), edition_citation.clone());
+            slots.insert("PDF_EDITION_PATH".into(), PDF_EDITION_PATH.into());
         }
         if WORLDS.iter().any(|(world, ..)| *world == route) {
             slots.insert("WORLD_ROWS".into(), world_rows(works, route));
