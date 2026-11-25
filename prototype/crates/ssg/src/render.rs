@@ -462,12 +462,11 @@ fn render_work(
 
 pub fn generate(root: &Path, output: &Path, works: &[Work], nav: &[Value]) -> Result<()> {
     let templates = root.join("site/templates");
-    let edition_url = format!("{DOMAIN}{PDF_EDITION_PATH}");
     let edition_citation = template(
         &fs::read_to_string(templates.join("edition-citation.html"))?,
         &BTreeMap::from([
             ("PDF_EDITION_PATH".into(), PDF_EDITION_PATH.into()),
-            ("PDF_EDITION_URL".into(), edition_url.clone()),
+            ("PDF_EDITION_URL".into(), format!("{DOMAIN}{PDF_EDITION_PATH}")),
         ]),
     )?;
     let collection_record = set_counts(
@@ -512,9 +511,6 @@ pub fn generate(root: &Path, output: &Path, works: &[Work], nav: &[Value]) -> Re
         if route == "about" {
             slots.insert("PDF_EDITION_CITATION".into(), edition_citation.clone());
             slots.insert("PDF_EDITION_PATH".into(), PDF_EDITION_PATH.into());
-        }
-        if route == "collection" {
-            slots.insert("PDF_EDITION_URL".into(), edition_url.clone());
         }
         if WORLDS.iter().any(|(world, ..)| *world == route) {
             slots.insert("WORLD_ROWS".into(), world_rows(works, route));
