@@ -607,6 +607,7 @@ pub fn indexes(root: &Path, output: &Path, works: &[Work], nav: &[Value]) -> Res
     for path in ["/", "/about", "/contact", "/collection", "/preface"] {
         add(path);
     }
+    add(PDF_EDITION_PATH);
     for (world, ..) in WORLDS {
         add(&format!("/{world}"));
         for work in works.iter().filter(|w| w.meta.world == world) {
