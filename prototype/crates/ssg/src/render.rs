@@ -10,6 +10,11 @@ const WORLD_SKIN: &str = "data-skin-zkyqgzqi";
 const DOCK_SKIN: &str = "data-skin-htlfczsh";
 const SITE_INDEX_SKIN: &str = "data-skin-ewxlwce5";
 const PDF_EDITION_PATH: &str = "/editions/Three-Worlds-2026-Digital-Edition.pdf";
+const PDF_EDITION_ISBN: &str = "978-0-646-75501-4";
+const WRITTEN_START: &str = "2023";
+const WRITTEN_END: &str = "2026";
+const PUBLICATION_DATE: &str = "2026-11-25";
+const SITE_METADATA_DATE: &str = "2026-11-26";
 
 pub fn escape(value: &str) -> String {
     value
@@ -43,6 +48,28 @@ fn template(input: &str, slots: &BTreeMap<String, String>) -> Result<String> {
     }
     output.push_str(rest);
     Ok(output)
+}
+
+fn publication_slots() -> BTreeMap<String, String> {
+    let year = &PUBLICATION_DATE[..4];
+    BTreeMap::from([
+        ("WRITTEN_START".into(), WRITTEN_START.into()),
+        ("WRITTEN_END".into(), WRITTEN_END.into()),
+        ("PUBLICATION_DATE".into(), PUBLICATION_DATE.into()),
+        ("PUBLICATION_YEAR".into(), year.into()),
+        ("SITE_METADATA_DATE".into(), SITE_METADATA_DATE.into()),
+        (
+            "CITATION_PUBLICATION_DATE".into(),
+            PUBLICATION_DATE.replace('-', "/"),
+        ),
+        (
+            "PDF_EDITION_LABEL".into(),
+            format!("First Digital Edition, {year}"),
+        ),
+        ("PDF_EDITION_ISBN".into(), PDF_EDITION_ISBN.into()),
+        ("PDF_EDITION_PATH".into(), PDF_EDITION_PATH.into()),
+        ("PDF_EDITION_URL".into(), format!("{DOMAIN}{PDF_EDITION_PATH}")),
+    ])
 }
 
 fn list_label((poems, prose): (usize, usize)) -> String {
@@ -387,8 +414,11 @@ fn render_work(
         seo,
         "<p class=\"poem-seo-citation\" {POEM_SKIN}>Cite as: {citation}</p></article>"
     );
-    let mut schema: Value =
-        serde_json::from_slice(&fs::read(root.join("site/data/work-schema.json"))?)?;
+    let publication = publication_slots();
+    let mut schema: Value = serde_json::from_str(&template(
+        &fs::read_to_string(root.join("site/data/work-schema.json"))?,
+        &publication,
+    )?)?;
     schema["@type"] = json!(if work.poem() { "Poem" } else { "CreativeWork" });
     for key in ["@id", "url", "mainEntityOfPage"] {
         schema[key] = json!(url);
@@ -440,6 +470,7 @@ fn render_work(
     let previous = &works[(position + works.len() - 1) % works.len()];
     let next = &works[(position + 1) % works.len()];
     let mut slots = menus(works, Some(work));
+    slots.extend(publication);
     slots.insert("PREVIOUS".into(), previous.path());
     slots.insert("NEXT".into(), next.path());
     for (key,value) in [
@@ -462,13 +493,10 @@ fn render_work(
 
 pub fn generate(root: &Path, output: &Path, works: &[Work], nav: &[Value]) -> Result<()> {
     let templates = root.join("site/templates");
-    let edition_url = format!("{DOMAIN}{PDF_EDITION_PATH}");
+    let publication = publication_slots();
     let edition_citation = template(
         &fs::read_to_string(templates.join("edition-citation.html"))?,
-        &BTreeMap::from([
-            ("PDF_EDITION_PATH".into(), PDF_EDITION_PATH.into()),
-            ("PDF_EDITION_URL".into(), edition_url.clone()),
-        ]),
+        &publication,
     )?;
     let collection_record = set_counts(
         &fs::read_to_string(templates.join("collection-record.html"))?,
@@ -486,6 +514,7 @@ pub fn generate(root: &Path, output: &Path, works: &[Work], nav: &[Value]) -> Re
     ] {
         let input = fs::read_to_string(templates.join(format!("{route}.html")))?;
         let mut slots = menus(works, None);
+        slots.extend(publication.clone());
         let mut loader = LOADER.to_string();
         if route == "home" {
             loader.push_str(r#"<script type="application/json" id="entry-data">true</script>"#);
@@ -497,24 +526,11 @@ pub fn generate(root: &Path, output: &Path, works: &[Work], nav: &[Value]) -> Re
             } else {
                 ("h2", "h3")
             };
-            slots.insert(
-                "COLLECTION_RECORD".into(),
-                template(
-                    &collection_record,
-                    &BTreeMap::from([
-                        ("RECORD_TITLE".into(), title.into()),
-                        ("RECORD_SUBHEADING".into(), subheading.into()),
-                        ("PDF_EDITION_CITATION".into(), edition_citation.clone()),
-                    ]),
-                )?,
-            );
-        }
-        if route == "about" {
+            slots.insert("RECORD_TITLE".into(), title.into());
+            slots.insert("RECORD_SUBHEADING".into(), subheading.into());
             slots.insert("PDF_EDITION_CITATION".into(), edition_citation.clone());
-            slots.insert("PDF_EDITION_PATH".into(), PDF_EDITION_PATH.into());
-        }
-        if route == "collection" {
-            slots.insert("PDF_EDITION_URL".into(), edition_url.clone());
+            let record = template(&collection_record, &slots)?;
+            slots.insert("COLLECTION_RECORD".into(), record);
         }
         if WORLDS.iter().any(|(world, ..)| *world == route) {
             slots.insert("WORLD_ROWS".into(), world_rows(works, route));
@@ -631,7 +647,7 @@ pub fn indexes(root: &Path, output: &Path, works: &[Work], nav: &[Value]) -> Res
         .split_once("## Key URLs")
         .context("Missing URLs marker in llms source")?
         .1;
-    let mut llms = set_counts(front, works);
+    let mut llms = template(&set_counts(front, works), &publication_slots())?;
     llms.push_str("## Works Index\n");
     for (world, label, roman, clock) in WORLDS {
         let list: Vec<_> = works.iter().filter(|w| w.meta.world == world).collect();

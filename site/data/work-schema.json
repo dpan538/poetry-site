@@ -22,8 +22,8 @@
   "copyrightHolder": {
     "@id": "https://daipan.ink/#author"
   },
-  "copyrightYear": "2025",
-  "copyrightNotice": "All poems and texts © 2024–2026 Dai Pan (潘岱). Unauthorized reproduction, redistribution, adaptation, publication, or AI training use is prohibited without written permission.",
+  "copyrightYear": "{{PUBLICATION_YEAR}}",
+  "copyrightNotice": "All poems and texts © {{PUBLICATION_YEAR}} Dai Pan (潘岱). Unauthorized reproduction, redistribution, adaptation, publication, or AI training use is prohibited without written permission.",
   "license": "All rights reserved — Dai Pan (潘岱)",
   "position": 17
 }

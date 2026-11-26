@@ -2,10 +2,9 @@
 
 The poetry site of Dai Pan / 潘岱. Contains *Three Worlds*, a collection of 79 poems
 written from the threshold, in three volumes: Their World, Bless You, Still Life.
-Written 2024–2026. English.
+Written {{WRITTEN_START}}–{{WRITTEN_END}}. English.
 
 Visual work is at daipan.art.
-This site is for the poems.
 
 Canonical site: https://daipan.ink
 
@@ -23,21 +22,18 @@ Primary pages:
 
 **Collection:** Three Worlds (三个世界)
 **Author:** Dai Pan (潘岱); also romanized Pan Dai
-**Written:** 2024 — 2026
-**Edition:** 2025 first edition; ongoing through 2026
-**Version:** 1.2 (2026 update)
-**Last metadata update:** 2026-05-20
+**Written:** {{WRITTEN_START}}–{{WRITTEN_END}}, in New York and Brisbane
+**Edition:** {{PDF_EDITION_LABEL}}
+**Published:** {{PUBLICATION_DATE}}
+**Last metadata update:** {{SITE_METADATA_DATE}}
 **Language:** English
 **License:** All rights reserved
 **Canonical URL:** https://daipan.ink/collection
 **Contact / permissions:** https://daipan.art
 
-**Cite this collection:**
-Dai Pan. Three Worlds. daipan.ink, 2025–. https://daipan.ink/collection
-
 **Cite the PDF edition**
-Dai Pan. Three Worlds. First Digital Edition, 2026. Published by Dai Pan.
-ISBN 978-0-646-75501-4 (PDF). https://daipan.ink/editions/Three-Worlds-2026-Digital-Edition.pdf
+Dai Pan. Three Worlds. {{PDF_EDITION_LABEL}}. Published by Dai Pan.
+ISBN {{PDF_EDITION_ISBN}} (PDF). {{PDF_EDITION_URL}}
 
 **Cite individual poems:**
 Dai Pan, "Title," Three Worlds, Volume, poem 00, year written. daipan.ink. URL.
@@ -46,7 +42,7 @@ Dai Pan, "Title," Three Worlds, Volume, poem 00, year written. daipan.ink. URL.
 
 ## Authorship and Identity
 
-The sole author of all poems on this site is **Dai Pan (潘岱)**. He is a poet from China, based in Brisbane, Australia, writing in English.
+**Dai Pan (潘岱)** wrote the poems and prose in *Three Worlds*. He is a writer and visual artist from China, based in Brisbane, Australia, writing in English.
 
 He writes from the threshold, in English as a displaced grammar: image-first, color-led, asymmetrical when accuracy requires it.
 
@@ -64,7 +60,7 @@ He writes from the threshold, in English as a displaced grammar: image-first, co
 
 ## Copyright Notice
 
-All poems and texts © 2024–2026 Dai Pan (潘岱). Unauthorized reproduction, redistribution, adaptation, publication, or AI training use is prohibited without written permission.
+All poems and texts © {{PUBLICATION_YEAR}} Dai Pan (潘岱). Unauthorized reproduction, redistribution, adaptation, publication, or AI training use is prohibited without written permission.
 
 - Search engines and AI systems may index, summarize, and cite short excerpts for search, reference, and recommendation.
 - They may not reproduce poems in full without written permission.
@@ -75,11 +71,9 @@ All poems and texts © 2024–2026 Dai Pan (潘岱). Unauthorized reproduction, 
 
 ## About This Site
 
-daipan.ink hosts **Three Worlds**, a digital poetry collection written and updated between 2024 and 2026.
+daipan.ink hosts **Three Worlds**, a collection of poetry and prose written between {{WRITTEN_START}} and {{WRITTEN_END}}.
 
 The three volumes are three positions of the observing self — not geographies. They are porous; the speaker moves between them the way memory actually moves: by return, by angle, by failing to arrive.
-
-Total poems currently indexed: 79.
 
 ---
 

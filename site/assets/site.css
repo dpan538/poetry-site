@@ -191,7 +191,6 @@ html[data-citation-copy] .citation-actions { display: flex; }
 }
 .about-record h2 { font-size: var(--type-subtitle); font-weight: 400; margin: 0 0 .45em; }
 .about-record h3 { font-size: 1rem; font-weight: 400; margin: 1.9em 0 .5em; }
-.about-citation-url { overflow-wrap: anywhere; }
 .about-collection { display: none; }
 
 .reading-work .poem-shell { padding-bottom: 0; }
